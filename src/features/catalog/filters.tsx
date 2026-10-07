@@ -1,36 +1,42 @@
-import { useId } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import type { CatalogParams } from '@/contracts/marketplace'
-import { facetsQuery } from './api'
-import { Button } from '@/components/ui/button'
-import { PriceFilter } from './price-filter'
-import { QueryError } from './components'
+import type { CatalogParams } from "@/contracts/marketplace";
+import { useQuery } from "@tanstack/react-query";
+import { useId } from "react";
+import { facetsQuery } from "./api";
+import { QueryError } from "./components";
+import { PriceFilter } from "./price-filter";
 
 type Props = {
-  params: CatalogParams
-  update: (patch: Partial<CatalogParams>) => void
-  clear: () => void
-}
+  params: CatalogParams;
+  update: (patch: Partial<CatalogParams>) => void;
+  clear: () => void;
+};
 
 type ChoicesProps = {
-  title: string
-  values: string[]
-  selected: string[]
-  counts: Record<string, number>
-  labels?: Record<string, string>
-  change: (values: string[]) => void
-}
+  title: string;
+  values: string[];
+  selected: string[];
+  counts: Record<string, number>;
+  labels?: Record<string, string>;
+  change: (values: string[]) => void;
+};
 
-function FilterChoices({ title, values, selected, counts, labels = {}, change }: ChoicesProps) {
-  const id = useId()
+function FilterChoices({
+  title,
+  values,
+  selected,
+  counts,
+  labels = {},
+  change,
+}: ChoicesProps) {
+  const id = useId();
   return (
     <fieldset>
       <legend className="font-medium">{title}</legend>
       <div className="mt-2">
         {[...new Set([...values, ...selected])].map((value, index) => {
-          const active = selected.includes(value)
-          const count = Object.hasOwn(counts, value) ? counts[value]! : 0
-          const label = Object.hasOwn(labels, value) ? labels[value]! : value
+          const active = selected.includes(value);
+          const count = Object.hasOwn(counts, value) ? counts[value]! : 0;
+          const label = Object.hasOwn(labels, value) ? labels[value]! : value;
           return (
             <button
               key={value}
@@ -38,32 +44,51 @@ function FilterChoices({ title, values, selected, counts, labels = {}, change }:
               aria-label={label}
               aria-pressed={active}
               aria-describedby={`${id}-count-${index}`}
-              className={`flex min-h-11 w-full items-center justify-between gap-3 px-2 text-left text-xs ${active ? 'font-semibold text-accent' : 'text-muted-foreground'}`}
-              onClick={() => change(active
-                ? selected.filter(item => item !== value)
-                : [...selected, value])}
+              className={`flex min-h-11 w-full items-center justify-between gap-3 px-2 text-left text-xs ${active ? "font-semibold text-accent" : "text-muted-foreground"}`}
+              onClick={() =>
+                change(
+                  active
+                    ? selected.filter((item) => item !== value)
+                    : [...selected, value],
+                )
+              }
             >
               <span className="min-w-0 break-words">{label}</span>
-              <span id={`${id}-count-${index}`} className="shrink-0 tabular-nums">
+              <span
+                id={`${id}-count-${index}`}
+                className="shrink-0 tabular-nums"
+              >
                 <span aria-hidden="true">({count})</span>
                 <span className="sr-only">{count} NFTs no catálogo</span>
               </span>
             </button>
-          )
+          );
         })}
       </div>
     </fieldset>
-  )
+  );
 }
 
 export function CatalogFilters({ params, update, clear }: Props) {
-  const facets = useQuery(facetsQuery)
-  const hasFilters = params.q || params.category.length || params.collection.length
-    || params.creator.length || params.network.length || params.minPrice !== undefined
-    || params.maxPrice !== undefined || params.availableOnly
+  const facets = useQuery(facetsQuery);
+  const hasFilters =
+    params.q ||
+    params.category.length ||
+    params.collection.length ||
+    params.creator.length ||
+    params.network.length ||
+    params.minPrice !== undefined ||
+    params.maxPrice !== undefined ||
+    params.availableOnly;
 
-  if (facets.isPending) return <p role="status">Carregando filtros…</p>
-  if (facets.isError) return <QueryError retry={() => void facets.refetch()} message="Não foi possível carregar os filtros." />
+  if (facets.isPending) return <p role="status">Carregando filtros…</p>;
+  if (facets.isError)
+    return (
+      <QueryError
+        retry={() => void facets.refetch()}
+        message="Não foi possível carregar os filtros."
+      />
+    );
 
   return (
     <div className="space-y-6">
@@ -72,10 +97,10 @@ export function CatalogFilters({ params, update, clear }: Props) {
         values={facets.data.category}
         selected={params.category}
         counts={facets.data.counts.category}
-        change={category => update({ category })}
+        change={(category) => update({ category })}
       />
       <PriceFilter
-        key={`${params.minPrice ?? ''}:${params.maxPrice ?? ''}:${facets.data.priceRange.max}`}
+        key={`${params.minPrice ?? ""}:${params.maxPrice ?? ""}:${facets.data.priceRange.max}`}
         minPrice={params.minPrice}
         maxPrice={params.maxPrice}
         catalogMax={facets.data.priceRange.max}
@@ -86,10 +111,11 @@ export function CatalogFilters({ params, update, clear }: Props) {
         values={facets.data.network}
         selected={params.network}
         counts={facets.data.counts.network}
-        labels={{ ethereum: 'Ethereum', polygon: 'Polygon', solana: 'Solana' }}
-        change={network => update({ network: network as CatalogParams['network'] })}
+        labels={{ ethereum: "Ethereum", polygon: "Polygon", solana: "Solana" }}
+        change={(network) =>
+          update({ network: network as CatalogParams["network"] })
+        }
       />
-      {Boolean(hasFilters) && <Button variant="ghost" onClick={clear}>Limpar filtros</Button>}
     </div>
-  )
+  );
 }
