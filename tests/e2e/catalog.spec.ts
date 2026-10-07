@@ -1,4 +1,14 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+
+async function searchNfts(page: Page, query: string) {
+  await page.getByRole('button', { name: 'Abrir busca de NFTs' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Buscar NFTs', exact: true })
+  await dialog.getByRole('searchbox', { name: 'Buscar NFTs' }).fill(query)
+  await dialog.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await expect(dialog).not.toBeVisible()
+  await expect(page.getByRole('button', { name: 'Abrir busca de NFTs' })).toBeFocused()
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/__proof')
@@ -13,27 +23,28 @@ test('catalog combines filters, sorts, paginates and restores URL history', asyn
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(12)
   await page.getByRole('button', { name: 'Próxima', exact: true }).click()
   await expect(page.getByText('Página 2 de 3', { exact: true })).toBeVisible()
-  await page.getByRole('searchbox', { name: 'Buscar NFTs' }).fill('Violet')
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await searchNfts(page, 'Violet')
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(9)
   if (isMobile) await page.getByRole('button', { name: 'Filtros', exact: true }).click()
   const filters = isMobile ? page.getByRole('dialog') : page.getByRole('complementary', { name: 'Filtros do catálogo' })
   await filters.getByRole('checkbox', { name: 'ethereum', exact: true }).check()
-  await filters.getByRole('checkbox', { name: 'Luna Studio', exact: true }).check()
+  await filters.getByRole('checkbox', { name: 'Fotografia', exact: true }).check()
+  await filters.getByRole('checkbox', { name: 'Generativa', exact: true }).check()
   if (isMobile) await filters.getByRole('button', { name: 'Ver resultados' }).click()
   await page.getByLabel('Ordenar por').selectOption('price-desc')
-  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(3)
+  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(2)
   await expect(page.getByTestId('catalog-grid').getByRole('heading').first()).toHaveText('Violet Nomad #25')
   const filteredUrl = page.url()
   await page.reload()
-  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(3)
-  await page.getByRole('searchbox', { name: 'Buscar NFTs' }).fill('not-a-real-artwork')
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(2)
+  await searchNfts(page, 'not-a-real-artwork')
   await expect(page.getByRole('heading', { name: 'Nenhum NFT encontrado' })).toBeVisible()
   await page.goBack()
   await expect(page).toHaveURL(filteredUrl)
+  await page.getByRole('button', { name: 'Abrir busca de NFTs' }).click()
   await expect(page.getByRole('searchbox')).toHaveValue('Violet')
-  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(3)
+  await page.keyboard.press('Escape')
+  await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(2)
 })
 test('direct detail supports gallery, editions, quantity limits and missing NFT', async ({ page }) => {
   await page.goto('/nfts/nft-001')
@@ -72,8 +83,7 @@ test('slow catalog shows skeleton and obsolete response cannot replace a newer s
   await page.goto('/')
   await expect(page.getByRole('status', { name: 'Carregando NFTs' })).toBeVisible()
   await page.evaluate(() => fetch('/api/__mock/catalog-network', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }))
-  await page.getByRole('searchbox').fill('Ivory')
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await searchNfts(page, 'Ivory')
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(9)
   await expect(page.getByTestId('catalog-grid').getByRole('heading').first()).toHaveText('Ivory Baron')
   // Wait until the delayed MSW response would have arrived, then check visible results.

@@ -144,3 +144,11 @@ API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 
 Compra e favorito têm indicação de indisponibilidade nesta etapa; serão conectados nas TASK-06/TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
 
 Revisão UI-01 solicitada: item 1 (slider de faixa de preço) implementado, com dois controles, leitura ETH e Aplicar; aguardando verificação visual/E2E local. Itens 2–5 (busca, grupos da sidebar, ordenação sutil e fundo do card) serão tratados separadamente conforme orientação do usuário.
+
+Revisão UI-01, item 2: barra de busca permanente removida do catálogo. Ícone de lupa no header abre diálogo de busca; submissão mantém filtros/ordenação, reinicia página e atualiza URL/API. Escape/fechar retornam foco à lupa. Typecheck, lint e build passaram; E2E adaptados, execução/validação visual pendentes. Itens 3–5 continuam para alterações separadas.
+
+Revisão UI-01, item 3: grupos visíveis limitados a Coleções (categorias de arte), Faixa de preço e Rede, na ordem da referência, em sidebar e drawer. Removidos grupos adicionais e Somente disponíveis da UI. Contratos de filtros adicionais preservados; TEST-01 adaptado para combinar duas categorias com rede/busca. Validação E2E/visual pendente. Itens 4–5 serão tratados separadamente.
+
+Revisão UI-01, item 4: Ordenar por estilizado como texto discreto, sem borda/fundo, com seta pequena e foco visível ao teclado. Select nativo e comportamento URL/API preservados. Validação visual pendente; item 5 segue para a próxima alteração.
+
+Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#241612`), padding de 16 px e altura ajustada ao conteúdo. Os cinco itens solicitados estão implementados; revisão visual e execução E2E local permanecem pendentes. TASK-05 não está concluída por estas alterações isoladas.

@@ -1,3 +1,4 @@
+import { HeaderSearch } from '@/features/catalog/header-search'
 import { defaultCatalog } from '@/features/catalog/search'
 import { Link, Outlet } from '@tanstack/react-router'
 import { Home, LogIn, ShoppingBag, UserRound } from 'lucide-react'
@@ -18,6 +19,7 @@ export function AppShell() {
           <Link to="/" search={defaultCatalog} hash="colecoes">Mercado</Link>
         </nav>
         <div className="flex items-center gap-2">
+          <HeaderSearch />
           <Button variant="ghost" size="icon" asChild>
             <Link to="/cart" aria-label="Carrinho de NFTs"><ShoppingBag aria-hidden="true" /></Link>
           </Button>

@@ -74,3 +74,7 @@ Após instalação pelo usuário, npm ls, typecheck completo, lint e build passa
 - E2E **não executado**: servidor preview bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. Aprovação da TASK-04 não valida estes novos testes. Execução local e revisão visual 390/768/1440 pendentes; sem screenshots/baselines desta etapa.
 
 Revisão UI-01, item 1: slider de preço implementado; 14 testes unitários, typecheck, lint, build e `git diff --check` passaram. E2E adicional em `catalog.spec.ts` verifica teclado, aplicação explícita e restauração de preços após refresh; preparado, não executado. Comparação visual e teste de arrastar os dois controles permanecem pendentes no navegador local.
+
+Revisão UI-01, item 2: E2E de busca/histórico/resposta antiga adaptados para abrir a lupa e submeter o diálogo. Typecheck, lint e build passaram; testes E2E adaptados não foram executados nesta etapa. Validação visual e foco do diálogo pendentes no navegador local.
+
+Revisão UI-01, item 3: TEST-01 adaptado para combinar busca, rede e duas categorias via grupo Coleções; restauração e ordenação mantidas. E2E adaptado ainda não executado; comparação visual dos três grupos pendente.

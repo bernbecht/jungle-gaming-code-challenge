@@ -6,8 +6,7 @@ import { catalogQuery } from '@/features/catalog/api'
 import { defaultCatalog } from '@/features/catalog/search'
 import { CatalogFilters } from '@/features/catalog/filters'
 import { NftCard, CatalogSkeleton, QueryError } from '@/features/catalog/components'
-import { Input } from '@/components/ui/input'
-import { ArrowDown, ArrowUpRight, SlidersHorizontal, X } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, ChevronDown, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function HomePage() {
@@ -55,16 +54,32 @@ export function HomePage() {
           <h2 id="collections-title" className="text-lg font-semibold text-primary">Explore as coleções</h2>
           <ArrowDown aria-hidden="true" size={18} className="text-primary" />
         </div>
-        <form key={params.q} className="mt-6 flex gap-2" onSubmit={e => { e.preventDefault(); update({ q: String(new FormData(e.currentTarget).get('q') ?? '') }) }} role="search">
-          <label className="sr-only" htmlFor="catalog-search">Buscar NFTs</label><Input id="catalog-search" name="q" defaultValue={params.q} placeholder="Busque obras, coleções ou criadores" type="search" /><Button type="submit">Buscar</Button>
-        </form>
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
           <div role="group" aria-label="Categorias de lançamento" className="flex flex-wrap gap-2">{([{ value: 'all', label: 'Todos os NFTs' }, { value: 'new', label: 'Novos lançamentos' }, { value: 'trending', label: 'Em alta' }] as const).map(tab => <Button key={tab.value} variant={params.tab === tab.value ? 'default' : 'ghost'} aria-pressed={params.tab === tab.value} onClick={() => update({ tab: tab.value })}>{tab.label}</Button>)}</div>
-          <label className="flex flex-wrap items-center gap-2 text-sm">Ordenar por<select className="min-h-11 max-w-full rounded border border-input bg-background px-3" value={params.sort} onChange={e => update({ sort: e.target.value as CatalogSort })}><option value="featured">Destaques</option><option value="recent">Listados recentemente</option><option value="price-asc">Menor preço</option><option value="price-desc">Maior preço</option><option value="name">Nome</option></select></label>
+          <div className="flex max-w-full items-center gap-1 text-xs text-muted-foreground">
+            <label htmlFor="catalog-sort" className="shrink-0">Ordenar por:</label>
+            <div className="relative min-w-0">
+              <select
+                id="catalog-sort"
+                className="min-h-11 max-w-full cursor-pointer appearance-none border-0 bg-transparent py-2 pr-5 pl-0 text-inherit focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                value={params.sort}
+                onChange={event => update({ sort: event.target.value as CatalogSort })}
+              >
+                <option className="bg-background text-foreground" value="featured">Destaques</option>
+                <option className="bg-background text-foreground" value="recent">Listados recentemente</option>
+                <option className="bg-background text-foreground" value="price-asc">Menor preço</option>
+                <option className="bg-background text-foreground" value="price-desc">Maior preço</option>
+                <option className="bg-background text-foreground" value="name">Nome</option>
+              </select>
+              <ChevronDown aria-hidden="true" size={12} className="pointer-events-none absolute top-1/2 right-0 -translate-y-1/2" />
+            </div>
+          </div>
           <Button ref={filterTrigger} variant="outline" className="lg:hidden" onClick={() => dialog.current?.showModal()}><SlidersHorizontal aria-hidden="true" />Filtros</Button>
         </div>
         <div className="mt-6 grid gap-8 lg:grid-cols-[230px_1fr]">
-          <aside aria-label="Filtros do catálogo" className="hidden lg:block"><CatalogFilters key={filterKey} params={params} update={update} clear={clear} /></aside>
+          <aside aria-label="Filtros do catálogo" className="hidden self-start bg-card p-4 lg:block">
+            <CatalogFilters key={filterKey} params={params} update={update} clear={clear} />
+          </aside>
           <div className="min-w-0">
             <p role="status" className="mb-4 text-sm text-muted-foreground">{catalog.isFetching && !catalog.isPending ? 'Atualizando catálogo…' : catalog.data ? `${catalog.data.total} NFTs encontrados` : ''}</p>
             {catalog.isPending ? <CatalogSkeleton count={params.pageSize} /> : catalog.isError ? <QueryError retry={() => void catalog.refetch()} /> : catalog.data.items.length === 0 ? <div className="border border-border p-8 text-center"><h3 className="font-semibold">Nenhum NFT encontrado</h3><p className="mt-3 text-sm text-muted-foreground">Altere os filtros ou volte ao catálogo completo.</p><Button className="mt-4" onClick={clear}>Limpar filtros</Button>{params.page > 1 && <Button variant="ghost" onClick={() => update({ page: 1 })}>Voltar à primeira página</Button>}</div> : <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6" data-testid="catalog-grid">{catalog.data.items.map(nft => <NftCard key={nft.id} nft={nft} />)}</div>}

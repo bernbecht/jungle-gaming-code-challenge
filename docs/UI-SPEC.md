@@ -193,3 +193,11 @@ TEST-13 compara baselines estáveis; TEST-14 faz revisão humana contra o Figma.
 ## Implementação inicial de tokens/assets — TASK-02
 
 CSS em `src/styles.css`, shell em `src/components/layout/app-shell.tsx`. Quatro SVGs placeholders estão disponíveis em `public/assets/placeholders/`, conforme DEC-17. Fonte escolhida: IBM Plex Mono via Fontsource (DEC-16), instalada e incluída no build. Inventário em [ASSETS](ASSETS.md). Ainda não houve screenshot da aplicação nem validação de fidelidade/responsividade; as composições finais seguem TASK-05/TASK-09/TASK-12.
+
+## Revisões de UI durante a TASK-05
+
+- Item 1: faixa de preço com dois controles na mesma trilha, leitura ETH e botão Aplicar, conforme referência desktop. Validação visual pendente.
+- Item 2: removida a barra permanente inserida no catálogo. Busca acessível pela lupa do header, abrindo diálogo; comportamento aberto proposto, sem frame correspondente. Disponível em desktop/mobile, preservando REQ-005/REQ-006. Validação visual pendente.
+- Item 3: sidebar/drawer com apenas Coleções → Faixa de preço → Rede. Coleções usa as categorias da fixture (Arte digital, Fotografia, Generativa), seguindo a semântica dos itens da screenshot. Removidos grupos adicionais Categorias/Criadores e controle Somente disponíveis. Limpar filtros permanece como ação auxiliar quando há seleção. Validação visual pendente.
+- Item 4: Ordenar por com rótulo/seleção em texto discreto, fundo transparente, sem borda e seta pequena. Mantido select nativo, foco visível ao teclado e opções existentes. Validação visual pendente.
+- Item 5: sidebar dentro de card retangular com fundo `#241612` (`bg-card`), padding de 16 px e altura do próprio conteúdo, conforme referência desktop. Validação visual pendente.

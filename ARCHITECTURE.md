@@ -140,3 +140,11 @@ Home inclui banners com links internos de filtro e quatro blocos explicativos no
 ### Revisão UI-01 — filtro de preço
 
 O filtro de preço usa uma faixa de dois controles nativos compartilhando a mesma trilha, conforme a screenshot desktop. Mostra mínimo/máximo e mantém o botão Aplicar: arrastar/usar teclado altera apenas o rascunho, aplicar envia decimais ETH à URL/API e reinicia a página. Limite superior deriva de API-03/facetas, sem copiar valores ilustrativos do PNG. Limites presentes na URL são preservados, inclusive acima do máximo atual e com até 18 casas; o domínio do slider se expande para representá-los. Há 1000 intervalos entre zero e o limite, convertidos com BigInt; não há cálculo financeiro com ponto flutuante. Os controles não cruzam e possuem nomes, valores ETH acessíveis, foco visível e áreas de interação de 44 px. Revisão no navegador ainda pendente.
+
+### Revisão UI-01 — busca pelo header
+
+A barra permanente acima do catálogo foi removida conforme revisão solicitada. `HeaderSearch` disponibiliza lupa no header e diálogo modal nativo com formulário, foco inicial na busca, Escape, fechamento explícito e retorno de foco. Ao abrir, carrega o termo aplicado na URL; fechar sem enviar descarta o rascunho. Submeter na home preserva filtros/ordenação e reinicia a página; fora da home, abre o catálogo com defaults e o termo informado. A busca continua passando por Router→Query→Axios→MSW, sem alterar contratos. O diálogo é uma decisão de interação para a lupa da referência, que não mostra seu estado aberto. A mesma ação está disponível em mobile; revisão visual pendente.
+
+### Revisão UI-01 — grupos de filtros
+
+A interface oferece apenas Coleções, Faixa de preço e Rede. Apesar do título Coleções, os itens mostrados no PNG são categorias de arte; portanto esse grupo envia `category` à API (Arte digital, Fotografia, Generativa na fixture atual). Os nomes reais de coleções, como Cosmic Shapes, continuam no detalhe/recomendações. `collection`, `creator` e `availableOnly` continuam aceitos por URL/API, mas não têm controles nesta sidebar. Remover controles não altera os parâmetros aplicados ao trocar outro filtro; Limpar filtros restaura todos ao padrão, inclusive os adicionais. Seleções múltiplas mantêm OR dentro do grupo e AND entre grupos conforme API-03.
