@@ -14,7 +14,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Resolver a abordagem das pendências visuais: fonte semelhante, placeholders temporários e layouts próprios (DEC-16, DEC-17, DEC-18).
 - [x] Iniciar implementação da aplicação pela TASK-02 (arquivos da base preparados).
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
-- [x] Smoke Playwright desktop/mobile executado pelo usuário e aprovado.
+- [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
 **Resumo:** preparação documental inicial concluída; TASK-01 concluída como análise e definição de abordagem; TASK-02 concluída; TASK-03 em andamento; TASK-04 a TASK-15 ainda a fazer. Os fluxos de negócio não foram implementados ou testados. Os documentos de contratos, arquitetura e cenários descrevem propostas, não código entregue; sua atualização final permanece na TASK-15.
 
@@ -103,6 +103,13 @@ TASK-02 concluída. TASK-03 em andamento para provar Axios→MSW e MSW→Socket.
 
 O usuário informou em 07/10/2026 que `npm run test:e2e` passou após instalar Chromium em seu terminal local. Resultado da execução local do agente não disponível: preview bloqueado por EPERM da sandbox. Suíte é apenas o smoke do shell; não comprova integração REST/socket nem os E2E dos 12 grupos.
 
-### Início da TASK-03 — 07/10/2026
+### TASK-03 — prova técnica parcial
 
-Prova REST/MSW, Socket.IO/MSW e publicação inicial ainda não implementadas. Verificar bindings e iniciar handlers reproduzíveis.
+- [x] Gerar worker MSW e inicializá-lo antes de montar o Router quando `VITE_MOCKS_ENABLED=true`.
+- [x] Criar `GET /api/__proof` atendido por MSW e chamado pela instância Axios.
+- [x] Integrar `socket.io-client` à prova usando o `@mswjs/socket.io-binding`; o mock envia `proof.event` através do WebSocket interceptado. O cliente é importado dinamicamente após a inicialização do worker para respeitar a ordem de patch do WebSocket.
+- [x] Preparar teste Playwright REST e Socket.IO em desktop/mobile em `tests/e2e/integration-proof.spec.ts`.
+- [x] Executar a prova no navegador local: o usuário confirmou que o reteste Socket.IO passou em 07/10/2026; a prova REST também havia passado anteriormente.
+- [ ] Fazer primeira publicação com `/__proof` e validar rota, worker, REST e evento Socket.IO no ambiente publicado. CLI/provedor e credenciais não estão disponíveis nesta sessão.
+
+Tipo, lint e build passaram depois da integração. O matcher do MSW foi validado isoladamente: o handler Socket.IO na raiz corresponde à URL padrão `/socket.io/`. O primeiro log do usuário confirmou handshake e envio de `proof.request`, mas não resposta; a causa era escutar o lado servidor do binding. O listener foi corrigido para usar o lado cliente, e o usuário confirmou o reteste bem-sucedido no navegador em 07/10/2026. A prova não cobre os eventos de domínio `nft.updated`/`order.updated`, que são tarefas seguintes. TASK-03 permanece **Em andamento** até validar a primeira publicação.

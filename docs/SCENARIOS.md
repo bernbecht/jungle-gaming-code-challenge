@@ -1,6 +1,6 @@
 # Cenários da simulação
 
-Status: **planejados, sem handlers implementados**. Contratos: [API-13](CONTRACTS.md). Uso nos testes: [TEST-MATRIX](TEST-MATRIX.md). REQ-030, REQ-031, REQ-044; DEC-05, DEC-15.
+Status: **prova de transporte REST e Socket.IO preparada; reteste do evento de resposta no browser pendente; cenários de domínio ainda planejados**. O bootstrap do worker e `GET /api/__proof` exercitam Axios→MSW. A rota `/__proof` conecta `socket.io-client` após o worker iniciar; `@mswjs/socket.io-binding` converte o evento `proof.event` no mock. O WebSocket padrão `/socket.io/` é normalizado pelo MSW para `/` antes de buscar o handler, por isso o link do mock registra a origem/raiz. A conexão simulada escuta e responde pelo wrapper `client` do binding, conforme seu exemplo de uso. Esse transporte usa WebSocket interceptado, namespace padrão e eventos textuais; não cobre namespaces personalizados, acknowledgements ou binário. Ainda não há banco, fixtures ou reset. Contratos de controle: [API-13](CONTRACTS.md). Uso nos testes: [TEST-MATRIX](TEST-MATRIX.md). REQ-029, REQ-030, REQ-031, REQ-032, REQ-044; DEC-05, DEC-15.
 
 ## Fixture padrão
 

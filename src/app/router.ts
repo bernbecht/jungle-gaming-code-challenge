@@ -7,6 +7,7 @@ import { HomePage } from '@/routes/home-page'
 import { UnavailablePage } from '@/routes/unavailable-page'
 import { NotFoundPage } from '@/routes/not-found-page'
 import { ErrorPage } from '@/routes/error-page'
+import { IntegrationProofPage } from '@/routes/integration-proof-page'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: AppShell,
@@ -15,6 +16,7 @@ const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
 })
 
 const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: HomePage })
+const integrationProofRoute = createRoute({ getParentRoute: () => rootRoute, path: '/__proof', component: IntegrationProofPage })
 
 // Rotas preparadas, sem dados privados ou operações simuladas.
 // Guards reais entram junto da sessão na TASK-06, antes de expor dados privados.
@@ -61,7 +63,7 @@ const orderRoute = createRoute({
 
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
-    homeRoute, cartRoute, loginRoute, registerRoute, profileRoute,
+    homeRoute, integrationProofRoute, cartRoute, loginRoute, registerRoute, profileRoute,
     walletsRoute, checkoutRoute, nftRoute, orderRoute,
   ]),
   context: { queryClient },

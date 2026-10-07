@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.0",
+    "@mswjs/socket.io-binding": "^0.2.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-router": "^1.132.0",
@@ -50,5 +51,10 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.57.1",
     "vite": "7.3.7"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

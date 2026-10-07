@@ -22,7 +22,7 @@ docs/
 
 | ID | Decisão e motivação | Requisitos |
 | --- | --- | --- |
-| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões resolvidas em package-lock.json; tipos/lint/build aprovados na TASK-02, integração REST/socket pendente da TASK-03 | REQ-001, REQ-050 |
+| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões resolvidas em package-lock.json; integração de prova REST/socket implementada na TASK-03, E2E e deploy inicial pendentes | REQ-001, REQ-050 |
 | DEC-02 | URL guarda busca/filtros/ordenação/página; Query guarda estado remoto; estado local guarda edição/formulários/diálogos. Não duplicar carrinho em outro store | REQ-005, REQ-025, REQ-027 |
 | DEC-03 | Componentes → hooks Query → serviços Axios → handlers MSW → domínio/banco simulado. Eventos e REST usam o mesmo domínio. UI não importa fixtures | REQ-025, REQ-029, REQ-030, REQ-032 |
 | DEC-04 | Inicialização aguarda ativação dos mocks, depois recupera sessão e resolve guards. Token fictício opaco persistido; handlers verificam dono e expiração em toda operação privada | REQ-021, REQ-022, REQ-023 |
@@ -32,7 +32,7 @@ docs/
 | DEC-08 | Cotação é snapshot com versão/validade, rede, itens e totais. Compra revalida atomicamente; diferença retorna conflito e nova cotação para revisão explícita | REQ-014, REQ-015 |
 | DEC-09 | Tentativa persistida antes do envio, por usuário, com chave e payload imutável. Busca por chave ou reenvio idêntico recupera pedido. Nova revisão gera nova tentativa somente após resolver a anterior | REQ-016, REQ-017 |
 | DEC-10 | Mock reserva estoque ao criar pendência; confirma consumo ou libera reserva na recusa. Carrinho conserva itens até confirmação. Snapshot do recibo nunca consulta preço atual | REQ-017, REQ-019, REQ-020 |
-| DEC-11 | Socket com transporte WebSocket no mock, namespace padrão e eventos textuais. Provar binding MSW compatível em TASK-03; sem acknowledgements como dependência de negócio | REQ-032, REQ-033 |
+| DEC-11 | Socket com transporte WebSocket no mock, namespace padrão e eventos textuais via `@mswjs/socket.io-binding` 0.2.0. Prova automatizada aguarda execução E2E; sem acknowledgements como dependência de negócio | REQ-032, REQ-033 |
 | DEC-12 | Versão por recurso + IDs de evento; comparar versões também nas respostas REST para evitar regressão. Reconexão invalida/reconsulta recursos ativos | REQ-027, REQ-034, REQ-035, REQ-036 |
 | DEC-13 | Favoritos são a mutation otimista: cancelar leitura, guardar snapshot, aplicar mudança, rollback em erro e invalidar ao concluir. Serializar ações do mesmo NFT para evitar rollback sobre ação posterior | REQ-008 |
 | DEC-14 | Assets locais, tokens extraídos do Figma, estados acessíveis reutilizáveis e layouts próprios para mobile quando necessários | REQ-004, REQ-037, REQ-038, REQ-039, REQ-040 |
@@ -94,7 +94,7 @@ Contrato em EVT-01 e EVT-02. Atualizar banco antes de emitir. Ignorar versão me
 
 Listeners pertencem a um único provedor por geração de sessão; cleanup deve funcionar também durante remount em desenvolvimento. `order.updated` é privado e validado por usuário/sessão; catálogo pode ter atualização pública. Reconexão revalida sessão primeiro e só então recursos privados.
 
-Limitação planejada do mock: transporte WebSocket, eventos textuais e namespace padrão; comportamento de polling/upgrade não será uma evidência coberta. Confirmar limitações reais das versões escolhidas em TASK-03 e atualizar esta seção. O desafio permite a integração compatível descrita; não permite substituir socket por callbacks na UI.
+Limitação da prova do mock: transporte WebSocket, eventos textuais e namespace padrão; comportamento de polling/upgrade não será uma evidência coberta. O binding documenta que não suporta namespaces personalizados, acknowledgements ou anexos binários. O teste E2E da TASK-03 ainda precisa ser executado. O desafio permite a integração compatível descrita; não permite substituir socket por callbacks na UI.
 
 ## Decisões de UX, desvios e limitações
 
@@ -112,4 +112,4 @@ Rotas definidas em código com TanStack Router (`src/app/router.ts`), mantendo c
 
 DEC-16: IBM Plex Mono selecionada via Fontsource (400/500/600/700), com imports locais no build; fonte instalada na versão 5.3.0 e incluída no build; licença distribuída em public/licenses/ibm-plex-mono-OFL.txt. DEC-17: quatro SVGs abstratos criados em `public/assets/placeholders/`. Inventário e fontes oficiais de referência em `docs/ASSETS.md`.
 
-Tokens raster aplicados em CSS; borda de input proposta mais clara (`#79583E`) para melhorar identificação de controles, mantendo borda decorativa `#3F2319`. Validar contraste real em TASK-12. A home é apenas uma composição inicial, não o catálogo implementado. Componentes Button/Input/Skeleton seguem o padrão shadcn/ui adaptado manualmente; nenhum comando CLI shadcn foi executado. MSW/Socket.IO ainda não estão ativos. Build/tipos/lint passaram. Browser não executado: sandbox bloqueia abertura da porta de preview e Chromium Playwright ainda não está instalado.
+Tokens raster aplicados em CSS; borda de input proposta mais clara (`#79583E`) para melhorar identificação de controles, mantendo borda decorativa `#3F2319`. Validar contraste real em TASK-12. A home é apenas uma composição inicial, não o catálogo implementado. Componentes Button/Input/Skeleton seguem o padrão shadcn/ui adaptado manualmente; nenhum comando CLI shadcn foi executado. O worker MSW atende uma prova Axios e uma prova Socket.IO está preparada via binding; não existem handlers de domínio ainda. Tipos, lint e build passam; o runner Playwright desta sessão continua bloqueado ao abrir porta local.

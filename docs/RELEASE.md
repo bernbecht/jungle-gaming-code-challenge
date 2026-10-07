@@ -25,7 +25,7 @@ Diretório proposto: `artifacts/lighthouse/<pagina>/<perfil>/run-<n>.{html,json}
 
 ## Publicação — REL-04
 
-Escolha proposta: Vercel, aceita pelo enunciado. Confirmar acesso à conta durante TASK-03. Netlify/Cloudflare Pages também são aceitos; registrar escolha final, configuração e URL no README.
+Escolha proposta: Vercel, aceita pelo enunciado. `vercel.json` já configura fallback da SPA para rotas internas conforme orientação oficial para Vite; build `dist` é gerado por `npm run build`. Publicação e smoke público ainda pendentes, pois o CLI/autenticação do provedor não estão disponíveis neste ambiente. Netlify/Cloudflare Pages também são aceitos; registrar escolha final e URL no README após deploy.
 
 Configurar build, diretório de saída, fallback SPA para rotas internas e entrega de assets/worker sem rewrite indevido. Variáveis públicas devem habilitar mocks sem conter segredos. Conferir que carregamento do worker e interceptação Socket.IO funcionam no build hospedado antes de prosseguir com funcionalidades.
 
