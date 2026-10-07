@@ -1,9 +1,10 @@
 # Project Instructions
 
-## Automatic commits
+## Commit workflow
 
-- Create a local commit after completing a coherent, functional change, such as a feature, bug fix, refactor, test improvement, or documentation update.
-- You are authorized to create local commits without asking for confirmation, subject to the environment's permission requirements.
+- After completing each task, review the changes and run the relevant checks, then report what changed and any verification results to the user.
+- Wait for the user's explicit approval before creating a commit. Do not interpret a task request, silence, or approval of the implementation itself as approval to commit.
+- After approval, create a local commit containing only the reviewed changes from that task. If the user does not approve, leave the changes uncommitted.
 - Group related changes into one commit and separate independent changes. Do not commit every small edit or create empty commits.
 - Before committing, review the diff and run the available checks relevant to the change. Documentation-only changes require a content and diff review, not application tests.
 - Do not commit incomplete work or changes with failing relevant checks. If verification is blocked, report the limitation before committing.
