@@ -14,6 +14,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings 0",
     "test:e2e": "playwright test",
+    "test:unit": "playwright test --config=playwright.unit.config.ts",
     "test:visual": "playwright test --grep @visual",
     "test:report": "playwright show-report",
     "audit:lighthouse": "node scripts/lighthouse.mjs"

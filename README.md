@@ -1,8 +1,10 @@
 # NFT Marketplace — desafio frontend
 
-Projeto com **TASK-03 concluída**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Catálogo, autenticação, compra e eventos de domínio ainda serão implementados.
+Projeto com **TASK-01 a TASK-04 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Telas de catálogo, autenticação, compra e eventos de domínio ainda serão implementados.
 
 Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integração](https://jungle-gaming-code-challenge.vercel.app/__proof). Deploy inicial na Vercel do commit `4047da3`; evidências em [RELEASE](docs/RELEASE.md).
+
+TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários seed, banco IndexedDB, catálogo MSW, reset/relógio e núcleo de cotação/pedidos. 12 testes unitários, typecheck, lint e build passaram; o usuário confirmou aprovação da suíte E2E local, incluindo catálogo, persistência e reset. Esta etapa ainda não foi publicada nem conectada às telas de catálogo/compra.
 
 ## Documentação e ordem de trabalho
 
@@ -13,13 +15,15 @@ Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integr
 | [ROTEIRO.md](ROTEIRO.md) | Cronograma de dois dias e prioridades |
 | [TASKS.md](TASKS.md) | Backlog com dependências, aceite, status e IDs TASK |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Decisões DEC sobre estado, sessão, dinheiro, pedidos e eventos |
+| [docs/FLOWS.md](docs/FLOWS.md) | Fluxos FLOW: ações do usuário, estados, alternativas e resultados esperados |
+| [docs/MOCKS-GUIDE.md](docs/MOCKS-GUIDE.md) | Guia didático dos arquivos, fixtures, banco, MSW e regras da TASK-04 |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Contratos propostos API/EVT, payloads, validações e erros |
 | [docs/UI-SPEC.md](docs/UI-SPEC.md) | Telas UI, análise dos 15 PNGs, tokens medidos e pendências visuais |
 | [docs/SCENARIOS.md](docs/SCENARIOS.md) | Fixtures, controles e cenários determinísticos SCN |
 | [docs/TEST-MATRIX.md](docs/TEST-MATRIX.md) | Cobertura TEST, assertions e registro de evidências |
 | [docs/RELEASE.md](docs/RELEASE.md) | Gates REL, auditoria, publicação e entrega |
 
-TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 e TASK-03 concluídas. Próxima etapa: TASK-04, contratos e banco simulado. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
+TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 a TASK-04 concluídas. Próxima etapa: TASK-05, telas de início/detalhe, filtros e estados. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
 
 Exemplo de rastreabilidade: REQ-015 (cotação revalidada) → TASK-08/TASK-10 → DEC-08 → API-08/API-09 e EVT-01 → UI-04 → SCN-10/SCN-17 → TEST-09 → REL-02.
 
@@ -55,6 +59,7 @@ npm run dev
 | `npm run typecheck` | TypeScript dos arquivos da aplicação/configuração/testes |
 | `npm run lint` | ESLint sem warnings permitidos |
 | `npm run test:e2e` | Smoke do shell e provas REST/Socket.IO em desktop/mobile; instalar Chromium com `npx playwright install chromium` antes |
+| `npm run test:unit` | Testes do domínio: precisão ETH, catálogo, cotação, idempotência, estoque e efeitos de confirmação/recusa; sem browser |
 | `npm run test:visual` | Filtro `@visual`; ainda não há testes visuais, portanto não deve ser considerado aprovado |
 | `npm run test:report` | Abrir relatório HTML após execução Playwright |
 | `npm run audit:lighthouse` | Auditoria exploratória da home; iniciar preview e disponibilizar Chrome antes. Não executa ainda a matriz final da TASK-14 |
@@ -69,9 +74,11 @@ O shell tem home inicial e rotas em preparação para detalhe, carrinho, login/c
 | --- | --- | --- |
 | `VITE_API_BASE_URL` | `/api` | Base da instância Axios |
 | `VITE_MOCKS_ENABLED` | `true` | Inicia o worker MSW antes de montar as rotas; habilitada no deploy Vercel |
-| `VITE_MOCK_SCENARIO` | `SCN-01` | Reservada para cenários; handlers/banco ainda não existem |
+| `VITE_MOCK_SCENARIO` | `SCN-01` | Único cenário disponível nesta etapa; outros cenários entram na TASK-11 |
 
-O worker MSW atende `GET /api/__proof` e responde ao evento Socket.IO `proof.request` com `proof.event`. Para verificar, abra `/__proof` e execute as duas provas. Os handlers de negócio e o banco simulado entram na TASK-04.
+O worker MSW atende `GET /api/__proof` e responde ao evento Socket.IO `proof.request` com `proof.event`. Para verificar, abra `/__proof` e execute as duas provas. Também atende `GET /api/nfts`, `GET /api/nfts/:id` e controles de status/reset/relógio em `/api/__mock/*`. O bootstrap prepara o IndexedDB antes de montar as rotas. Os endpoints privados de conta/carrinho/compra serão conectados nas tarefas seguintes.
+
+O banco `kurio-demo` mantém um schema interno. Se mudarmos seu formato, dados incompatíveis serão substituídos pelas fixtures. Reset de demonstração: `POST /api/__mock/reset` com `{"scenarioId":"SCN-01"}`. Status: `GET /api/__mock/status`. Relógio: `POST /api/__mock/clock` com `{"advanceMs":2000}`. Esses controles pertencem aos mocks; painel previsto na TASK-11.
 
 ## Fonte e assets
 

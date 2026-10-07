@@ -9,10 +9,7 @@ import { env } from '@/lib/env'
 let mockWorkerStart: Promise<void> | undefined
 
 function startMockWorker() {
-  mockWorkerStart ??= import('@/mocks/browser').then(({ worker }) => worker.start({
-    onUnhandledRequest: 'bypass',
-    serviceWorker: { url: '/mockServiceWorker.js' },
-  })).then(() => undefined)
+  mockWorkerStart ??= import('@/mocks/browser').then(({ initializeMocks }) => initializeMocks())
   return mockWorkerStart
 }
 

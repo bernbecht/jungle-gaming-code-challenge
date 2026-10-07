@@ -47,6 +47,7 @@ As decisões abaixo complementam DEC-14 e substituem a espera por informações 
 | DEC-16 | Escolher por comparação com os PNGs uma fonte semelhante, de aparência monoespaçada, disponível para uso local. Não depender da identificação da fonte original no Figma. Registrar família, pesos e origem quando escolhidos | TASK-02; revisão em TASK-12 / TEST-14 | REQ-037, REQ-040 |
 | DEC-17 | Usar assets placeholders por enquanto. Manter arquivos locais, identidades estáveis e proporções compatíveis com os componentes. Documentar substituições; reavaliar a qualidade visual antes da entrega, sem presumir que placeholders já atendem à fidelidade exigida | TASK-02, TASK-04, TASK-05; revisão em TASK-12 / TEST-14 | REQ-030, REQ-037, REQ-040 |
 | DEC-18 | Criar adaptações próprias para tablet e telas mobile sem referência, seguindo a identidade dos PNGs e preservando todos os fluxos. Não aguardar novos frames do Figma | TASK-05, TASK-08, TASK-09, TASK-12 / TEST-14 | REQ-004, REQ-037, REQ-039 |
+| DEC-19 | Contratos distinguem username/displayName e slot/nickname/profileName/provider da carteira. ENS e indicação são opcionais; perfil usa a carteira principal como fonte do apelido. Collector guarda esses metadados e observação no snapshot, sem exigir serviços reais de ENS ou indicação | TASK-04; formulários em TASK-06/TASK-09 | REQ-014, REQ-024, REQ-025 |
 
 A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
 
@@ -75,6 +76,8 @@ GET: uma repetição automática apenas para rede/5xx, com pequeno atraso; 4xx s
 Invalidar não significa mostrar tela vazia: manter conteúdo existente com feedback discreto de atualização. Skeleton é para carregamento sem conteúdo utilizável. Query keys privadas nunca dependem apenas do nome do recurso.
 
 ## Compra — DEC-08, DEC-09, DEC-10
+
+Fluxos de comportamento: [FLOW-01: Compra](docs/FLOWS.md#flow-01-compra) e [FLOW-02: Recuperação de tentativa](docs/FLOWS.md#flow-02-recuperação-de-tentativa). As decisões abaixo descrevem sua implementação.
 
 ```text
 Carrinho → cotação revisada → envio com chave persistida → pending
@@ -113,3 +116,13 @@ Rotas definidas em código com TanStack Router (`src/app/router.ts`), mantendo c
 DEC-16: IBM Plex Mono selecionada via Fontsource (400/500/600/700), com imports locais no build; fonte instalada na versão 5.3.0 e incluída no build; licença distribuída em public/licenses/ibm-plex-mono-OFL.txt. DEC-17: quatro SVGs abstratos criados em `public/assets/placeholders/`. Inventário e fontes oficiais de referência em `docs/ASSETS.md`.
 
 Tokens raster aplicados em CSS; borda de input proposta mais clara (`#79583E`) para melhorar identificação de controles, mantendo borda decorativa `#3F2319`. Validar contraste real em TASK-12. A home é apenas uma composição inicial, não o catálogo implementado. Componentes Button/Input/Skeleton seguem o padrão shadcn/ui adaptado manualmente; nenhum comando CLI shadcn foi executado. O worker MSW atende uma prova Axios e uma prova Socket.IO está preparada via binding; não existem handlers de domínio ainda. Tipos, lint e build passam; o runner Playwright desta sessão continua bloqueado ao abrir porta local.
+
+### Fundação de domínio — TASK-04
+
+DTOs v1 implementados em `src/contracts/marketplace.ts`; handlers de catálogo/detalhe e controles básicos em `src/mocks/handlers.ts`. Fixtures só são importadas pela camada de mocks. A UI ainda não consulta o catálogo.
+
+DEC-05: IndexedDB `kurio-demo`, store `state`, registro `database`; schema interno 1. Formato incompatível restaura as fixtures, sem migração. Cada operação usa uma transação readwrite sobre o estado inteiro: o reducer é síncrono e seu resultado só é devolvido depois do commit. Isso serializa operações também entre abas. Senhas seed são derivadas com PBKDF2/SHA-256, 100 mil iterações e salt distinto por usuário; o banco guarda salt/verificador. O bootstrap inicializa o banco antes de montar as rotas.
+
+DEC-06/DEC-08/DEC-10: ETH transportado como texto, cálculos em wei/BigInt, desconto em basis points truncado para baixo. Cotação vale 5 minutos do relógio simulado; taxa por rede também é simulada em ETH. Pedidos pendentes reservam estoque, reenvios consultam a tentativa antes de revalidar, conflitos ficam registrados. Confirmação consome estoque e apenas os lotes capturados do carrinho; recusa libera reserva. Alterar o catálogo não altera o snapshot do recibo.
+
+O relógio começa em `2026-01-15T12:00:00Z` e avança explicitamente pelo controle; não há scheduler/eventos de domínio nesta etapa. Esses mecanismos entram nas TASK-10/TASK-11. O núcleo não expõe endpoints privados de compra antes da implementação de sessão/carrinho/checkout. 12 testes do domínio passaram; validação IndexedDB/MSW no browser preparada, ainda pendente.

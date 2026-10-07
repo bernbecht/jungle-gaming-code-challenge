@@ -1,6 +1,6 @@
 # Matriz de testes e evidências
 
-Status: **smoke do shell e E2E REST/Socket.IO via MSW aprovados pelo usuário; testes de negócio ainda não criados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
+Status: **smoke do shell, E2E REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 12 testes unitários do núcleo aprovados pelo agente**. Os E2E dos fluxos de negócio na interface ainda serão implementados. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
 
 Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENARIOS.md). Contratos: [CONTRACTS](CONTRACTS.md). Execução: TASK-13 a TASK-15 em [TASKS](../TASKS.md).
 
@@ -54,6 +54,8 @@ Preencher uma linha por grupo/projeto executado. `Não executado` é diferente d
 | E2E da prova REST e Socket.IO via MSW (desktop/mobile) | Commit `81534f9` | Passou, conforme confirmação do usuário em 07/10/2026 | `npm run test:e2e`; terminal local do usuário | Relatório/trace não acessível nesta sessão. Deploy ainda pendente (TEST-18). |
 | TEST-18 — smoke do deploy inicial (TASK-03) | `4047da3` / `dpl_HLZFEAJ95RT29n9ipfAHJHzKaMnj` | Passou em 07/10/2026, observado pelo agente | https://jungle-gaming-code-challenge.vercel.app/__proof; Chrome e janela anônima | Home, acesso direto/refresh da rota, REST e Socket.IO aprovados sem login na Vercel. Provas confirmam worker e interceptação. Fluxos de negócio e smoke final permanecem pendentes na TASK-15. |
 | Demais grupos | — | Não executado | — | A implementar |
+| TEST-17 — núcleo financeiro/idempotência (parcial) | Árvore de trabalho TASK-04 | 12 testes unitários passaram, executados pelo agente | `npm run test:unit`; `tests/unit/marketplace.spec.ts` | Precisão wei, filtros/paginação, fixtures, fingerprint, cotação alterada, reserva, recusa, snapshot e remoção de lotes. Não comprova checkout na interface. Typecheck, lint e build também passaram. |
+| Fundação MSW/IndexedDB — catálogo, refresh e reset | Árvore de trabalho TASK-04 | Passou, conforme confirmação do usuário em 07/10/2026 | `npm run test:e2e`; `tests/e2e/mock-foundation.spec.ts`; terminal local do usuário | Suíte desktop/mobile, incluindo shell e provas REST/Socket.IO. Relatório/trace não anexado. Tentativa do agente bloqueada antes dos testes por `listen EPERM` em `127.0.0.1:4173`. Não comprova fluxos de catálogo/compra na interface. |
 
 ## Evidência de referência visual (não é execução de teste)
 
