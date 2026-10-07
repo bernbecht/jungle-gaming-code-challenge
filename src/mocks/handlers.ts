@@ -1,6 +1,6 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
 import { delay, http, HttpResponse, ws } from 'msw'
-import { listNfts, parseCatalogParams, readNft } from './catalog'
+import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { advanceClock } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
@@ -45,7 +45,7 @@ export const handlers = [
       return transact(state => listNfts(state, params))
     })
   }),
-  http.get('/api/nfts/facets', () => respond(() => transact(state => Object.fromEntries(['category', 'collection', 'creator', 'network'].map(key => [key, [...new Set(state.nfts.map(nft => nft[key as 'category' | 'collection' | 'creator' | 'network']))].sort()]))))),
+  http.get('/api/nfts/facets', () => respond(() => transact(catalogFacets))),
   http.get('/api/nfts/:id', ({ params }) => respond(() => transact(state => readNft(state, String(params.id))))),
   http.get('/api/__mock/status', () => respond(() => transact(state => ({ schemaVersion: state.schemaVersion, scenarioId: state.scenarioId, now: new Date(state.now).toISOString(), nftCount: state.nfts.length, userCount: state.users.length })))),
   http.post('/api/__mock/reset', ({ request }) => respond(async () => {

@@ -84,3 +84,55 @@
   .skeleton::after { animation: none; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
 }
+
+/* Two native range inputs share one track; each thumb remains keyboard operable. */
+.price-slider {
+  position: relative;
+  height: 44px;
+  margin-inline: 8px;
+}
+.price-slider-track {
+  position: absolute;
+  inset: 20px 0 auto;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to right,
+    var(--input) 0 var(--price-start),
+    var(--primary) var(--price-start) var(--price-end),
+    var(--input) var(--price-end) 100%);
+}
+.price-slider input {
+  position: absolute;
+  inset: 0 -22px;
+  width: calc(100% + 44px);
+  height: 44px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+.price-slider input::-webkit-slider-runnable-track { height: 3px; background: transparent; }
+.price-slider input::-moz-range-track { height: 3px; background: transparent; }
+.price-slider input::-webkit-slider-thumb {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  margin-top: -20.5px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0 6px, var(--card) 6px 8px, transparent 8px);
+  pointer-events: auto;
+  cursor: grab;
+}
+.price-slider input::-moz-range-thumb {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0 6px, var(--card) 6px 8px, transparent 8px);
+  pointer-events: auto;
+  cursor: grab;
+}
+.price-slider input:focus-visible { outline: none; }
+.price-slider input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--ring); outline-offset: 3px; }
+.price-slider input:focus-visible::-moz-range-thumb { outline: 2px solid var(--ring); outline-offset: 3px; }

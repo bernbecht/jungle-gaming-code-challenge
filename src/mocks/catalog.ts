@@ -1,5 +1,5 @@
 import type { CatalogParams, CatalogSort, Network, Nft, Page } from '../contracts/marketplace'
-import { toWei } from '../lib/money'
+import { fromWei, toWei } from '../lib/money'
 import { invalid, MockError } from './errors'
 import type { DatabaseState } from './state'
 
@@ -85,4 +85,16 @@ export function listNfts(state: DatabaseState, params: CatalogParams): Page<Nft>
   })
   const start = (params.page - 1) * params.pageSize
   return { items: items.slice(start, start + params.pageSize), total: items.length, page: params.page, pageSize: params.pageSize }
+}
+
+export function catalogFacets(state: DatabaseState) {
+  const values = (key: 'category' | 'collection' | 'creator' | 'network') =>
+    [...new Set(state.nfts.map(nft => nft[key]))].sort()
+  const prices = state.nfts.flatMap(nft => nft.editions.map(edition => toWei(edition.unitPrice)))
+  const maximum = prices.reduce((highest, price) => price > highest ? price : highest, 0n)
+  return {
+    category: values('category'), collection: values('collection'),
+    creator: values('creator'), network: values('network'),
+    priceRange: { min: '0', max: fromWei(maximum) },
+  }
 }

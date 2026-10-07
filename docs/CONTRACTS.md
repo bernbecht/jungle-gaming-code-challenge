@@ -80,6 +80,6 @@ Após desconexão/reconexão, buscar REST mesmo sem evento. Listeners antigos s�
 
 ### Complementos API-03/API-13 — TASK-05
 
-`GET /api/nfts/facets` retorna `{ category: string[], collection: string[], creator: string[], network: string[] }`: valores únicos ordenados do catálogo inteiro, independentes dos filtros atuais, para permitir combinar seleções sem esconder opções. É um endpoint auxiliar, sem dados privados.
+`GET /api/nfts/facets` retorna `{ category: string[], collection: string[], creator: string[], network: string[], priceRange: { min: Money, max: Money } }`: valores únicos ordenados do catálogo inteiro, independentes dos filtros atuais, para permitir combinar seleções sem esconder opções. O limite de preço parte de zero e chega ao maior preço de edição do catálogo (decimal ETH exato). É um endpoint auxiliar, sem dados privados.
 
 `POST /api/__mock/catalog-network` aceita `{ delayMs?: number, failuresRemaining?: number }` (defaults zero; inteiros 0–10000 e 0–10). Configura latência das próximas listagens e quantas delas retornam 503. Cada requisição captura a configuração ao chegar; permite reproduzir respostas fora de ordem. Reset restaura ambos a zero. Configuração transitória por aba/worker, não persiste após refresh; cenários completos/painel seguem na TASK-11. Não afeta detalhe/facetas. Valores inválidos retornam 422.

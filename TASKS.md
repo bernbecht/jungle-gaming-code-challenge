@@ -142,3 +142,5 @@ API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 
 - [ ] Revisar visualmente início/detalhe em 390/768/1440 px; fidelidade final/baselines permanecem na TASK-12/TASK-13.
 
 Compra e favorito têm indicação de indisponibilidade nesta etapa; serão conectados nas TASK-06/TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
+
+Revisão UI-01 solicitada: item 1 (slider de faixa de preço) implementado, com dois controles, leitura ETH e Aplicar; aguardando verificação visual/E2E local. Itens 2–5 (busca, grupos da sidebar, ordenação sutil e fundo do card) serão tratados separadamente conforme orientação do usuário.

@@ -72,3 +72,5 @@ Após instalação pelo usuário, npm ls, typecheck completo, lint e build passa
 - 14 testes unitários passaram na árvore de trabalho: 12 anteriores e dois de normalização/serialização de URL (`tests/unit/catalog-search.spec.ts`). Typecheck, lint e build passaram.
 - `tests/e2e/catalog.spec.ts` prepara TEST-01 (busca/filtros/ordenação/paginação/histórico), TEST-02 (detalhe/galeria/limites/404) e parte de TEST-12 (shimmer lento, resposta antiga, falha 503 e retry), em desktop/mobile, com reset por teste e controle MSW de rede.
 - E2E **não executado**: servidor preview bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. Aprovação da TASK-04 não valida estes novos testes. Execução local e revisão visual 390/768/1440 pendentes; sem screenshots/baselines desta etapa.
+
+Revisão UI-01, item 1: slider de preço implementado; 14 testes unitários, typecheck, lint, build e `git diff --check` passaram. E2E adicional em `catalog.spec.ts` verifica teclado, aplicação explícita e restauração de preços após refresh; preparado, não executado. Comparação visual e teste de arrastar os dois controles permanecem pendentes no navegador local.
