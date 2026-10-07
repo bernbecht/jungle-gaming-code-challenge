@@ -12,7 +12,13 @@ import { defaultCatalog } from "@/features/catalog/search";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import axios from "axios";
-import { ChevronLeft, Heart, ShoppingCart, Star } from "lucide-react";
+import {
+  ChevronLeft,
+  Heart,
+  HeartIcon,
+  ShoppingCart,
+  Star,
+} from "lucide-react";
 import { useState } from "react";
 
 export function NftDetailPage() {
@@ -203,47 +209,36 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
               ))}
             </div>
           </fieldset>
-          <p role="status" className="mt-4 text-sm text-muted-foreground">
-            {updating
-              ? "Atualizando disponibilidade…"
-              : edition.available > 0
-                ? `${edition.available} unidades disponíveis`
-                : "Esta edição está esgotada."}
-          </p>
-          <div
-            role="group"
-            aria-label="Quantidade"
-            className="nft-detail-desktop-quantity mt-4 flex items-center gap-4"
-          >
-            <Button
-              aria-label="Diminuir quantidade"
-              disabled={quantity <= 1 || edition.available === 0}
-              onClick={() => setQuantity(quantity - 1)}
+          <div className="flex items-center justify-between mt-4">
+            <div
+              role="group"
+              aria-label="Quantidade"
+              className="nft-detail-desktop-quantity flex items-center gap-4"
             >
-              −
-            </Button>
-            <output aria-label="Quantidade selecionada">{quantity}</output>
-            <Button
-              aria-label="Aumentar quantidade"
-              disabled={quantity >= edition.available}
-              onClick={() => setQuantity(quantity + 1)}
-            >
-              +
-            </Button>
+              <Button
+                aria-label="Diminuir quantidade"
+                disabled={quantity <= 1 || edition.available === 0}
+                onClick={() => setQuantity(quantity - 1)}
+              >
+                −
+              </Button>
+              <output aria-label="Quantidade selecionada">{quantity}</output>
+              <Button
+                aria-label="Aumentar quantidade"
+                disabled={quantity >= edition.available}
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                +
+              </Button>
+            </div>
+            <div className="nft-detail-desktop-actions flex flex-wrap gap-3">
+              <Button disabled>Comprar</Button>
+              <Button variant="outline" disabled>
+                <HeartIcon size={20} aria-hidden />
+                Favoritar
+              </Button>
+            </div>
           </div>
-          <div className="nft-detail-desktop-actions mt-5 flex flex-wrap gap-3">
-            <Button disabled>Comprar NFT</Button>
-            <Button variant="outline" disabled>
-              Favoritar
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/cart">Ver carrinho</Link>
-            </Button>
-          </div>
-          <p className="mt-3 text-xs leading-6 text-muted-foreground">
-            Compra e favoritos estarão disponíveis após a integração de carrinho
-            e conta.
-          </p>
           <dl className="mt-6 space-y-3 text-sm text-muted-foreground">
             <div>
               <dt className="inline">ID do token: </dt>
