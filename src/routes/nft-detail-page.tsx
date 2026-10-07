@@ -247,7 +247,8 @@ function NftDetail({ nft }: { nft: Nft }) {
               className="nft-detail-desktop-quantity flex items-center gap-4"
             >
               <Button
-                className="h-7 w-7 shrink-0 rounded-full p-2"
+                size="stepper"
+                className="text-2xl leading-none"
                 aria-label="Diminuir quantidade"
                 disabled={quantity <= 1 || edition.available === 0}
                 onClick={() => setQuantity(quantity - 1)}
@@ -256,7 +257,8 @@ function NftDetail({ nft }: { nft: Nft }) {
               </Button>
               <output aria-label="Quantidade selecionada">{quantity}</output>
               <Button
-                className="h-7 w-7 shrink-0 rounded-full p-0"
+                size="stepper"
+                className="text-2xl leading-none"
                 aria-label="Aumentar quantidade"
                 disabled={quantity >= edition.available}
                 onClick={() => setQuantity(quantity + 1)}
@@ -265,7 +267,9 @@ function NftDetail({ nft }: { nft: Nft }) {
               </Button>
             </div>
             <div className="nft-detail-desktop-actions flex flex-wrap gap-3">
-              <Button disabled>Comprar</Button>
+              <Button className="uppercase" disabled>
+                Comprar
+              </Button>
               <Button variant="outline" disabled>
                 <HeartIcon size={20} aria-hidden />
                 Favoritar
@@ -379,7 +383,8 @@ function NftDetail({ nft }: { nft: Nft }) {
           >
             <span className="text-muted-foreground">Qtd.</span>
             <Button
-              className="h-7 w-5 min-h-0 min-w-0 rounded-full px-0 py-0"
+              size="stepper"
+              className="text-lg leading-none"
               aria-label="Diminuir quantidade"
               disabled={quantity <= 1 || edition.available === 0}
               onClick={() => setQuantity(quantity - 1)}
@@ -393,7 +398,8 @@ function NftDetail({ nft }: { nft: Nft }) {
               {quantity}
             </output>
             <Button
-              className="h-7 w-5 min-h-0 min-w-0 rounded-full px-0 py-0"
+              size="stepper"
+              className="text-lg leading-none"
               aria-label="Aumentar quantidade"
               disabled={quantity >= edition.available}
               onClick={() => setQuantity(quantity + 1)}
