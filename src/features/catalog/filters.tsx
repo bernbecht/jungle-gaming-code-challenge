@@ -31,7 +31,7 @@ function FilterChoices({
   const id = useId();
   return (
     <fieldset>
-      <legend className="font-medium">{title}</legend>
+      <legend className="font-medium text-lg">{title}</legend>
       <div className="mt-2">
         {[...new Set([...values, ...selected])].map((value, index) => {
           const active = selected.includes(value);
@@ -44,7 +44,7 @@ function FilterChoices({
               aria-label={label}
               aria-pressed={active}
               aria-describedby={`${id}-count-${index}`}
-              className={`flex min-h-11 w-full items-center justify-between gap-3 px-2 text-left text-xs ${active ? "font-semibold text-accent" : "text-muted-foreground"}`}
+              className={`flex min-h-9 w-full items-center justify-between gap-3 px-2 text-left text-base ${active ? "font-semibold text-accent" : "text-muted-foreground"}`}
               onClick={() =>
                 change(
                   active
