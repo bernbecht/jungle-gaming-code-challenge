@@ -32,7 +32,7 @@ function FilterChoices({
   return (
     <fieldset>
       <legend className="font-medium text-lg">{title}</legend>
-      <div className="mt-2">
+      <div>
         {[...new Set([...values, ...selected])].map((value, index) => {
           const active = selected.includes(value);
           const count = Object.hasOwn(counts, value) ? counts[value]! : 0;
@@ -44,7 +44,7 @@ function FilterChoices({
               aria-label={label}
               aria-pressed={active}
               aria-describedby={`${id}-count-${index}`}
-              className={`flex min-h-9 w-full items-center justify-between gap-3 px-2 text-left text-base ${active ? "font-semibold text-accent" : "text-muted-foreground"}`}
+              className={`flex min-h-10 w-full items-center justify-between gap-3 px-2 text-left text-base ${active ? "font-semibold text-accent" : "text-muted-foreground"}`}
               onClick={() =>
                 change(
                   active
@@ -81,7 +81,7 @@ export function CatalogFilters({ params, update }: Props) {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <FilterChoices
         title="Coleções"
         values={facets.data.category}

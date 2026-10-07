@@ -33,7 +33,6 @@ export function PriceFilter({ minPrice, maxPrice, catalogMax, apply }: Props) {
 
   return (
     <form
-      className="space-y-3 border-t border-border pt-4"
       onSubmit={(event) => {
         event.preventDefault();
         apply({ minPrice: minimum, maxPrice: maximum });
@@ -85,10 +84,10 @@ export function PriceFilter({ minPrice, maxPrice, catalogMax, apply }: Props) {
           }}
         />
       </div>
-      <p id={`${id}-value`} className="text-xs">
+      <p id={`${id}-value`} className="text-base">
         Preço: {minimum.replace(".", ",")} – {maximum.replace(".", ",")} ETH
       </p>
-      <Button type="submit" className="min-h-9 px-3 py-1 text-xs">
+      <Button type="submit" className="mt-5 min-h-9 px-3 py-1 text-xs">
         Aplicar
       </Button>
     </form>
