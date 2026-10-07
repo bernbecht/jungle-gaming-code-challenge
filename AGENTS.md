@@ -16,14 +16,27 @@
 ## Commit messages
 
 - Write all commit messages, including optional bodies and footers, in English.
-- Use Conventional Commits with a matching gitmoji in the description:
-  `<type>[optional scope]: <gitmoji> <short imperative summary>`.
+- Format each commit subject as `<gitmoji> <short imperative summary>`.
 - Use an actual emoji character, not a shortcode such as `:sparkles:`.
-- Choose the type and gitmoji that best describe the change. Common examples:
-  - `feat: ✨ add game search filters`
-  - `fix: 🐛 handle empty search results`
-  - `refactor: ♻️ extract shared game card logic`
-  - `docs: 📝 document local setup`
-  - `test: ✅ cover pagination edge cases`
-  - `chore: 🔧 update development configuration`
+- Select a gitmoji by its meaning in the [official Gitmoji guide](https://gitmoji.dev/). Use the single emoji that most accurately describes the main purpose of the commit; do not choose one only for decoration.
+- Use these common mappings when they fit:
+  - `✨ add game search filters`
+  - `🐛 handle empty search results`
+  - `🚑️ fix a critical production issue`
+  - `♻️ extract shared game card logic`
+  - `⚡️ improve game list rendering performance`
+  - `📝 document local setup`
+  - `✅ cover pagination edge cases`
+  - `💄 update button styling`
+  - `♿️ improve keyboard accessibility`
+  - `📱 improve the mobile layout`
+  - `🔧 update development configuration`
+  - `⬆️ upgrade a dependency` / `⬇️ downgrade a dependency`
+  - `➕ add a dependency` / `➖ remove a dependency`
+  - `🚨 fix lint or compiler warnings`
+  - `🙈 update .gitignore`
+  - `🚚 move or rename files`
+  - `💥 introduce a breaking change`
+  - `⏪️ revert a change`
+- For cases not listed here, consult the official guide and follow its description (for example, `🏗️` for architectural changes, `👷` for CI build changes, `🧱` for infrastructure, and `🌐` for localization).
 - Keep the summary concise and specific. Add a body when the motivation or important consequences need explanation.
