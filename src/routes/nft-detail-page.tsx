@@ -379,8 +379,7 @@ function NftDetail({ nft }: { nft: Nft }) {
           >
             <span className="text-muted-foreground">Qtd.</span>
             <Button
-              variant="outline"
-              size="icon"
+              className="h-7 w-5 min-h-0 min-w-0 rounded-full px-0 py-0"
               aria-label="Diminuir quantidade"
               disabled={quantity <= 1 || edition.available === 0}
               onClick={() => setQuantity(quantity - 1)}
@@ -394,8 +393,7 @@ function NftDetail({ nft }: { nft: Nft }) {
               {quantity}
             </output>
             <Button
-              variant="outline"
-              size="icon"
+              className="h-7 w-5 min-h-0 min-w-0 rounded-full px-0 py-0"
               aria-label="Aumentar quantidade"
               disabled={quantity >= edition.available}
               onClick={() => setQuantity(quantity + 1)}
