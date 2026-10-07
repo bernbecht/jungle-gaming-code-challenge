@@ -1,6 +1,6 @@
 # Especificação de interface
 
-Status: **15 screenshots analisadas em 06/10/2026; implementação ainda não iniciada**. Referências locais abaixo. O arquivo Figma não foi inspecionado diretamente; fontes, tokens originais, camadas e interações não foram confirmados. TASK-01 está parcialmente executada. A análise distingue observação do PNG, medição raster e proposta de implementação.
+Status: **15 screenshots analisadas em 06/10/2026; implementação ainda não iniciada**. Referências locais abaixo. O arquivo Figma não foi inspecionado diretamente; fontes, tokens originais, camadas e interações não foram confirmados. TASK-01 concluída como análise; decisões de implementação aceitas em DEC-16, DEC-17 e DEC-18. A análise distingue observação do PNG, medição raster e proposta de implementação.
 
 Rotas abaixo são propostas, não URLs impostas pelo desafio. Regras técnicas em [ARCHITECTURE](../ARCHITECTURE.md); testes em [TEST-MATRIX](TEST-MATRIX.md).
 
@@ -59,7 +59,7 @@ Amostragem dos pixels opacos de Carteiras desktop e Login mobile encontrou as co
 
 **Estimativas geométricas para começar, a validar no browser:** container desktop de aproximadamente 1200 px com margens de 120 px em 1440; sidebar de conta/catálogo perto de 310 px; gutter de 24–32 px; margem mobile de 24–28 px. Inputs desktop em torno de 40 px, mobile em torno de 50 px; CTAs mobile próximos de 60 px. Texto de corpo por volta de 14–16 px, títulos de seção 18–22 px. Não tratar essas estimativas como medições do Figma.
 
-Família/pesos exatos continuam desconhecidos; selecionar uma fonte mono local somente após comparação visual e registrar substituição em DEC-14. Não afirmar que é uma família específica. Verificar contraste real dos pares de tokens e estados no browser em TEST-14.
+Família/pesos originais permanecem desconhecidos. Por DEC-16, escolher uma fonte mono semelhante durante TASK-02, comparar com os PNGs e registrar família/pesos/origem; não aguardar informação do Figma. Não afirmar que é uma família específica. Verificar contraste real dos pares de tokens e estados no browser em TEST-14.
 
 ## Análise por tela
 
@@ -150,7 +150,7 @@ Reutilizar comportamento, mantendo diferenças de composição desktop/mobile. U
 
 ## Lacunas, inconsistências e decisões antes de codificar
 
-1. **Assets:** só há screenshots. Foram vistos quatro motivos principais de arte (verde/óculos, lilás/chapéu, escuro/blazer e dourado/fones), repetidos em múltiplos NFTs; ainda não há arquivos individuais. Extração por recorte pode ser avaliada depois, com perda/limites documentados; não usar screenshot inteiro como página.
+1. **Assets:** só há screenshots. Foram vistos quatro motivos principais de arte (verde/óculos, lilás/chapéu, escuro/blazer e dourado/fones), repetidos em múltiplos NFTs; ainda não há arquivos individuais. Por DEC-17, usar placeholders locais temporários, sem depender de extração dos PNGs. Manter proporções e identidade por NFT; revisar substituições em TASK-12. Não usar screenshot inteiro como página.
 2. **Dados ilustrativos:** Violet Nomad e Ivory Baron têm IDs de token diferentes entre carrinho e recibo; imagens associadas aos títulos mudam em algumas telas; badge de carrinho não corresponde necessariamente à soma. Definir fixture única e coerente, priorizando REQ-030 sobre copiar inconsistências.
 3. **Catálogo/API:** faltam rede, abas Novos/Em alta, ordenação Listados recentemente, atributos/token/rating e possível preço anterior no modelo proposto. Mapear DTO e semântica antes dos handlers. Facetas/contagens devem refletir a fixture, não números fixos do PNG.
 4. **Formulários:** separar username/displayName/profileName e decidir se referências de carteira no perfil são metadados ou relação com carteira principal. Evitar duas fontes divergentes para o mesmo dado.
@@ -158,6 +158,18 @@ Reutilizar comportamento, mantendo diferenças de composição desktop/mobile. U
 6. **Responsividade:** 768 px e mobile de três telas precisam de projeto; telas de 414 não substituem validação a 390. Comportamento sticky, scroll, teclados e mudanças de orientação precisam ser verificados no browser.
 7. **Acessibilidade:** aumentar área acionável de controles pequenos sem depender da dimensão do ícone; labels, foco, contraste e avisos devem ser aferidos em TEST-11/TEST-14. Nenhuma conformidade foi comprovada só pela inspeção dos PNGs.
 8. **Escopo auxiliar:** visual inclui Google/Facebook, newsletter, avaliações, compartilhamento, links editoriais/suporte e ação central mobile sem significado claro. Manter composição e comportamento coerente sem acrescentar integrações reais nem falso sucesso.
+
+## Diretrizes aceitas para referências ausentes — DEC-18
+
+Estas são escolhas de projeto, não informações extraídas do Figma:
+
+- Tablet (768 px): navegação compacta, filtros em drawer e catálogo em duas colunas; empilhar detalhe e resumo quando a largura comprometer leitura. Usar duas colunas de formulário somente quando os campos couberem sem truncamento.
+- Perfil mobile: navegação de conta compacta; campos em uma coluna; avatar com Alterar/Remover; grupo de senha separado e ação Salvar acessível.
+- Carteiras mobile: cards principal/secundária, edição em formulário de uma coluna e seleção de rede/provedor com labels completos.
+- Confirmação mobile: painel de recibo com metadados empilhados, itens em linhas flexíveis e totais legíveis; sem tabela rígida de quatro colunas.
+- Preservar erros, loading, revisão de compra, foco, teclado e conteúdo completo em todos os tamanhos. Validar em 390/768/1440, além de comparar com referências de 414 px.
+
+TASK-05/TASK-08/TASK-09 implementam as composições; TASK-12 ajusta após uso real e TEST-14 registra evidências. Fonte e placeholders seguem DEC-16/DEC-17, com seleção/preparo durante a implementação.
 
 ## Ordem de implementação visual
 

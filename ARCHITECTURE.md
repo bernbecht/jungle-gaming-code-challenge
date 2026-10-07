@@ -38,6 +38,18 @@ docs/
 | DEC-14 | Assets locais, tokens extraídos do Figma, estados acessíveis reutilizáveis e layouts próprios para mobile quando necessários | REQ-004, REQ-037, REQ-038, REQ-039, REQ-040 |
 | DEC-15 | Cenários controlados por configuração/painel de demonstração; testes acionam handlers de controle, nunca setters/cache. Relógio do domínio e latência são controláveis | REQ-031, REQ-044 |
 
+## Decisões visuais confirmadas pelo usuário — 06/10/2026
+
+As decisões abaixo complementam DEC-14 e substituem a espera por informações adicionais do Figma. Estão aceitas como diretrizes; sua implementação ainda não ocorreu.
+
+| ID | Decisão | Execução / verificação | Requisitos |
+| --- | --- | --- | --- |
+| DEC-16 | Escolher por comparação com os PNGs uma fonte semelhante, de aparência monoespaçada, disponível para uso local. Não depender da identificação da fonte original no Figma. Registrar família, pesos e origem quando escolhidos | TASK-02; revisão em TASK-12 / TEST-14 | REQ-037, REQ-040 |
+| DEC-17 | Usar assets placeholders por enquanto. Manter arquivos locais, identidades estáveis e proporções compatíveis com os componentes. Documentar substituições; reavaliar a qualidade visual antes da entrega, sem presumir que placeholders já atendem à fidelidade exigida | TASK-02, TASK-04, TASK-05; revisão em TASK-12 / TEST-14 | REQ-030, REQ-037, REQ-040 |
+| DEC-18 | Criar adaptações próprias para tablet e telas mobile sem referência, seguindo a identidade dos PNGs e preservando todos os fluxos. Não aguardar novos frames do Figma | TASK-05, TASK-08, TASK-09, TASK-12 / TEST-14 | REQ-004, REQ-037, REQ-039 |
+
+A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
+
 ## Sessão e isolamento — DEC-04
 
 Sessão terá uma geração local que muda em logout/troca de usuário. Ao trocar: bloquear UI privada, abortar requests, desconectar socket privado, liberar listeners, remover queries privadas e dados de tentativa carregados em memória. Resultado iniciado em geração anterior é descartado mesmo se o cancelamento chegar tarde. Autorização também existe nos handlers, não apenas nos guards.
@@ -88,7 +100,7 @@ Limitação planejada do mock: transporte WebSocket, eventos textuais e namespac
 
 Decisões propostas: informar ajuste no merge de carrinho; bloquear envio durante tentativa pendente/desconectada; mostrar diferença de cotação antes de nova confirmação; manter erro junto do campo e feedback global acessível. Ações fora do escopo devem ser omitidas quando permitido ou explicar indisponibilidade, sem mensagem de sucesso.
 
-Arquivo Figma ainda não inspecionado diretamente. As 15 screenshots foram analisadas em UI-SPEC: paleta raster, composição e campos visíveis registrados; fonte original, assets separados e semântica de campos ainda pendentes. Não há substituição de asset aprovada/registrada. Ao identificar uma, registrar requisito/UI afetado, motivo, efeito visual/acessível e evidência. Versões, custo real da persistência e compatibilidade do binding ainda dependem da prova técnica.
+Arquivo Figma ainda não inspecionado diretamente. As 15 screenshots foram analisadas em UI-SPEC: paleta raster, composição e campos visíveis registrados; fonte original indisponível, placeholders temporários e layouts sem referência tratados por DEC-16, DEC-17 e DEC-18. Semântica de alguns campos ainda pendente. Ao identificar uma, registrar requisito/UI afetado, motivo, efeito visual/acessível e evidência. Versões, custo real da persistência e compatibilidade do binding ainda dependem da prova técnica.
 
 ### Ajustes propostos após análise das screenshots — DEC-14
 

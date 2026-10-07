@@ -17,7 +17,7 @@ Projeto em **fase de planejamento**. Ainda não há aplicação, package.json, s
 | [docs/TEST-MATRIX.md](docs/TEST-MATRIX.md) | Cobertura TEST, assertions e registro de evidências |
 | [docs/RELEASE.md](docs/RELEASE.md) | Gates REL, auditoria, publicação e entrega |
 
-TASK-01 tem análise das 15 screenshots registrada; fonte/assets separados e algumas decisões continuam pendentes. Prosseguir com TASK-02, concluir prova técnica TASK-03 e seguir dependências. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
+TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. Prosseguir com TASK-02, concluir prova técnica TASK-03 e seguir dependências. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
 
 Exemplo de rastreabilidade: REQ-015 (cotação revalidada) → TASK-08/TASK-10 → DEC-08 → API-08/API-09 e EVT-01 → UI-04 → SCN-10/SCN-17 → TEST-09 → REL-02.
 

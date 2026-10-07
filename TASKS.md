@@ -4,12 +4,26 @@ Cronograma: [ROTEIRO.md](ROTEIRO.md). Requisitos: [REQUIREMENTS.md](REQUIREMENTS
 
 Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → Em andamento → Em verificação → Concluído; Bloqueado deve incluir motivo. Uma tarefa só é concluída com critérios de aceite e evidências dos testes indicados, sem marcar requisitos atendidos apenas por existir código.
 
+## Situação atual — 06/10/2026
+
+- [x] Roteiro de desenvolvimento criado em [ROTEIRO](ROTEIRO.md).
+- [x] Documentação inicial criada: requisitos, tarefas, arquitetura, contratos propostos, interface, cenários, matriz de testes, entrega e README.
+- [x] IDs e links locais da documentação validados.
+- [x] Todas as 15 screenshots analisadas; inventário, dimensões, cores e diferenças desktop/mobile registrados em [UI-SPEC](docs/UI-SPEC.md).
+- [x] Lacunas de contratos e inconsistências nas referências documentadas.
+- [x] Resolver a abordagem das pendências visuais: fonte semelhante, placeholders temporários e layouts próprios (DEC-16, DEC-17, DEC-18).
+- [ ] Iniciar implementação da aplicação pela TASK-02.
+
+**Resumo:** preparação documental inicial concluída; TASK-01 concluída como análise e definição de abordagem; TASK-02 a TASK-15 ainda a fazer. Nenhuma funcionalidade da aplicação foi implementada ou testada. Os documentos de contratos, arquitetura e cenários descrevem propostas, não código entregue; sua atualização final permanece na TASK-15.
+
+## Tarefas
+
 | ID | Dia / bloco do roteiro | Trabalho e critérios de aceite | Dependências | Requisitos | Testes | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| TASK-01 | 1 / 1 | Analisar referências; preencher frames, tokens e assets em UI-SPEC; documentar pendências sem inventar medidas | — | REQ-004, REQ-037, REQ-040 | TEST-14 | Em andamento |
-| TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind | — | REQ-001, REQ-025, REQ-050 | TEST-16 | A fazer |
+| TASK-01 | 1 / 1 | Analisar referências; preencher frames, tokens e assets em UI-SPEC; documentar pendências sem inventar medidas | — | REQ-004, REQ-037, REQ-040 | TEST-14 (posterior, na TASK-12) | Concluído |
+| TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind; escolher fonte local semelhante (DEC-16) e preparar placeholders (DEC-17) | — | REQ-001, REQ-025, REQ-050 | TEST-16 | A fazer |
 | TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | A fazer |
-| TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures, reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | A fazer |
+| TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | A fazer |
 | TASK-05 | 1 / 3 | Início/detalhe completos; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | A fazer |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | A fazer |
@@ -17,7 +31,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
 | TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
-| TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440; Figma, shimmer, reduced motion, teclado, foco, zoom, assets e ações auxiliares | TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
+| TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
 | TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
 | TASK-14 | 2 / 11 | Auditar cedo; concluir 12 medições no build final, medianas/métricas, HTML/JSON e análise de desvios | TASK-12 | REQ-001, REQ-045, REQ-046 | TEST-15 | A fazer |
 | TASK-15 | 2 / 12 | Atualizar docs para implementação real, checkout limpo, entregar artefatos, deploy final e smoke público | TASK-13, TASK-14 | REQ-028, REQ-033, REQ-047, REQ-048, REQ-049, REQ-050 | TEST-16, TEST-18 | A fazer |
@@ -34,4 +48,25 @@ Ao trabalhar em uma tarefa, registrar aqui: ID, status, commit/arquivo, verifica
 
 ### TASK-01 — 06/10/2026
 
-Analisadas as 15 screenshots (9 desktop, 6 mobile), dimensões verificadas e paleta raster amostrada. Evidência documental em [UI-SPEC](docs/UI-SPEC.md). Inspeção identificou variantes mobile, formulários além dos contratos v0 e inconsistências nos dados ilustrativos. Restam fonte/assets individuais, semântica de campos e controles ambíguos, adaptação tablet/mobile ausente e comparação com aplicação. TEST-14 não foi executado: ainda não há UI implementada.
+Analisadas as 15 screenshots (9 desktop, 6 mobile), dimensões verificadas e paleta raster amostrada. Evidência documental em [UI-SPEC](docs/UI-SPEC.md). Inspeção identificou variantes mobile, formulários além dos contratos v0 e inconsistências nos dados ilustrativos. A abordagem de fonte/assets e adaptações sem referência foi resolvida pelas decisões do usuário DEC-16, DEC-17 e DEC-18. A execução foi distribuída nas tarefas de implementação; semântica de campos, controles ambíguos e comparação com aplicação permanecem nessas tarefas. TEST-14 não foi executado: ainda não há UI implementada.
+
+Checklist da TASK-01:
+
+- [x] Inventariar e analisar as nove screenshots desktop e seis mobile.
+- [x] Registrar links e dimensões dos arquivos.
+- [x] Amostrar cores e distinguir valores medidos de estimativas.
+- [x] Mapear composição, componentes reutilizáveis e campos visíveis.
+- [x] Identificar telas/estados sem referência e discrepâncias entre PNGs.
+- [x] Definir abordagem de fonte: escolher semelhante local em TASK-02; revisar em TASK-12 (DEC-16).
+- [x] Definir alternativa de assets: placeholders temporários locais em TASK-02/TASK-04/TASK-05; revisar em TASK-12 (DEC-17).
+- [x] Registrar diretrizes próprias para tablet e mobile ausente em UI-SPEC; implementar em TASK-05/TASK-08/TASK-09 e revisar em TASK-12 (DEC-18).
+
+Semântica dos campos e revisão dos DTOs identificadas nesta análise serão resolvidas em TASK-04/TASK-09; controles auxiliares e ajustes de acessibilidade serão tratados em TASK-12. Comparação da aplicação com as referências e execução de TEST-14 pertencem à TASK-12; não são necessárias para comprovar que a análise documental foi realizada, nem estão concluídas por ela.
+
+## Regra de atualização do progresso
+
+Ao encerrar cada etapa, atualizar o status da tarefa e marcar os critérios realmente concluídos. Registrar arquivos/evidências, verificações executadas, pendências e próximo passo. Trabalho parcial fica explícito no checklist; não marcar a tarefa inteira como concluída antes do aceite. Resultados de testes ficam em [TEST-MATRIX](docs/TEST-MATRIX.md), sem confundir revisão documental com teste da aplicação.
+
+### Encerramento da TASK-01 — 06/10/2026
+
+Análise documental concluída com base nos PNGs disponíveis e nas decisões explícitas do usuário. Fonte concreta, placeholders e layouts ainda não foram implementados. O aceite desta tarefa é documental; TEST-14 permanece não executado e será realizado sobre a aplicação na TASK-12. Próximo passo: TASK-02.
