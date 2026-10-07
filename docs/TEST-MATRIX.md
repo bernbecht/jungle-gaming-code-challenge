@@ -1,6 +1,6 @@
 # Matriz de testes e evidências
 
-Status inicial: **todos os testes não executados; arquivos de teste ainda não criados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
+Status: **TEST-16 parcialmente verificado; smoke do shell escrito, mas bloqueado antes de execução; testes dos fluxos de negócio ainda não criados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
 
 Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENARIOS.md). Contratos: [CONTRACTS](CONTRACTS.md). Execução: TASK-13 a TASK-15 em [TASKS](../TASKS.md).
 
@@ -48,8 +48,16 @@ Preencher uma linha por grupo/projeto executado. `Não executado` é diferente d
 
 | Teste / projeto | Commit | Resultado | Relatório/trace/screenshot | Observações |
 | --- | --- | --- | --- | --- |
-| Todos | — | Não executado | — | Projeto ainda em documentação |
+| TEST-16 (tipos/lint/build) | Árvore de trabalho | Passou parcialmente | Comandos registrados abaixo | Não comprova fluxos nem checkout limpo |
+| Smoke shell (desktop/mobile) | Terminal local do usuário | Passou, conforme confirmação do usuário em 07/10/2026 | `npm run test:e2e`; ambiente local do usuário | Runner da sandbox tentou executar mas webServer foi bloqueado por EPERM; sem trace local acessível |
+| Demais grupos | — | Não executado | — | A implementar |
 
 ## Evidência de referência visual (não é execução de teste)
 
 Em 06/10/2026 foram inspecionados os 15 PNGs originais em UI-SPEC. Dimensões desktop: 1440 px de largura; mobile: 414 × 896. TEST-13/TEST-14 devem incluir comparação adicional em 414 px, mantendo as larguras obrigatórias. Ainda não existem screenshots da aplicação para comparar; não registrar esta análise como teste aprovado.
+
+## TEST-16 — verificação parcial da TASK-02
+
+Base escrita; **aceite ainda pendente**. Passaram: sintaxe TS/TSX de 20 arquivos usando TypeScript 5.9.3 do cache, resolução dos imports locais `@/`, parsing JSON/SVG, `node --check` de ESLint/script Lighthouse e `git diff --check`. Essas verificações não resolvem tipos de dependências nem executam a aplicação.
+
+Após instalação pelo usuário, npm ls, typecheck completo, lint e build passaram; lockfile presente. Vite 7.3.7 promovido a dependência direta com a mesma resolução/integridade; npm ci --dry-run offline passou. Licença da fonte incluída em dist. Playwright iniciou no terminal do usuário e o smoke desktop/mobile passou, conforme confirmação em 07/10/2026. O runner da sandbox continua bloqueado com listen EPERM em 127.0.0.1:4173; não há relatório local acessível. `tests/e2e/shell.spec.ts` está preparado para Chromium desktop/mobile; não cobre API/socket nem substitui os 12 grupos exigidos. TEST-18/deploy continuam pendentes.

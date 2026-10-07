@@ -1,0 +1,54 @@
+{
+  "name": "kurio-nft-marketplace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "npm@11.19.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "eslint . --max-warnings 0",
+    "test:e2e": "playwright test",
+    "test:visual": "playwright test --grep @visual",
+    "test:report": "playwright show-report",
+    "audit:lighthouse": "node scripts/lighthouse.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.0",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-router": "^1.132.0",
+    "axios": "^1.12.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "socket.io-client": "^4.8.1",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.4",
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/vite": "4.2.1",
+    "@types/node": "22.19.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.4",
+    "eslint": "9.39.4",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "eslint-plugin-react-refresh": "0.4.26",
+    "globals": "16.5.0",
+    "lighthouse": "^12.8.2",
+    "msw": "^2.12.0",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.1",
+    "vite": "7.3.7"
+  }
+}

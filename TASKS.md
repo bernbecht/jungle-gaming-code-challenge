@@ -12,17 +12,19 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Todas as 15 screenshots analisadas; inventário, dimensões, cores e diferenças desktop/mobile registrados em [UI-SPEC](docs/UI-SPEC.md).
 - [x] Lacunas de contratos e inconsistências nas referências documentadas.
 - [x] Resolver a abordagem das pendências visuais: fonte semelhante, placeholders temporários e layouts próprios (DEC-16, DEC-17, DEC-18).
-- [ ] Iniciar implementação da aplicação pela TASK-02.
+- [x] Iniciar implementação da aplicação pela TASK-02 (arquivos da base preparados).
+- [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
+- [x] Smoke Playwright desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** preparação documental inicial concluída; TASK-01 concluída como análise e definição de abordagem; TASK-02 a TASK-15 ainda a fazer. Nenhuma funcionalidade da aplicação foi implementada ou testada. Os documentos de contratos, arquitetura e cenários descrevem propostas, não código entregue; sua atualização final permanece na TASK-15.
+**Resumo:** preparação documental inicial concluída; TASK-01 concluída como análise e definição de abordagem; TASK-02 concluída; TASK-03 em andamento; TASK-04 a TASK-15 ainda a fazer. Os fluxos de negócio não foram implementados ou testados. Os documentos de contratos, arquitetura e cenários descrevem propostas, não código entregue; sua atualização final permanece na TASK-15.
 
 ## Tarefas
 
 | ID | Dia / bloco do roteiro | Trabalho e critérios de aceite | Dependências | Requisitos | Testes | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | TASK-01 | 1 / 1 | Analisar referências; preencher frames, tokens e assets em UI-SPEC; documentar pendências sem inventar medidas | — | REQ-004, REQ-037, REQ-040 | TEST-14 (posterior, na TASK-12) | Concluído |
-| TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind; escolher fonte local semelhante (DEC-16) e preparar placeholders (DEC-17) | — | REQ-001, REQ-025, REQ-050 | TEST-16 | A fazer |
-| TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | A fazer |
+| TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind; escolher fonte local semelhante (DEC-16) e preparar placeholders (DEC-17) | — | REQ-001, REQ-025, REQ-050 | TEST-16 parcial + smoke shell | Concluído |
+| TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | Em andamento |
 | TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | A fazer |
 | TASK-05 | 1 / 3 | Início/detalhe completos; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | A fazer |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
@@ -69,4 +71,38 @@ Ao encerrar cada etapa, atualizar o status da tarefa e marcar os critérios real
 
 ### Encerramento da TASK-01 — 06/10/2026
 
-Análise documental concluída com base nos PNGs disponíveis e nas decisões explícitas do usuário. Fonte concreta, placeholders e layouts ainda não foram implementados. O aceite desta tarefa é documental; TEST-14 permanece não executado e será realizado sobre a aplicação na TASK-12. Próximo passo: TASK-02.
+Análise documental concluída com base nos PNGs disponíveis e nas decisões explícitas do usuário. A fonte semelhante e os placeholders foram preparados na TASK-02; composições tablet/mobile serão implementadas nas tarefas de telas. O aceite desta tarefa é documental; TEST-14 permanece não executado e será realizado sobre a aplicação na TASK-12. Próximo passo à época: TASK-02.
+
+### TASK-02 — base concluída
+
+Arquivos: `package.json`, configurações Vite/TypeScript/ESLint/Tailwind/shadcn, `src/app`, `src/routes`, `src/components`, `src/lib`, placeholders em `public/assets/placeholders`, configuração Playwright e script inicial de Lighthouse. Não houve commit automático.
+
+- [x] Escrever manifest, configuração de runtime/env, scripts e aliases.
+- [x] Preparar providers Query/Router, rotas das nove telas, 404 e fallback de erro.
+- [x] Preparar instância Axios e política inicial de retry (sem dados fictícios no cliente).
+- [x] Escrever tokens e shell responsivo com Button/Input/Skeleton adaptados do padrão shadcn/ui.
+- [x] Escolher IBM Plex Mono (pesos 400/500/600/700) via Fontsource, para servir localmente após instalação; comparação no browser ainda pendente.
+- [x] Criar quatro placeholders SVG locais, estáveis e sem dependência de serviço externo.
+- [x] Preparar smoke do shell em Chromium desktop/mobile e script exploratório Lighthouse; ainda não executados.
+- [x] Verificar sintaxe de 20 arquivos TS/TSX, imports locais, JSON, XML dos SVGs, sintaxe JS/MJS e `git diff --check`.
+- [x] Instalar dependências e gerar `package-lock.json` (instalação realizada pelo usuário).
+- [x] Executar typecheck, lint e build; todos passaram.
+- [x] Declarar Vite 7.3.7 diretamente e sincronizar lockfile com resolução já instalada; `npm ci --dry-run --offline --ignore-scripts --no-audit --no-fund` passou.
+- [x] Incluir licença IBM Plex Mono no build em `public/licenses/ibm-plex-mono-OFL.txt`.
+- [x] Smoke Playwright do shell em Chromium desktop/mobile aprovado pelo usuário no terminal local.
+- [ ] Comparação visual de fonte/shell com os PNGs fica para TASK-12.
+
+Bloqueio inicial de instalação resolvido pelo usuário. `npm ls --depth=0`, `npm run typecheck`, `npm run lint` e `npm run build` passaram. Build gera JS/CSS, fontes locais e licença. O dry-run de npm ci verifica sincronização do lockfile, mas não substitui instalação real em checkout limpo (TASK-15).
+
+O runner desta sessão não conseguiu iniciar o preview por `listen EPERM 127.0.0.1:4173`. O usuário executou o smoke Playwright em seu terminal local e confirmou que passou em Chromium desktop/mobile. Registro como aprovado pelo usuário; o resultado observado pela execução local do agente continua bloqueado pela sandbox. Nenhum fluxo de negócio REST/socket foi exercitado pelo smoke.
+
+TASK-02 concluída. TASK-03 em andamento para provar Axios→MSW e MSW→Socket.IO→cliente; primeiro deploy permanece sujeito ao acesso ao provedor.
+
+
+### Smoke shell — confirmação do usuário
+
+O usuário informou em 07/10/2026 que `npm run test:e2e` passou após instalar Chromium em seu terminal local. Resultado da execução local do agente não disponível: preview bloqueado por EPERM da sandbox. Suíte é apenas o smoke do shell; não comprova integração REST/socket nem os E2E dos 12 grupos.
+
+### Início da TASK-03 — 07/10/2026
+
+Prova REST/MSW, Socket.IO/MSW e publicação inicial ainda não implementadas. Verificar bindings e iniciar handlers reproduzíveis.

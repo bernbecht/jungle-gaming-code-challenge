@@ -1,6 +1,6 @@
 # Arquitetura e decisões
 
-Status: **projeto proposto; implementação ainda não iniciada**. Decisões abaixo guiam o desenvolvimento e devem ser atualizadas quando o código trouxer evidência diferente. Fonte de obrigações: [REQUIREMENTS.md](REQUIREMENTS.md). Payloads: [CONTRACTS](docs/CONTRACTS.md).
+Status: **base da TASK-02 com dependências instaladas, tipos/lint/build aprovados; verificação no navegador pendente**. Providers/router, cliente Axios, tokens e shell estão preparados. Demais decisões de domínio permanecem propostas. Decisões abaixo guiam o desenvolvimento e devem ser atualizadas quando o código trouxer evidência diferente. Fonte de obrigações: [REQUIREMENTS.md](REQUIREMENTS.md). Payloads: [CONTRACTS](docs/CONTRACTS.md).
 
 ## Estrutura e limites
 
@@ -22,7 +22,7 @@ docs/
 
 | ID | Decisão e motivação | Requisitos |
 | --- | --- | --- |
-| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões serão fixadas em TASK-02 após prova de compatibilidade | REQ-001, REQ-050 |
+| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões resolvidas em package-lock.json; tipos/lint/build aprovados na TASK-02, integração REST/socket pendente da TASK-03 | REQ-001, REQ-050 |
 | DEC-02 | URL guarda busca/filtros/ordenação/página; Query guarda estado remoto; estado local guarda edição/formulários/diálogos. Não duplicar carrinho em outro store | REQ-005, REQ-025, REQ-027 |
 | DEC-03 | Componentes → hooks Query → serviços Axios → handlers MSW → domínio/banco simulado. Eventos e REST usam o mesmo domínio. UI não importa fixtures | REQ-025, REQ-029, REQ-030, REQ-032 |
 | DEC-04 | Inicialização aguarda ativação dos mocks, depois recupera sessão e resolve guards. Token fictício opaco persistido; handlers verificam dono e expiração em toda operação privada | REQ-021, REQ-022, REQ-023 |
@@ -40,7 +40,7 @@ docs/
 
 ## Decisões visuais confirmadas pelo usuário — 06/10/2026
 
-As decisões abaixo complementam DEC-14 e substituem a espera por informações adicionais do Figma. Estão aceitas como diretrizes; sua implementação ainda não ocorreu.
+As decisões abaixo complementam DEC-14 e substituem a espera por informações adicionais do Figma. Estão aceitas como diretrizes. Fonte selecionada e placeholders criados na TASK-02; layouts completos e revisão no browser ainda pendentes.
 
 | ID | Decisão | Execução / verificação | Requisitos |
 | --- | --- | --- | --- |
@@ -105,3 +105,11 @@ Arquivo Figma ainda não inspecionado diretamente. As 15 screenshots foram anali
 ### Ajustes propostos após análise das screenshots — DEC-14
 
 Login/cadastro usam apresentação modal no desktop e página no mobile, preservando rotas e acesso direto. Checkout mobile deve oferecer dados/revisão além do frame de carteira. Header privado deve refletir sessão apesar do botão Entrar presente na referência. Recibo deve indicar simulação em vez de alegar transação real. IDs/imagens/badges inconsistentes entre PNGs serão substituídos por uma fixture coerente. Essas decisões preservam REQ-014, REQ-020, REQ-021 e REQ-030; ainda não foram implementadas ou verificadas. Detalhes de ENS/indicação e da ação central mobile permanecem decisões pendentes, não funcionalidades inferidas.
+
+### Estado da base — TASK-02
+
+Rotas definidas em código com TanStack Router (`src/app/router.ts`), mantendo componentes de página separados. Essa opção evita geração de arquivos nesta base pequena; guards e search params entram junto dos fluxos correspondentes. QueryClient usa retry apenas para falha transitória Axios; nenhuma mutation possui retry automático. Há apenas páginas de indisponibilidade nas rotas ainda não implementadas, sem dados privados ou simulação de sucesso.
+
+DEC-16: IBM Plex Mono selecionada via Fontsource (400/500/600/700), com imports locais no build; fonte instalada na versão 5.3.0 e incluída no build; licença distribuída em public/licenses/ibm-plex-mono-OFL.txt. DEC-17: quatro SVGs abstratos criados em `public/assets/placeholders/`. Inventário e fontes oficiais de referência em `docs/ASSETS.md`.
+
+Tokens raster aplicados em CSS; borda de input proposta mais clara (`#79583E`) para melhorar identificação de controles, mantendo borda decorativa `#3F2319`. Validar contraste real em TASK-12. A home é apenas uma composição inicial, não o catálogo implementado. Componentes Button/Input/Skeleton seguem o padrão shadcn/ui adaptado manualmente; nenhum comando CLI shadcn foi executado. MSW/Socket.IO ainda não estão ativos. Build/tipos/lint passaram. Browser não executado: sandbox bloqueia abertura da porta de preview e Chromium Playwright ainda não está instalado.

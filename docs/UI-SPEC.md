@@ -1,6 +1,6 @@
 # Especificação de interface
 
-Status: **15 screenshots analisadas em 06/10/2026; implementação ainda não iniciada**. Referências locais abaixo. O arquivo Figma não foi inspecionado diretamente; fontes, tokens originais, camadas e interações não foram confirmados. TASK-01 concluída como análise; decisões de implementação aceitas em DEC-16, DEC-17 e DEC-18. A análise distingue observação do PNG, medição raster e proposta de implementação.
+Status: **15 screenshots analisadas em 06/10/2026; shell inicial escrito na TASK-02, ainda não validado no browser**. Referências locais abaixo. O arquivo Figma não foi inspecionado diretamente; fontes, tokens originais, camadas e interações não foram confirmados. TASK-01 concluída como análise; decisões de implementação aceitas em DEC-16, DEC-17 e DEC-18. A análise distingue observação do PNG, medição raster e proposta de implementação.
 
 Rotas abaixo são propostas, não URLs impostas pelo desafio. Regras técnicas em [ARCHITECTURE](../ARCHITECTURE.md); testes em [TEST-MATRIX](TEST-MATRIX.md).
 
@@ -59,7 +59,7 @@ Amostragem dos pixels opacos de Carteiras desktop e Login mobile encontrou as co
 
 **Estimativas geométricas para começar, a validar no browser:** container desktop de aproximadamente 1200 px com margens de 120 px em 1440; sidebar de conta/catálogo perto de 310 px; gutter de 24–32 px; margem mobile de 24–28 px. Inputs desktop em torno de 40 px, mobile em torno de 50 px; CTAs mobile próximos de 60 px. Texto de corpo por volta de 14–16 px, títulos de seção 18–22 px. Não tratar essas estimativas como medições do Figma.
 
-Família/pesos originais permanecem desconhecidos. Por DEC-16, escolher uma fonte mono semelhante durante TASK-02, comparar com os PNGs e registrar família/pesos/origem; não aguardar informação do Figma. Não afirmar que é uma família específica. Verificar contraste real dos pares de tokens e estados no browser em TEST-14.
+Família/pesos originais permanecem desconhecidos. Por DEC-16, foi selecionada IBM Plex Mono via Fontsource, pesos 400/500/600/700, durante TASK-02; instalação concluída e comparação no browser ainda pendente; não aguardar informação do Figma. Não afirmar que é uma família específica. Verificar contraste real dos pares de tokens e estados no browser em TEST-14.
 
 ## Análise por tela
 
@@ -189,3 +189,7 @@ Primeiro tokens/shell e variantes de campos/botões; depois NFTCard/galeria, lin
 ## Critério de aprovação visual
 
 TEST-13 compara baselines estáveis; TEST-14 faz revisão humana contra o Figma. Screenshot aprovado apenas por coincidir com baseline não prova fidelidade ao layout. Registrar frame, viewport, screenshot e desvios restantes em TEST-MATRIX.
+
+## Implementação inicial de tokens/assets — TASK-02
+
+CSS em `src/styles.css`, shell em `src/components/layout/app-shell.tsx`. Quatro SVGs placeholders estão disponíveis em `public/assets/placeholders/`, conforme DEC-17. Fonte escolhida: IBM Plex Mono via Fontsource (DEC-16), instalada e incluída no build. Inventário em [ASSETS](ASSETS.md). Ainda não houve screenshot da aplicação nem validação de fidelidade/responsividade; as composições finais seguem TASK-05/TASK-09/TASK-12.
