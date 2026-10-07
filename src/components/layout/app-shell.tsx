@@ -1,14 +1,15 @@
 import { HeaderSearch } from '@/features/catalog/header-search'
 import { defaultCatalog } from '@/features/catalog/search'
-import { Link, Outlet } from '@tanstack/react-router'
-import { Home, LogIn, ShoppingBag, UserRound } from 'lucide-react'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { Heart, Home, LogIn, ScanLine, ShoppingBag, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function AppShell() {
+  const isHome = useLocation().pathname === '/'
   return (
     <div className="min-h-dvh">
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
-      <header className="page-container flex min-h-20 items-center justify-between gap-4 border-b border-border">
+      <header className={`page-container flex min-h-20 items-center justify-between gap-4 border-b border-border ${isHome ? 'hidden md:flex' : ''}`}>
         <Link to="/" search={defaultCatalog} aria-label="Kurio — início" className="text-lg font-bold tracking-[0.14em]">
           KURIO
         </Link>
@@ -43,13 +44,19 @@ export function AppShell() {
 
       <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">
         <Link to="/" search={defaultCatalog} activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
-          <Home aria-hidden="true" size={20} /><span>Início</span>
+          <Home aria-hidden="true" size={20} /><span className="sr-only">Início</span>
         </Link>
-        <Link to="/cart" activeProps={{ className: 'text-primary' }}>
-          <ShoppingBag aria-hidden="true" size={20} /><span>Carrinho</span>
+        {isHome && <button type="button" disabled aria-label="Favoritos indisponíveis nesta etapa" className="text-muted-foreground disabled:opacity-100">
+          <Heart aria-hidden="true" size={20} />
+        </button>}
+        {isHome && <button type="button" className="mobile-nav-center" disabled aria-label="Ação central não disponível nesta demonstração">
+          <ScanLine aria-hidden="true" size={25} />
+        </button>}
+        <Link to="/cart" activeProps={{ className: 'text-primary' }} aria-label="Carrinho">
+          <ShoppingBag aria-hidden="true" size={20} />
         </Link>
-        <Link to="/profile" activeProps={{ className: 'text-primary' }}>
-          <UserRound aria-hidden="true" size={20} /><span>Perfil</span>
+        <Link to="/profile" activeProps={{ className: 'text-primary' }} aria-label="Perfil">
+          <UserRound aria-hidden="true" size={20} />
         </Link>
       </nav>
     </div>

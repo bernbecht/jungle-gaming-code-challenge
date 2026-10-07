@@ -207,3 +207,17 @@ CSS em `src/styles.css`, shell em `src/components/layout/app-shell.tsx`. Quatro 
 - Revisão de paginação: números compactos alinhados à direita abaixo da grade, página atual com fundo cobre, outras com fundo transparente/borda discreta e seta de avanço. Seta de retorno aparece depois da primeira página; setas indisponíveis não aparecem. Total vem da API (três páginas na fixture atual, não quatro fixas do PNG). Controles têm 28 px visuais/44 px de área acionável, foco visível e `aria-current`. Listas longas usam reticências. Comparação visual no navegador pendente.
 
 - Navegação Todos os NFTs / Novos lançamentos / Em alta: implementada como links. O link ativo usa texto e barra inferior em `#D28A4C`, sem preenchimento de botão; inativos usam texto `#F5F1EB` e borda inferior transparente. O link ativo usa `aria-current="page"`; navegar preserva busca/filtros/ordenação e reinicia a página. Destino continua na seção do catálogo. Verificação E2E pendente.
+
+## Homepage mobile — composição específica
+
+Implementação na TASK-05: no mobile, o header desktop é substituído por busca larga acionável e botão de filtros; o hero desktop dá lugar a painel compacto com chamada e duas artes placeholder sobrepostas; ordenação some do frame; grade usa duas colunas com deslocamento vertical alternado e coração desabilitado até favoritos/autenticação. Badge RARO observado no PNG foi removido conforme DEC-20: não há critério ou campo de domínio que sustente a classificação. Barra inferior da homepage mostra início, favoritos, ação central, carrinho e perfil. Favoritos levam ao login (REQ-008); ação central permanece desabilitada e identificada como indisponível porque sua finalidade não foi definida no PNG. Desktop conserva header e hero próprios. A validação visual de ambos continua pendente; placeholders não foram substituídos.
+
+
+### Dúvida para apresentação — badge RARO (DEC-20)
+
+- **Observado:** o frame mobile tem um selo “RARO” em um card.
+- **No enunciado:** não há requisito para o selo nem definição do que torna um NFT raro.
+- **Decisão atual:** badge omitido; não inferimos raridade a partir da edição `1/1`.
+- **Pergunta possível:** “O selo RARO do protótipo é apenas editorial ou deveria corresponder a uma regra de raridade na API? Qual seria o critério?”
+
+A imagem comprova que o protótipo exibe o selo; não comprova que haja uma regra de negócio por trás dele.

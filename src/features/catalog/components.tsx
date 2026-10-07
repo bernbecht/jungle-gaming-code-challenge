@@ -2,40 +2,53 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Nft } from "@/contracts/marketplace";
 import { Link } from "@tanstack/react-router";
+import { Heart } from "lucide-react";
 import { lowestEdition } from "./price";
 
-export function NftCard({ nft }: { nft: Nft }) {
+export function NftCard({ nft, mobileHome = false }: { nft: Nft; mobileHome?: boolean }) {
   const edition = lowestEdition(nft);
   return (
     <article className="min-w-0">
-      <Link
-        to="/nfts/$nftId"
-        params={{ nftId: nft.id }}
-        className="group block"
-        aria-label={`Ver ${nft.name}`}
-      >
-        <div className="relative bg-card">
-          <img
-            src={nft.images[0]?.url}
-            alt={nft.images[0]?.alt ?? nft.name}
-            width={640}
-            height={640}
-            loading="lazy"
-            className="aspect-square w-full rounded-xl object-cover"
-          />
-          {!nft.editions.some((e) => e.available > 0) && (
-            <span className="absolute bottom-4 left-4 rounded bg-background px-2 py-1 text-xs">
-              Esgotado
-            </span>
-          )}
-        </div>
-        <h3 className="mt-8 break-words text-base font-medium group-hover:text-primary">
-          {nft.name}
-        </h3>
-        <p className="mt-1 font-semibold text-primary text-lg">
-          {edition.unitPrice} ETH
-        </p>
-      </Link>
+      <div className="relative">
+        <Link
+          to="/nfts/$nftId"
+          params={{ nftId: nft.id }}
+          className="group block"
+          aria-label={`Ver ${nft.name}`}
+        >
+          <div className="relative bg-card p-1 md:p-3">
+            <img
+              src={nft.images[0]?.url}
+              alt={nft.images[0]?.alt ?? nft.name}
+              width={640}
+              height={640}
+              loading="lazy"
+              className="aspect-square w-full rounded-xl object-cover"
+            />
+            {!nft.editions.some((item) => item.available > 0) && (
+              <span className="absolute bottom-3 left-3 rounded bg-background px-2 py-1 text-xs">
+                Esgotado
+              </span>
+            )}
+          </div>
+          <h3 className="mt-3 break-words px-1 text-sm font-medium group-hover:text-primary md:mt-8 md:text-base">
+            {nft.name}
+          </h3>
+          <p className="mt-1 px-1 text-sm font-semibold text-primary md:text-lg">
+            {edition.unitPrice} ETH
+          </p>
+        </Link>
+        {mobileHome && (
+          <button
+            type="button"
+            disabled
+            aria-label={`Favoritar ${nft.name} (indisponível nesta etapa)`}
+            className="absolute top-3 right-3 inline-flex size-9 items-center justify-center rounded-full bg-background/90 text-primary disabled:opacity-100 md:hidden"
+          >
+            <Heart aria-hidden="true" size={18} />
+          </button>
+        )}
+      </div>
     </article>
   );
 }

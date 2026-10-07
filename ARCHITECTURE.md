@@ -48,6 +48,7 @@ As decisões abaixo complementam DEC-14 e substituem a espera por informações 
 | DEC-17 | Usar assets placeholders por enquanto. Manter arquivos locais, identidades estáveis e proporções compatíveis com os componentes. Documentar substituições; reavaliar a qualidade visual antes da entrega, sem presumir que placeholders já atendem à fidelidade exigida | TASK-02, TASK-04, TASK-05; revisão em TASK-12 / TEST-14 | REQ-030, REQ-037, REQ-040 |
 | DEC-18 | Criar adaptações próprias para tablet e telas mobile sem referência, seguindo a identidade dos PNGs e preservando todos os fluxos. Não aguardar novos frames do Figma | TASK-05, TASK-08, TASK-09, TASK-12 / TEST-14 | REQ-004, REQ-037, REQ-039 |
 | DEC-19 | Contratos distinguem username/displayName e slot/nickname/profileName/provider da carteira. ENS e indicação são opcionais; perfil usa a carteira principal como fonte do apelido. Collector guarda esses metadados e observação no snapshot, sem exigir serviços reais de ENS ou indicação | TASK-04; formulários em TASK-06/TASK-09 | REQ-014, REQ-024, REQ-025 |
+| DEC-20 | Não exibir badge RARO no card do catálogo: o PNG mobile o mostra, mas não existe requisito formal nem critério/campo no contrato que determine raridade. Perguntar na apresentação se é marcação editorial ou conceito de domínio; reconsiderar se houver regra explícita | TASK-05 / UI-SPEC; pergunta de apresentação | — |
 
 A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
 
@@ -152,3 +153,12 @@ A interface oferece apenas Coleções, Faixa de preço e Rede. Apesar do título
 ### Revisão UI-01 — aparência e contagens dos filtros
 
 Coleções e Rede usam botões de alternância sem borda/fundo ou checkbox visível. `aria-pressed` expressa seleção múltipla, Enter/Espaço alternam e a contagem é descrição acessível. Tokens `text-muted-foreground` (`#CFB28C`) e `text-accent` (`#E89B55`) reproduzem as cores solicitadas; semibold também diferencia a seleção visualmente. O DTO compartilhado `CatalogFacets` inclui contagens calculadas no MSW, com um NFT por categoria/rede, independentemente das edições, filtros ou página. As contagens representam o inventário completo, não o resultado de uma combinação atual. Uma opção da URL ausente do catálogo aparece com zero e pode ser desmarcada.
+
+### Homepage mobile — TASK-05 / DEC-18
+
+A homepage mobile usa uma composição própria: o header desktop some apenas na raiz mobile e dá lugar à busca acionável/filtros dentro da página. Um hero curto usa SVGs placeholder sobrepostos e tratamento decorativo local. A ordenação fica fora do frame mobile; tabs e filtros seguem aplicáveis por URL. Cards em duas colunas alternam deslocamento; não mostram badge RARO porque não há regra formal que classifique a raridade. Coração no card leva à autenticação quando a feature estiver ligada; nesta etapa aparece desabilitado para não aparentar sucesso. A barra inferior da home tem cinco posições; a ação central é visualmente representada e desabilitada, sem atribuir-lhe função que o Figma não documenta. Desktop mantém seu header/hero próprios. Conferir composição e overflow em 390 px, além de 414, antes de aceitar a fidelidade.
+
+
+#### Badge “Raro” no protótipo — DEC-20
+
+A screenshot mobile inclui RARO, mas o desafio não exige essa marca, e os DTOs/fixtures não definem uma classificação de raridade. Removemos o badge dos cards para não converter uma indicação visual isolada em regra de produto com critério inventado. Pergunta sugerida para a apresentação: “O selo RARO do protótipo é apenas editorial ou deveria corresponder a uma regra de raridade no domínio/API? Qual seria essa regra?” A screenshot e o registro da ausência no enunciado são evidência da dúvida, não evidência de uma regra implementada.

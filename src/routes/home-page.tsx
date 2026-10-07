@@ -8,6 +8,7 @@ import {
   QueryError,
 } from "@/features/catalog/components";
 import { CatalogFilters } from "@/features/catalog/filters";
+import { HeaderSearch } from "@/features/catalog/header-search";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
@@ -42,9 +43,63 @@ export function HomePage() {
   };
   return (
     <>
+      <div className="flex items-center gap-2 pt-5 md:hidden">
+        <HeaderSearch variant="field" />
+        <Button
+          ref={filterTrigger}
+          variant="default"
+          size="icon"
+          aria-label="Abrir filtros do catálogo"
+          onClick={() => dialog.current?.showModal()}
+          className="shrink-0 rounded-xl"
+        >
+          <SlidersHorizontal aria-hidden="true" />
+        </Button>
+      </div>
+      <section
+        aria-labelledby="mobile-hero-title"
+        className="relative mt-4 flex min-h-[190px] items-center overflow-hidden rounded-[28px] bg-card p-4 md:hidden"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 38% 50%, #55331f 0, #382319 48%, #241612 100%)",
+        }}
+      >
+        <div className="relative z-10 w-[58%]">
+          <p className="mb-2 text-xs text-foreground">Bem-vindo à Kurio</p>
+          <h1
+            id="mobile-hero-title"
+            className="text-lg leading-snug font-semibold uppercase"
+          >
+            Seja dono da cultura digital
+          </h1>
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
+            Descubra NFTs selecionados de criadores do mundo todo.
+          </p>
+          <a
+            href="#colecoes"
+            className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary"
+          >
+            Explorar <ArrowUpRight aria-hidden="true" size={14} />
+          </a>
+        </div>
+        <img
+          src="/assets/placeholders/emerald.svg"
+          alt="Arte digital temporária em tons de verde"
+          width={160}
+          height={160}
+          className="absolute top-3 right-3 aspect-square w-[39%] rounded-2xl object-cover"
+        />
+        <img
+          src="/assets/placeholders/ivory.svg"
+          alt="Arte digital temporária complementar"
+          width={96}
+          height={96}
+          className="absolute right-[28%] bottom-3 aspect-square w-[23%] rounded-xl border-2 border-card object-cover"
+        />
+      </section>
       <section
         aria-labelledby="hero-title"
-        className="grid items-center gap-10 py-10 md:grid-cols-2 md:gap-16 md:py-16"
+        className="hidden items-center gap-10 py-10 md:grid md:grid-cols-2 md:gap-16 md:py-16"
       >
         <div className="max-w-xl">
           <p className="mb-5 text-xs font-medium tracking-widest text-muted-foreground">
@@ -88,7 +143,7 @@ export function HomePage() {
       <section
         id="colecoes"
         aria-labelledby="collections-title"
-        className="scroll-mt-6 py-8"
+        className="md:scroll-mt-6 md:py-8"
       >
         <div className="mt-6 grid gap-12 lg:grid-cols-[310px_1fr]">
           <aside
@@ -107,7 +162,7 @@ export function HomePage() {
               <div
                 role="group"
                 aria-label="Categorias de lançamento"
-                className="flex flex-wrap gap-2 lg:col-start-1"
+                className="flex flex-nowrap gap-0 overflow-x-auto lg:col-start-1"
               >
                 {(
                   [
@@ -128,7 +183,7 @@ export function HomePage() {
                   </Link>
                 ))}
               </div>
-              <div className="flex max-w-full items-center gap-1 justify-end lg:col-start-2 lg:ml-0 lg:justify-self-end">
+              <div className="hidden max-w-full items-center gap-1 justify-end lg:col-start-2 lg:justify-self-end lg:flex">
                 <label htmlFor="catalog-sort" className="shrink-0">
                   Ordenar por:
                 </label>
@@ -175,15 +230,6 @@ export function HomePage() {
                   </select>
                 </div>
               </div>
-              <Button
-                ref={filterTrigger}
-                variant="outline"
-                className="lg:hidden"
-                onClick={() => dialog.current?.showModal()}
-              >
-                <SlidersHorizontal aria-hidden="true" />
-                Filtros
-              </Button>
             </div>
             {catalog.isPending ? (
               <CatalogSkeleton count={params.pageSize} />
@@ -206,11 +252,11 @@ export function HomePage() {
               </div>
             ) : (
               <div
-                className="grid grid-cols-2 gap-4  md:grid-cols-3 md:gap-8 md:gap-y-20"
+                className="mobile-nft-grid grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-8 md:gap-y-20"
                 data-testid="catalog-grid"
               >
                 {catalog.data.items.map((nft) => (
-                  <NftCard key={nft.id} nft={nft} />
+                  <NftCard key={nft.id} nft={nft} mobileHome />
                 ))}
               </div>
             )}

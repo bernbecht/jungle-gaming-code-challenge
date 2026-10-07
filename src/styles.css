@@ -136,3 +136,16 @@
 .price-slider input:focus-visible { outline: none; }
 .price-slider input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--ring); outline-offset: 3px; }
 .price-slider input:focus-visible::-moz-range-thumb { outline: 2px solid var(--ring); outline-offset: 3px; }
+
+@media (max-width: 767px) {
+  .mobile-nft-grid > article:nth-child(even) {
+    transform: translateY(1.5rem);
+  }
+  .mobile-nft-grid {
+    padding-bottom: 1.5rem;
+  }
+}
+.mobile-nav-center {
+  @apply -mt-8 inline-flex size-16 shrink-0 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-lg;
+}
+.mobile-nav-center:disabled { opacity: 1; }

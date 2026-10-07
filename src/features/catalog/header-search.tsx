@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { defaultCatalog, validateCatalogSearch } from './search'
 
-export function HeaderSearch() {
+export function HeaderSearch({ variant = 'icon' }: { variant?: 'icon' | 'field' }) {
   const id = useId()
   const dialog = useRef<HTMLDialogElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -20,7 +20,8 @@ export function HeaderSearch() {
       <Button
         ref={trigger}
         variant="ghost"
-        size="icon"
+        size={variant === 'icon' ? 'icon' : 'default'}
+        className={variant === 'field' ? 'w-full justify-start rounded-xl bg-card px-4 text-left text-muted-foreground hover:bg-card' : undefined}
         aria-label="Abrir busca de NFTs"
         aria-haspopup="dialog"
         aria-controls={`${id}-dialog`}
@@ -31,6 +32,7 @@ export function HeaderSearch() {
         }}
       >
         <Search aria-hidden="true" />
+        {variant === 'field' && <span>Explorar coleções</span>}
       </Button>
       <dialog
         ref={dialog}
