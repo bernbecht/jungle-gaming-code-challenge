@@ -21,6 +21,37 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+function CollectorRating({ rating, count }: { rating: number; count: number }) {
+  return (
+    <span
+      role="img"
+      aria-label={`${rating.toFixed(1)} de 5 estrelas; ${count} avaliações de colecionadores`}
+      className="hidden items-center gap-1 md:flex"
+    >
+      <span aria-hidden="true" className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }, (_, index) => {
+          const fill = Math.min(1, Math.max(0, rating - index)) * 100;
+          return (
+            <span key={index} className="relative inline-flex">
+              <Star
+                size={16}
+                className="fill-muted-foreground text-muted-foreground"
+              />
+              <span
+                className="absolute inset-y-0 left-0 overflow-hidden"
+                style={{ width: `${fill}%` }}
+              >
+                <Star size={16} className="fill-primary text-primary" />
+              </span>
+            </span>
+          );
+        })}
+      </span>
+      <span className="text-sm">{count} avaliações de colecionadores</span>
+    </span>
+  );
+}
+
 export function NftDetailPage() {
   const { nftId } = useParams({ from: "/nfts/$nftId" });
   const nft = useQuery(nftQuery(nftId));
@@ -62,9 +93,9 @@ export function NftDetailPage() {
       </section>
     );
   }
-  return <NftDetail key={nftId} nft={nft.data} updating={nft.isFetching} />;
+  return <NftDetail key={nftId} nft={nft.data} />;
 }
-function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
+function NftDetail({ nft }: { nft: Nft }) {
   const [imageIndex, setImageIndex] = useState(0);
   const [editionId, setEditionId] = useState(lowestEdition(nft).id);
   const [requestedQuantity, setQuantity] = useState(1);
@@ -175,10 +206,10 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
             <p className="hidden text-xl font-semibold text-primary md:block">
               {edition.unitPrice} ETH
             </p>
-            <p className="hidden items-center gap-2 text-sm md:flex">
-              <Star className="text-primary" size={18} aria-hidden="true" />
-              {nft.rating.average.toFixed(1)} · {nft.rating.count} avaliações
-            </p>
+            <CollectorRating
+              rating={nft.rating.average}
+              count={nft.rating.count}
+            />
           </div>
           <h2 className="mt-5 font-semibold">Sobre este NFT</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">
@@ -216,6 +247,7 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
               className="nft-detail-desktop-quantity flex items-center gap-4"
             >
               <Button
+                className="h-7 w-7 shrink-0 rounded-full p-2"
                 aria-label="Diminuir quantidade"
                 disabled={quantity <= 1 || edition.available === 0}
                 onClick={() => setQuantity(quantity - 1)}
@@ -224,6 +256,7 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
               </Button>
               <output aria-label="Quantidade selecionada">{quantity}</output>
               <Button
+                className="h-7 w-7 shrink-0 rounded-full p-0"
                 aria-label="Aumentar quantidade"
                 disabled={quantity >= edition.available}
                 onClick={() => setQuantity(quantity + 1)}
@@ -239,7 +272,7 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
               </Button>
             </div>
           </div>
-          <dl className="mt-6 space-y-3 text-sm text-muted-foreground">
+          <dl className="mt-6 space-y-3 text-base text-muted-foreground">
             <div>
               <dt className="inline">ID do token: </dt>
               <dd className="inline">#{nft.tokenId}</dd>
