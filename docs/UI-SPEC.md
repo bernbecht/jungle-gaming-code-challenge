@@ -75,9 +75,9 @@ Proposta: filtro em drawer no mobile e busca expansível no desktop. Não deduzi
 
 Desktop: quatro miniaturas à esquerda, arte principal, informações à direita; preço/rating, descrição, chips de edição (1/1, 1/10, 1/50, ABERTA), quantidade, Comprar e Favoritar. Metadados: ID do token, coleção e atributos; ações de compartilhar. Abaixo, tabs de detalhes/avaliações, texto técnico, cinco recomendações e footer.
 
-Mobile: voltar/favorito no topo, imagem grande, painel de informações sobreposto visualmente à base da imagem e bloco inferior de quantidade/preço/Comprar NFT/carrinho. Rating aparece como cápsula. Não há evidência de miniaturas, tabs ou recomendações no trecho visível; não concluir que foram removidas do fluxo completo.
+Mobile: header global e navegação inferior não aparecem. Há voltar/favorito no topo, imagem grande, painel de informações sobreposto visualmente à base da imagem e bloco inferior com quantidade/preço/Comprar NFT/carrinho. Rating aparece como cápsula. A barra está ancorada visualmente ao rodapé nesta captura; comportamento fixo durante rolagem deve ser confirmado em uso. Não há evidência de miniaturas, tabs ou recomendações no trecho visível; não concluir que foram removidas do fluxo completo.
 
-Proposta: compra abre/adiciona ao fluxo de carrinho sem confirmar pedido; botão de carrinho mantém acesso explícito. Galeria permanece acessível via controles no mobile. Barra de compra pode ser sticky após validar scroll/teclado; o PNG sozinho não prova posicionamento fixo. Informações de rede/contrato são dados simulados, não comprovação de blockchain.
+Adaptação: esconder header global e navegação inferior nesta rota mobile; compor voltar/favorito no topo e manter controles de compra numa barra fixa com safe-area e espaço inferior no conteúdo. Favorito, compra e adicionar ao carrinho permanecem desabilitados enquanto TASK-06/TASK-07 não conectarem essas operações; não simular sucesso. Galeria permanece acessível por enquanto via imagem principal; validar se precisa de affordance de troca mobile. Informações de rede/contrato são dados simulados, não comprovação de blockchain.
 
 ### UI-03 — Carrinho
 

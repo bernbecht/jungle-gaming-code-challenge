@@ -5,11 +5,13 @@ import { Heart, Home, LogIn, ScanLine, ShoppingBag, UserRound } from 'lucide-rea
 import { Button } from '@/components/ui/button'
 
 export function AppShell() {
-  const isHome = useLocation().pathname === '/'
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
+  const isNftDetail = pathname.startsWith('/nfts/')
   return (
     <div className="min-h-dvh">
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
-      <header className={`page-container flex min-h-20 items-center justify-between gap-4 border-b border-border ${isHome ? 'hidden md:flex' : ''}`}>
+      <header className={`page-container flex min-h-20 items-center justify-between gap-4 border-b border-border ${(isHome || isNftDetail) ? 'hidden md:flex' : ''}`}>
         <Link to="/" search={defaultCatalog} aria-label="Kurio — início" className="text-lg font-bold tracking-[0.14em]">
           KURIO
         </Link>
@@ -34,7 +36,7 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      <footer className="page-container mt-16 border-t border-border pt-8 pb-28 md:pb-8">
+      <footer className={`page-container mt-16 border-t border-border pt-8 ${isHome ? 'pb-28 md:pb-8' : 'pb-8'}`}>
         <div className="flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between">
           <span className="font-semibold tracking-widest">KURIO</span>
           <p className="text-muted-foreground">Feito para colecionadores, criadores e cultura.</p>
@@ -42,23 +44,23 @@ export function AppShell() {
         <p className="mt-6 text-xs text-muted-foreground">Demonstração. Nenhuma transação real é realizada.</p>
       </footer>
 
-      <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">
+      {isHome && <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">
         <Link to="/" search={defaultCatalog} activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
           <Home aria-hidden="true" size={20} /><span className="sr-only">Início</span>
         </Link>
-        {isHome && <button type="button" disabled aria-label="Favoritos indisponíveis nesta etapa" className="text-muted-foreground disabled:opacity-100">
+        <button type="button" disabled aria-label="Favoritos indisponíveis nesta etapa" className="text-muted-foreground disabled:opacity-100">
           <Heart aria-hidden="true" size={20} />
-        </button>}
-        {isHome && <button type="button" className="mobile-nav-center" disabled aria-label="Ação central não disponível nesta demonstração">
+        </button>
+        <button type="button" className="mobile-nav-center" disabled aria-label="Ação central não disponível nesta demonstração">
           <ScanLine aria-hidden="true" size={25} />
-        </button>}
+        </button>
         <Link to="/cart" activeProps={{ className: 'text-primary' }} aria-label="Carrinho">
           <ShoppingBag aria-hidden="true" size={20} />
         </Link>
         <Link to="/profile" activeProps={{ className: 'text-primary' }} aria-label="Perfil">
           <UserRound aria-hidden="true" size={20} />
         </Link>
-      </nav>
+      </nav>}
     </div>
   )
 }

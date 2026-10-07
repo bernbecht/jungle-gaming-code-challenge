@@ -138,6 +138,10 @@ Facetas são derivadas pelo MSW do catálogo, nunca importadas das fixtures pelo
 
 Home inclui banners com links internos de filtro e quatro blocos explicativos no lugar de artigos sem conteúdo navegável. Avaliações mostram apenas agregados presentes no contrato. Compartilhamento copia a URL com feedback, sem integração social externa. Estes ajustes e placeholders precisam de revisão visual na TASK-12; nenhuma fidelidade pixel a pixel foi comprovada.
 
+### Detalhe mobile — UI-02 / TASK-05
+
+Na rota `/nfts/:nftId`, o mobile esconde o header global e a navegação inferior do shell. O detalhe tem controles próprios de voltar/favoritar no topo e uma barra fixa inferior com quantidade, preço, compra e carrinho; o conteúdo reserva espaço para não ficar encoberto e respeita a safe area. Compra/favorito/adicionar ao carrinho seguem desabilitados até TASK-06/TASK-07 implementarem as operações. A screenshot mostra a barra junto ao rodapé; fixidez durante rolagem foi adotada como interpretação e precisa de validação no browser.
+
 ### Revisão UI-01 — filtro de preço
 
 O filtro de preço usa uma faixa de dois controles nativos compartilhando a mesma trilha, conforme a screenshot desktop. Mostra mínimo/máximo e mantém o botão Aplicar: arrastar/usar teclado altera apenas o rascunho, aplicar envia decimais ETH à URL/API e reinicia a página. Limite superior deriva de API-03/facetas, sem copiar valores ilustrativos do PNG. Limites presentes na URL são preservados, inclusive acima do máximo atual e com até 18 casas; o domínio do slider se expande para representá-los. Há 1000 intervalos entre zero e o limite, convertidos com BigInt; não há cálculo financeiro com ponto flutuante. Os controles não cruzam e possuem nomes, valores ETH acessíveis, foco visível e áreas de interação de 44 px. Revisão no navegador ainda pendente.

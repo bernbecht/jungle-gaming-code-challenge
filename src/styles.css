@@ -149,3 +149,43 @@
   @apply -mt-8 inline-flex size-16 shrink-0 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-lg;
 }
 .mobile-nav-center:disabled { opacity: 1; }
+
+.mobile-detail-toolbar {
+  @apply flex items-center justify-between py-6;
+}
+.mobile-detail-toolbar a,
+.mobile-detail-toolbar button {
+  @apply inline-flex size-9 items-center justify-center rounded-full border border-border text-primary;
+}
+.mobile-detail-toolbar button:disabled { opacity: 1; }
+.mobile-purchase-bar {
+  @apply fixed right-0 bottom-0 left-0 z-30 rounded-t-3xl border-t border-border bg-card px-6 pt-5;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 767px) {
+  .nft-detail-layout { gap: 0; }
+  .nft-detail-gallery > img {
+    border: 0;
+    border-radius: 1.5rem;
+  }
+  .nft-detail-info {
+    position: relative;
+    z-index: 1;
+    margin: -2rem -1.5rem 0;
+    padding: 1.5rem 1.5rem 2rem;
+    border-radius: 2rem 2rem 0 0;
+    background: var(--card);
+  }
+  .nft-detail-price-row { display: none; }
+  .nft-detail-info .mobile-rating { display: flex; }
+  .nft-detail-info h2 { @apply sr-only; }
+  .nft-detail-info fieldset input[type="radio"] { @apply sr-only; }
+  .nft-detail-desktop-quantity,
+  .nft-detail-desktop-actions,
+  .nft-detail-info > p.mt-3 { display: none; }
+}
+@media (min-width: 768px) {
+  .mobile-detail-toolbar,
+  .mobile-purchase-bar { display: none; }
+}
