@@ -184,9 +184,10 @@ function NftDetail({ nft, updating }: { nft: Nft; updating: boolean }) {
               {nft.editions.map((item) => (
                 <label
                   key={item.id}
-                  className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm ${item.id === edition.id ? "border-primary text-primary" : "border-border"}`}
+                  className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-card ${item.id === edition.id ? "border-primary text-primary" : "border-border"}`}
                 >
                   <input
+                    className="sr-only"
                     type="radio"
                     name="edition"
                     value={item.id}

@@ -180,7 +180,6 @@
   .nft-detail-price-row { display: none; }
   .nft-detail-info .mobile-rating { display: flex; }
   .nft-detail-info h2 { @apply sr-only; }
-  .nft-detail-info fieldset input[type="radio"] { @apply sr-only; }
   .nft-detail-desktop-quantity,
   .nft-detail-desktop-actions,
   .nft-detail-info > p.mt-3 { display: none; }
