@@ -206,7 +206,7 @@ export function HomePage() {
               </div>
             ) : (
               <div
-                className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6"
+                className="grid grid-cols-2 gap-4  md:grid-cols-3 md:gap-8 md:gap-y-20"
                 data-testid="catalog-grid"
               >
                 {catalog.data.items.map((nft) => (
