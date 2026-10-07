@@ -156,3 +156,5 @@ Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#
 Revisão adicional UI-01: Coleções/Rede com texto clicável e contagens à direita; removidos checkboxes visíveis. Cores exatas de estado, teclado e seleção múltipla via `aria-pressed`; contagens calculadas pela API. 15 testes unitários, typecheck, lint e build passaram. TEST-01 adaptado para botões; execução E2E e revisão visual continuam pendentes.
 
 Revisão UI-01 — paginação: substituídos Anterior/Página X de Y/Próxima por números alinhados à direita e setas, com destaque cobre na página atual. Total dinâmico, clique direto, URL e histórico preservados. TEST-01 adaptado para acesso direto às páginas e estado das setas. Removidas variáveis sem uso deixadas após retirada do botão Limpar dos filtros. Validação E2E/visual pendente.
+
+Ajuste adicional UI-01: opções de lançamento são links de rota; a seleção usa texto e barra inferior em `#D28A4C`, sem fundo de botão. Mantêm parâmetros atuais, resetam página e sinalizam link ativo com `aria-current`. Typecheck/lint/build passaram; E2E pendente.

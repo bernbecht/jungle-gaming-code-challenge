@@ -1,5 +1,5 @@
-import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import type { CatalogParams, CatalogSort } from "@/contracts/marketplace";
 import { catalogQuery } from "@/features/catalog/api";
 import {
@@ -11,13 +11,7 @@ import { CatalogFilters } from "@/features/catalog/filters";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  ChevronDown,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ArrowUpRight, SlidersHorizontal, X } from "lucide-react";
 import { useRef } from "react";
 
 export function HomePage() {
@@ -39,6 +33,13 @@ export function HomePage() {
     ? Math.max(1, Math.ceil(catalog.data.total / params.pageSize))
     : 1;
   const filterKey = `${params.minPrice ?? ""}:${params.maxPrice ?? ""}`;
+  const sortLabels: Record<CatalogSort, string> = {
+    featured: "Destaques",
+    recent: "Listados recentemente",
+    "price-asc": "Menor preço",
+    "price-desc": "Maior preço",
+    name: "Nome",
+  };
   return (
     <>
       <section
@@ -89,96 +90,6 @@ export function HomePage() {
         aria-labelledby="collections-title"
         className="scroll-mt-6 py-8"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
-          <h2
-            id="collections-title"
-            className="text-lg font-semibold text-primary"
-          >
-            Explore as coleções
-          </h2>
-          <ArrowDown aria-hidden="true" size={18} className="text-primary" />
-        </div>
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <div
-            role="group"
-            aria-label="Categorias de lançamento"
-            className="flex flex-wrap gap-2"
-          >
-            {(
-              [
-                { value: "all", label: "Todos os NFTs" },
-                { value: "new", label: "Novos lançamentos" },
-                { value: "trending", label: "Em alta" },
-              ] as const
-            ).map((tab) => (
-              <Button
-                key={tab.value}
-                variant={params.tab === tab.value ? "default" : "ghost"}
-                aria-pressed={params.tab === tab.value}
-                onClick={() => update({ tab: tab.value })}
-              >
-                {tab.label}
-              </Button>
-            ))}
-          </div>
-          <div className="flex max-w-full items-center gap-1 text-xs text-muted-foreground">
-            <label htmlFor="catalog-sort" className="shrink-0">
-              Ordenar por:
-            </label>
-            <div className="relative min-w-0">
-              <select
-                id="catalog-sort"
-                className="min-h-11 max-w-full cursor-pointer appearance-none border-0 bg-transparent py-2 pr-5 pl-0 text-inherit focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                value={params.sort}
-                onChange={(event) =>
-                  update({ sort: event.target.value as CatalogSort })
-                }
-              >
-                <option
-                  className="bg-background text-foreground"
-                  value="featured"
-                >
-                  Destaques
-                </option>
-                <option
-                  className="bg-background text-foreground"
-                  value="recent"
-                >
-                  Listados recentemente
-                </option>
-                <option
-                  className="bg-background text-foreground"
-                  value="price-asc"
-                >
-                  Menor preço
-                </option>
-                <option
-                  className="bg-background text-foreground"
-                  value="price-desc"
-                >
-                  Maior preço
-                </option>
-                <option className="bg-background text-foreground" value="name">
-                  Nome
-                </option>
-              </select>
-              <ChevronDown
-                aria-hidden="true"
-                size={12}
-                className="pointer-events-none absolute top-1/2 right-0 -translate-y-1/2"
-              />
-            </div>
-          </div>
-          <Button
-            ref={filterTrigger}
-            variant="outline"
-            className="lg:hidden"
-            onClick={() => dialog.current?.showModal()}
-          >
-            <SlidersHorizontal aria-hidden="true" />
-            Filtros
-          </Button>
-        </div>
         <div className="mt-6 grid gap-8 lg:grid-cols-[230px_1fr]">
           <aside
             aria-label="Filtros do catálogo"
@@ -192,6 +103,88 @@ export function HomePage() {
             />
           </aside>
           <div className="min-w-0">
+            <div className="flex w-full flex-wrap items-center justify-between gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto]">
+              <div
+                role="group"
+                aria-label="Categorias de lançamento"
+                className="flex flex-wrap gap-2 lg:col-start-1"
+              >
+                {(
+                  [
+                    { value: "all", label: "Todos os NFTs" },
+                    { value: "new", label: "Novos lançamentos" },
+                    { value: "trending", label: "Em alta" },
+                  ] as const
+                ).map((tab) => (
+                  <Link
+                    key={tab.value}
+                    to="/"
+                    search={{ ...params, tab: tab.value, page: 1 }}
+                    hash="colecoes"
+                    aria-current={params.tab === tab.value ? "page" : undefined}
+                    className={`inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-1 text-xs transition-colors focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:text-base ${params.tab === tab.value ? "border-primary font-semibold text-primary" : "border-transparent text-foreground hover:text-primary"}`}
+                  >
+                    {tab.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex max-w-full items-center gap-1 justify-end lg:col-start-2 lg:ml-0 lg:justify-self-end">
+                <label htmlFor="catalog-sort" className="shrink-0">
+                  Ordenar por:
+                </label>
+                <div className="relative min-w-0">
+                  <select
+                    id="catalog-sort"
+                    className="max-w-full cursor-pointer appearance-none border-0 bg-transparent px-0 py-2 text-right text-inherit focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    style={{ width: `${sortLabels[params.sort].length}ch` }}
+                    value={params.sort}
+                    onChange={(event) =>
+                      update({ sort: event.target.value as CatalogSort })
+                    }
+                  >
+                    <option
+                      className="bg-background text-foreground"
+                      value="featured"
+                    >
+                      Destaques
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="recent"
+                    >
+                      Listados recentemente
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="price-asc"
+                    >
+                      Menor preço
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="price-desc"
+                    >
+                      Maior preço
+                    </option>
+                    <option
+                      className="bg-background text-foreground"
+                      value="name"
+                    >
+                      Nome
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <Button
+                ref={filterTrigger}
+                variant="outline"
+                className="lg:hidden"
+                onClick={() => dialog.current?.showModal()}
+              >
+                <SlidersHorizontal aria-hidden="true" />
+                Filtros
+              </Button>
+            </div>
             {catalog.isPending ? (
               <CatalogSkeleton count={params.pageSize} />
             ) : catalog.isError ? (
@@ -225,7 +218,7 @@ export function HomePage() {
               <Pagination
                 page={params.page}
                 totalPages={totalPages}
-                onPageChange={page => update({ page })}
+                onPageChange={(page) => update({ page })}
               />
             )}
           </div>
