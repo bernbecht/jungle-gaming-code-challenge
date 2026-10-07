@@ -1,3 +1,4 @@
+import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import type { CatalogParams, CatalogSort } from "@/contracts/marketplace";
 import { catalogQuery } from "@/features/catalog/api";
@@ -221,28 +222,11 @@ export function HomePage() {
               </div>
             )}
             {catalog.data && catalog.data.total > 0 && (
-              <nav
-                aria-label="Paginação"
-                className="mt-8 flex flex-wrap items-center justify-center gap-3"
-              >
-                <Button
-                  variant="outline"
-                  disabled={params.page <= 1}
-                  onClick={() => update({ page: params.page - 1 })}
-                >
-                  Anterior
-                </Button>
-                <span className="text-sm">
-                  Página {params.page} de {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  disabled={params.page >= totalPages}
-                  onClick={() => update({ page: params.page + 1 })}
-                >
-                  Próxima
-                </Button>
-              </nav>
+              <Pagination
+                page={params.page}
+                totalPages={totalPages}
+                onPageChange={page => update({ page })}
+              />
             )}
           </div>
         </div>

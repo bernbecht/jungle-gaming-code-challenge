@@ -21,8 +21,15 @@ test.beforeEach(async ({ page }) => {
 test('catalog combines filters, sorts, paginates and restores URL history', async ({ page, isMobile }) => {
   await page.goto('/')
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(12)
-  await page.getByRole('button', { name: 'Próxima', exact: true }).click()
-  await expect(page.getByText('Página 2 de 3', { exact: true })).toBeVisible()
+  const pagination = page.getByRole('navigation', { name: 'Paginação', exact: true })
+  await expect(pagination.getByRole('button', { name: 'Página 1', exact: true })).toHaveAttribute('aria-current', 'page')
+  await pagination.getByRole('button', { name: 'Próxima página', exact: true }).click()
+  await expect(pagination.getByRole('button', { name: 'Página 2', exact: true })).toHaveAttribute('aria-current', 'page')
+  await pagination.getByRole('button', { name: 'Página 3', exact: true }).click()
+  await expect(pagination.getByRole('button', { name: 'Página 3', exact: true })).toHaveAttribute('aria-current', 'page')
+  await expect(pagination.getByRole('button', { name: 'Próxima página', exact: true })).toHaveCount(0)
+  await pagination.getByRole('button', { name: 'Página anterior', exact: true }).click()
+  await expect(pagination.getByRole('button', { name: 'Página 2', exact: true })).toHaveAttribute('aria-current', 'page')
   await searchNfts(page, 'Violet')
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(9)
   if (isMobile) await page.getByRole('button', { name: 'Filtros', exact: true }).click()
@@ -68,7 +75,7 @@ test('direct detail supports gallery, editions, quantity limits and missing NFT'
 test('invalid URL values use safe defaults and mobile drawer restores focus', async ({ page, isMobile }) => {
   await page.goto('/?page=-1&sort=bad&minPrice=garbage&network=bad')
   await expect(page.getByTestId('catalog-grid').getByRole('article')).toHaveCount(12)
-  await expect(page.getByText('Página 1 de 3', { exact: true })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Paginação', exact: true }).getByRole('button', { name: 'Página 1', exact: true })).toHaveAttribute('aria-current', 'page')
   if (isMobile) {
     const trigger = page.getByRole('button', { name: 'Filtros', exact: true })
     await trigger.click()

@@ -80,3 +80,5 @@ Revisão UI-01, item 2: E2E de busca/histórico/resposta antiga adaptados para a
 Revisão UI-01, item 3: TEST-01 adaptado para combinar busca, rede e duas categorias via grupo Coleções; restauração e ordenação mantidas. E2E adaptado ainda não executado; comparação visual dos três grupos pendente.
 
 Revisão de contagens/aparência UI-01: 15 testes unitários passaram, incluindo contagem única de NFTs e atualização após mudanças de categoria/rede. Typecheck, lint e build passaram. TEST-01 adaptado para seleção por botões e `aria-pressed`; E2E/cores/alinhamento ainda sem validação no navegador.
+
+Revisão UI-01 de paginação: TEST-01 adaptado para números, `aria-current`, avanço/retorno e ausência de avanço na última página. Teste E2E preparado, não executado. Revisão visual da paginação pendente; estado da URL e total continuam derivados da consulta.

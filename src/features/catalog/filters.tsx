@@ -69,18 +69,8 @@ function FilterChoices({
   );
 }
 
-export function CatalogFilters({ params, update, clear }: Props) {
+export function CatalogFilters({ params, update }: Props) {
   const facets = useQuery(facetsQuery);
-  const hasFilters =
-    params.q ||
-    params.category.length ||
-    params.collection.length ||
-    params.creator.length ||
-    params.network.length ||
-    params.minPrice !== undefined ||
-    params.maxPrice !== undefined ||
-    params.availableOnly;
-
   if (facets.isPending) return <p role="status">Carregando filtros…</p>;
   if (facets.isError)
     return (

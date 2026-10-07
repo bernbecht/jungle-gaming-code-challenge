@@ -154,3 +154,5 @@ Revisão UI-01, item 4: Ordenar por estilizado como texto discreto, sem borda/fu
 Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#241612`), padding de 16 px e altura ajustada ao conteúdo. Os cinco itens solicitados estão implementados; revisão visual e execução E2E local permanecem pendentes. TASK-05 não está concluída por estas alterações isoladas.
 
 Revisão adicional UI-01: Coleções/Rede com texto clicável e contagens à direita; removidos checkboxes visíveis. Cores exatas de estado, teclado e seleção múltipla via `aria-pressed`; contagens calculadas pela API. 15 testes unitários, typecheck, lint e build passaram. TEST-01 adaptado para botões; execução E2E e revisão visual continuam pendentes.
+
+Revisão UI-01 — paginação: substituídos Anterior/Página X de Y/Próxima por números alinhados à direita e setas, com destaque cobre na página atual. Total dinâmico, clique direto, URL e histórico preservados. TEST-01 adaptado para acesso direto às páginas e estado das setas. Removidas variáveis sem uso deixadas após retirada do botão Limpar dos filtros. Validação E2E/visual pendente.

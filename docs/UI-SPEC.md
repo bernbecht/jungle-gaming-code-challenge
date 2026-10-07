@@ -203,3 +203,5 @@ CSS em `src/styles.css`, shell em `src/components/layout/app-shell.tsx`. Quatro 
 - Item 5: sidebar dentro de card retangular com fundo `#241612` (`bg-card`), padding de 16 px e altura do próprio conteúdo, conforme referência desktop. Validação visual pendente.
 
 - Revisão adicional de Coleções/Rede: opções como texto acionável, sem caixas de checkbox, com contagem à direita. Cores `#CFB28C` sem seleção e `#E89B55` selecionado; seleção também usa peso semibold e `aria-pressed`. Contagens reais da API por categoria/rede do catálogo completo, não valores ilustrativos do PNG. Teclado/foco e seleção múltipla preservados. Validação visual pendente.
+
+- Revisão de paginação: números compactos alinhados à direita abaixo da grade, página atual com fundo cobre, outras com fundo transparente/borda discreta e seta de avanço. Seta de retorno aparece depois da primeira página; setas indisponíveis não aparecem. Total vem da API (três páginas na fixture atual, não quatro fixas do PNG). Controles têm 28 px visuais/44 px de área acionável, foco visível e `aria-current`. Listas longas usam reticências. Comparação visual no navegador pendente.
