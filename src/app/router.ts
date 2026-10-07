@@ -3,6 +3,8 @@ import { createRootRouteWithContext, createRoute, createRouter } from '@tanstack
 import type { QueryClient } from '@tanstack/react-query'
 import { queryClient } from '@/app/query-client'
 import { AppShell } from '@/components/layout/app-shell'
+import { NftDetailPage } from '@/routes/nft-detail-page'
+import { validateCatalogSearch } from '@/features/catalog/search'
 import { HomePage } from '@/routes/home-page'
 import { UnavailablePage } from '@/routes/unavailable-page'
 import { NotFoundPage } from '@/routes/not-found-page'
@@ -15,7 +17,7 @@ const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   errorComponent: ErrorPage,
 })
 
-const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: HomePage })
+const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', validateSearch: validateCatalogSearch, component: HomePage })
 const integrationProofRoute = createRoute({ getParentRoute: () => rootRoute, path: '/__proof', component: IntegrationProofPage })
 
 // Rotas preparadas, sem dados privados ou operações simuladas.
@@ -53,7 +55,7 @@ const checkoutRoute = createRoute({
 const nftRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/nfts/$nftId',
-  component: () => createElement(UnavailablePage, { title: 'Detalhes do NFT' }),
+  component: NftDetailPage,
 })
 const orderRoute = createRoute({
   getParentRoute: () => rootRoute,

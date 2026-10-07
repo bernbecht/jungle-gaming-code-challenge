@@ -126,3 +126,13 @@ DEC-05: IndexedDB `kurio-demo`, store `state`, registro `database`; schema inter
 DEC-06/DEC-08/DEC-10: ETH transportado como texto, cálculos em wei/BigInt, desconto em basis points truncado para baixo. Cotação vale 5 minutos do relógio simulado; taxa por rede também é simulada em ETH. Pedidos pendentes reservam estoque, reenvios consultam a tentativa antes de revalidar, conflitos ficam registrados. Confirmação consome estoque e apenas os lotes capturados do carrinho; recusa libera reserva. Alterar o catálogo não altera o snapshot do recibo.
 
 O relógio começa em `2026-01-15T12:00:00Z` e avança explicitamente pelo controle; não há scheduler/eventos de domínio nesta etapa. Esses mecanismos entram nas TASK-10/TASK-11. O núcleo não expõe endpoints privados de compra antes da implementação de sessão/carrinho/checkout. 12 testes do domínio passaram; validação IndexedDB/MSW no browser preparada, ainda pendente.
+
+## Catálogo e detalhe — TASK-05
+
+`src/features/catalog/search.ts` normaliza os parâmetros do Router (defaults seguros, listas únicas/ordenadas, ETH exato e faixa coerente) e serializa os filtros REST como parâmetros repetidos. O estado aplicado reside na URL; busca e preço têm rascunho local até submissão. Mudanças de filtros/ordenação/aba reiniciam a página. A busca é submetida explicitamente, sem debounce ou requisição por tecla.
+
+`api.ts` define consultas Axios com AbortSignal. Chaves `['nfts', 'list', params]`, `['nfts', 'detail', id]` e `['nfts', 'facets']` separam os resultados. A troca de filtros mostra skeleton se não há cache correspondente; não apresenta a lista anterior como resultado do novo filtro. Mantém política global de 30 segundos e uma repetição para falhas transitórias; refetch em background informa atualização. Cancelamento e isolamento por chave impedem respostas antigas de substituir a pesquisa atual. Eventos/invalidação de mutations entram nas tarefas seguintes.
+
+Facetas são derivadas pelo MSW do catálogo, nunca importadas das fixtures pelos componentes. Mobile/tablet usa `<dialog>` modal nativo com foco contido, Escape e retorno ao botão; desktop usa sidebar a partir de 1024 px. As mesmas opções ficam na URL. Galeria mantém seleção local; troca de NFT reinicia seleção e quantidade, que fica limitada à disponibilidade da edição atual. Compra/favorito estão desabilitados com explicação até integrar as operações.
+
+Home inclui banners com links internos de filtro e quatro blocos explicativos no lugar de artigos sem conteúdo navegável. Avaliações mostram apenas agregados presentes no contrato. Compartilhamento copia a URL com feedback, sem integração social externa. Estes ajustes e placeholders precisam de revisão visual na TASK-12; nenhuma fidelidade pixel a pixel foi comprovada.

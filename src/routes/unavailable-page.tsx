@@ -1,3 +1,4 @@
+import { defaultCatalog } from '@/features/catalog/search'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,7 @@ export function UnavailablePage({ title }: { title: string }) {
         Esta página está em preparação. Por enquanto, nenhuma operação está disponível aqui.
       </p>
       <Button asChild className="mt-7" variant="outline">
-        <Link to="/"><ArrowLeft aria-hidden="true" />Voltar ao início</Link>
+        <Link to="/" search={defaultCatalog}><ArrowLeft aria-hidden="true" />Voltar ao início</Link>
       </Button>
     </section>
   )

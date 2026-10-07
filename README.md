@@ -1,10 +1,10 @@
 # NFT Marketplace — desafio frontend
 
-Projeto com **TASK-01 a TASK-04 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Telas de catálogo, autenticação, compra e eventos de domínio ainda serão implementados.
+Projeto com **TASK-01 a TASK-04 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Catálogo e detalhe estão implementados na TASK-05 na árvore de trabalho, aguardando validação local. Autenticação, compra e eventos de domínio ainda serão implementados.
 
 Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integração](https://jungle-gaming-code-challenge.vercel.app/__proof). Deploy inicial na Vercel do commit `4047da3`; evidências em [RELEASE](docs/RELEASE.md).
 
-TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários seed, banco IndexedDB, catálogo MSW, reset/relógio e núcleo de cotação/pedidos. 12 testes unitários, typecheck, lint e build passaram; o usuário confirmou aprovação da suíte E2E local, incluindo catálogo, persistência e reset. Esta etapa ainda não foi publicada nem conectada às telas de catálogo/compra.
+TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários seed, banco IndexedDB, catálogo MSW, reset/relógio e núcleo de cotação/pedidos. 12 testes unitários, typecheck, lint e build passaram; o usuário confirmou aprovação da suíte E2E local, incluindo catálogo, persistência e reset. Esta base está conectada ao catálogo/detalhe na TASK-05; compra e publicação da nova versão continuam pendentes.
 
 ## Documentação e ordem de trabalho
 
@@ -23,7 +23,7 @@ TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários 
 | [docs/TEST-MATRIX.md](docs/TEST-MATRIX.md) | Cobertura TEST, assertions e registro de evidências |
 | [docs/RELEASE.md](docs/RELEASE.md) | Gates REL, auditoria, publicação e entrega |
 
-TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 a TASK-04 concluídas. Próxima etapa: TASK-05, telas de início/detalhe, filtros e estados. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
+TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 a TASK-04 concluídas. Etapa atual: TASK-05, telas de início/detalhe, filtros e estados; E2E local e revisão visual pendentes. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
 
 Exemplo de rastreabilidade: REQ-015 (cotação revalidada) → TASK-08/TASK-10 → DEC-08 → API-08/API-09 e EVT-01 → UI-04 → SCN-10/SCN-17 → TEST-09 → REL-02.
 
@@ -97,3 +97,9 @@ Seleção/reset será pelo painel de demonstração e controles MSW descritos em
 O usuário confirmou aprovação do smoke e das provas E2E REST/Socket.IO no terminal local em desktop/mobile. O agente validou manualmente REST e Socket.IO no deploy público, incluindo acesso direto/refresh de `/__proof` e janela anônima. Tipos/lint/build passaram; TEST-16 segue parcial. Não há auditoria Lighthouse realizada. A matriz exige os 12 grupos E2E, baselines de quatro telas e revisão em 390/768/1440. Lighthouse terá 12 medições e medianas por página/perfil. Guardar evidências nos registros de TEST-MATRIX e RELEASE.
 
 Repositório: https://github.com/bernbecht/jungle-gaming-code-challenge. Publicação inicial na Vercel validada na TASK-03; TASK-15 concluirá a entrega e registrará o commit final. Limitações e desvios reais devem constar em ARCHITECTURE, sem tratar propostas como resultados medidos.
+
+### Validar a TASK-05 localmente
+
+Execute `npm run test:e2e` para testar catálogo e detalhe junto das provas anteriores. Abra `/` e `/nfts/nft-001` em 390/768/1440 px; teste busca, filtros, histórico, galeria e quantidade. `/nfts/missing` demonstra 404. Compra/favorito ainda aguardam integração.
+
+Para testar carregamento/erro no catálogo, no console do navegador use `fetch('/api/__mock/catalog-network', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ delayMs: 1500, failuresRemaining: 2 }) })` antes de acessar uma busca não presente no cache. Duas falhas permitem observar erro após o retry automático; a nova tentativa manual recupera. Envie ambos como zero ou resete o cenário para restaurar. Contrato/limites em `docs/CONTRACTS.md`.

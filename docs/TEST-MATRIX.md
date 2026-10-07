@@ -66,3 +66,9 @@ Em 06/10/2026 foram inspecionados os 15 PNGs originais em UI-SPEC. Dimensões de
 Base escrita; **aceite ainda pendente**. Passaram: sintaxe TS/TSX de 20 arquivos usando TypeScript 5.9.3 do cache, resolução dos imports locais `@/`, parsing JSON/SVG, `node --check` de ESLint/script Lighthouse e `git diff --check`. Essas verificações não resolvem tipos de dependências nem executam a aplicação.
 
 Após instalação pelo usuário, npm ls, typecheck completo, lint e build passaram; lockfile presente. Vite 7.3.7 promovido a dependência direta com a mesma resolução/integridade; npm ci --dry-run offline passou. Licença da fonte incluída em dist. Playwright iniciou no terminal do usuário e o smoke desktop/mobile passou, conforme confirmação em 07/10/2026. O runner da sandbox continua bloqueado com listen EPERM em 127.0.0.1:4173; não há relatório local acessível. `tests/e2e/shell.spec.ts` está preparado para Chromium desktop/mobile; não cobre API/socket nem substitui os 12 grupos exigidos. TEST-18/deploy continuam pendentes.
+
+## Evidência TASK-05 — 07/10/2026
+
+- 14 testes unitários passaram na árvore de trabalho: 12 anteriores e dois de normalização/serialização de URL (`tests/unit/catalog-search.spec.ts`). Typecheck, lint e build passaram.
+- `tests/e2e/catalog.spec.ts` prepara TEST-01 (busca/filtros/ordenação/paginação/histórico), TEST-02 (detalhe/galeria/limites/404) e parte de TEST-12 (shimmer lento, resposta antiga, falha 503 e retry), em desktop/mobile, com reset por teste e controle MSW de rede.
+- E2E **não executado**: servidor preview bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. Aprovação da TASK-04 não valida estes novos testes. Execução local e revisão visual 390/768/1440 pendentes; sem screenshots/baselines desta etapa.

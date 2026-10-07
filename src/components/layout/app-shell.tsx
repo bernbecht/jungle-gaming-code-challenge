@@ -1,3 +1,4 @@
+import { defaultCatalog } from '@/features/catalog/search'
 import { Link, Outlet } from '@tanstack/react-router'
 import { Home, LogIn, ShoppingBag, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,14 +8,14 @@ export function AppShell() {
     <div className="min-h-dvh">
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <header className="page-container flex min-h-20 items-center justify-between gap-4 border-b border-border">
-        <Link to="/" aria-label="Kurio — início" className="text-lg font-bold tracking-[0.14em]">
+        <Link to="/" search={defaultCatalog} aria-label="Kurio — início" className="text-lg font-bold tracking-[0.14em]">
           KURIO
         </Link>
         <nav aria-label="Navegação principal" className="hidden items-center gap-8 md:flex">
-          <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
+          <Link to="/" search={defaultCatalog} activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
             Início
           </Link>
-          <Link to="/" hash="colecoes">Mercado</Link>
+          <Link to="/" search={defaultCatalog} hash="colecoes">Mercado</Link>
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
@@ -39,7 +40,7 @@ export function AppShell() {
       </footer>
 
       <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">
-        <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
+        <Link to="/" search={defaultCatalog} activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
           <Home aria-hidden="true" size={20} /><span>Início</span>
         </Link>
         <Link to="/cart" activeProps={{ className: 'text-primary' }}>

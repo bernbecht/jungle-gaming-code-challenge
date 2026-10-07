@@ -47,7 +47,7 @@ Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/m
 
 ## Parâmetros, validações e erros
 
-API-03: `q`, `category`, `collection`, `creator`, `network`, `minPrice`, `maxPrice`, `availableOnly`, `tab`, `sort`, `page`, `pageSize`. Filtros múltiplos de mesma dimensão usam parâmetros repetidos; dimensões diferentes combinam por AND. Redes: `ethereum`, `polygon`, `solana`. Abas: `all`, `new` (criação nos últimos 7 dias do relógio simulado), `trending` (flag da fixture). Ordenação: `featured`, `recent`, `price-asc`, `price-desc`, `name`; preço de referência é o menor preço das edições disponíveis, ou menor preço da edição se todas esgotadas. Desempate por ID. Padrão página 1, tamanho 12, máximo 48. Preço, rede e abas foram mapeados conforme UI-SPEC; os controles de URL/interface entram na TASK-05.
+API-03: `q`, `category`, `collection`, `creator`, `network`, `minPrice`, `maxPrice`, `availableOnly`, `tab`, `sort`, `page`, `pageSize`. Filtros múltiplos de mesma dimensão usam parâmetros repetidos; dimensões diferentes combinam por AND. Redes: `ethereum`, `polygon`, `solana`. Abas: `all`, `new` (criação nos últimos 7 dias do relógio simulado), `trending` (flag da fixture). Ordenação: `featured`, `recent`, `price-asc`, `price-desc`, `name`; preço de referência é o menor preço das edições disponíveis, ou menor preço da edição se todas esgotadas. Desempate por ID. Padrão página 1, tamanho 12, máximo 48. Preço, rede e abas foram mapeados conforme UI-SPEC; os controles de URL/interface estão implementados na TASK-05; validação E2E local pendente.
 
 Entrada inválida na URL é normalizada pelo router; entrada inválida direta na API retorna 422. Alterar busca/filtros/ordenação reinicia página. O cliente deve enviar parâmetros normalizados equivalentes aos exibidos.
 
@@ -77,3 +77,9 @@ Envelope proposto: `{eventId, resourceId, version, occurredAt, data}`. Eventos p
 | EVT-02 | `order.updated`: `{order:Order}`; privado | Comparar identidade/versão; atualizar pedido; reconsultar carrinho no confirmado; nunca executar baixa local nem regredir terminal | REQ-017, REQ-018, REQ-019, REQ-023, REQ-034, REQ-035 |
 
 Após desconexão/reconexão, buscar REST mesmo sem evento. Listeners antigos são liberados. Reemissão duplicada mantém eventId/versão; teste de evento antigo usa versão inferior e payload antigo sem reverter o banco. Transporte de DEC-11 validado na TASK-03; publicação dos eventos de domínio permanece na TASK-10.
+
+### Complementos API-03/API-13 — TASK-05
+
+`GET /api/nfts/facets` retorna `{ category: string[], collection: string[], creator: string[], network: string[] }`: valores únicos ordenados do catálogo inteiro, independentes dos filtros atuais, para permitir combinar seleções sem esconder opções. É um endpoint auxiliar, sem dados privados.
+
+`POST /api/__mock/catalog-network` aceita `{ delayMs?: number, failuresRemaining?: number }` (defaults zero; inteiros 0–10000 e 0–10). Configura latência das próximas listagens e quantas delas retornam 503. Cada requisição captura a configuração ao chegar; permite reproduzir respostas fora de ordem. Reset restaura ambos a zero. Configuração transitória por aba/worker, não persiste após refresh; cenários completos/painel seguem na TASK-11. Não afeta detalhe/facetas. Valores inválidos retornam 422.

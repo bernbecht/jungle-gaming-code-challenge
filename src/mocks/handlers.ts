@@ -1,5 +1,5 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
-import { http, HttpResponse, ws } from 'msw'
+import { delay, http, HttpResponse, ws } from 'msw'
 import { listNfts, parseCatalogParams, readNft } from './catalog'
 import { advanceClock } from './commerce'
 import { resetDatabase, transact } from './database'
@@ -7,6 +7,7 @@ import { invalid, MockError } from './errors'
 
 // MSW normalizes Socket.IO's default `/socket.io/` path to `/` before matching ws.link.
 const socket = ws.link(window.location.origin.replace(/^http/, 'ws'))
+let catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
 const closeSockets = new Set<() => void>()
 
 async function respond<T extends object>(operation: () => Promise<T>) {
@@ -25,10 +26,26 @@ async function readBody(request: Request): Promise<Record<string, unknown>> {
 }
 
 export const handlers = [
-  http.get('/api/nfts', ({ request }) => respond(() => {
-    const params = parseCatalogParams(new URL(request.url).searchParams)
-    return transact(state => listNfts(state, params))
+  http.post('/api/__mock/catalog-network', ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const delayMs = body.delayMs ?? 0, failuresRemaining = body.failuresRemaining ?? 0
+    if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10000) invalid('Latência inválida (0–10000 ms).')
+    if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
+    catalogNetwork = { delayMs, failuresRemaining }
+    return { ...catalogNetwork }
   })),
+  http.get('/api/nfts', async ({ request }) => {
+    const delayMs = catalogNetwork.delayMs
+    const fail = catalogNetwork.failuresRemaining > 0
+    if (fail) catalogNetwork.failuresRemaining--
+    if (delayMs) await delay(delayMs)
+    if (fail) return HttpResponse.json({ error: { code: 'TEMPORARY_FAILURE', message: 'Falha temporária do catálogo.' } }, { status: 503 })
+    return respond(() => {
+      const params = parseCatalogParams(new URL(request.url).searchParams)
+      return transact(state => listNfts(state, params))
+    })
+  }),
+  http.get('/api/nfts/facets', () => respond(() => transact(state => Object.fromEntries(['category', 'collection', 'creator', 'network'].map(key => [key, [...new Set(state.nfts.map(nft => nft[key as 'category' | 'collection' | 'creator' | 'network']))].sort()]))))),
   http.get('/api/nfts/:id', ({ params }) => respond(() => transact(state => readNft(state, String(params.id))))),
   http.get('/api/__mock/status', () => respond(() => transact(state => ({ schemaVersion: state.schemaVersion, scenarioId: state.scenarioId, now: new Date(state.now).toISOString(), nftCount: state.nfts.length, userCount: state.users.length })))),
   http.post('/api/__mock/reset', ({ request }) => respond(async () => {
@@ -38,6 +55,7 @@ export const handlers = [
     const now = body.now === undefined ? undefined : typeof body.now === 'string' ? Date.parse(body.now) : NaN
     if (now !== undefined && (!Number.isFinite(now) || !Number.isSafeInteger(now))) invalid('Data de reset inválida.')
     await resetDatabase(now)
+    catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
     for (const close of closeSockets) close()
     closeSockets.clear()
     return { scenarioId: 'SCN-01', reset: true }
