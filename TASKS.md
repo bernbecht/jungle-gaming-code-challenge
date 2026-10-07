@@ -152,3 +152,5 @@ Revisão UI-01, item 3: grupos visíveis limitados a Coleções (categorias de a
 Revisão UI-01, item 4: Ordenar por estilizado como texto discreto, sem borda/fundo, com seta pequena e foco visível ao teclado. Select nativo e comportamento URL/API preservados. Validação visual pendente; item 5 segue para a próxima alteração.
 
 Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#241612`), padding de 16 px e altura ajustada ao conteúdo. Os cinco itens solicitados estão implementados; revisão visual e execução E2E local permanecem pendentes. TASK-05 não está concluída por estas alterações isoladas.
+
+Revisão adicional UI-01: Coleções/Rede com texto clicável e contagens à direita; removidos checkboxes visíveis. Cores exatas de estado, teclado e seleção múltipla via `aria-pressed`; contagens calculadas pela API. 15 testes unitários, typecheck, lint e build passaram. TEST-01 adaptado para botões; execução E2E e revisão visual continuam pendentes.

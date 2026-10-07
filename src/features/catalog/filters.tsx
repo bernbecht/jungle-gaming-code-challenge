@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { CatalogParams } from '@/contracts/marketplace'
 import { facetsQuery } from './api'
@@ -15,27 +16,41 @@ type ChoicesProps = {
   title: string
   values: string[]
   selected: string[]
+  counts: Record<string, number>
+  labels?: Record<string, string>
   change: (values: string[]) => void
 }
 
-function FilterChoices({ title, values, selected, change }: ChoicesProps) {
+function FilterChoices({ title, values, selected, counts, labels = {}, change }: ChoicesProps) {
+  const id = useId()
   return (
     <fieldset>
       <legend className="font-medium">{title}</legend>
-      <div className="mt-2 space-y-1">
-        {[...new Set([...values, ...selected])].map(value => (
-          <label key={value} className="flex min-h-10 cursor-pointer items-center gap-3 text-sm">
-            <input
-              type="checkbox"
-              className="size-4 accent-primary"
-              checked={selected.includes(value)}
-              onChange={event => change(event.target.checked
-                ? [...selected, value]
-                : selected.filter(item => item !== value))}
-            />
-            {value}
-          </label>
-        ))}
+      <div className="mt-2">
+        {[...new Set([...values, ...selected])].map((value, index) => {
+          const active = selected.includes(value)
+          const count = Object.hasOwn(counts, value) ? counts[value]! : 0
+          const label = Object.hasOwn(labels, value) ? labels[value]! : value
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-label={label}
+              aria-pressed={active}
+              aria-describedby={`${id}-count-${index}`}
+              className={`flex min-h-11 w-full items-center justify-between gap-3 px-2 text-left text-xs ${active ? 'font-semibold text-accent' : 'text-muted-foreground'}`}
+              onClick={() => change(active
+                ? selected.filter(item => item !== value)
+                : [...selected, value])}
+            >
+              <span className="min-w-0 break-words">{label}</span>
+              <span id={`${id}-count-${index}`} className="shrink-0 tabular-nums">
+                <span aria-hidden="true">({count})</span>
+                <span className="sr-only">{count} NFTs no catálogo</span>
+              </span>
+            </button>
+          )
+        })}
       </div>
     </fieldset>
   )
@@ -56,6 +71,7 @@ export function CatalogFilters({ params, update, clear }: Props) {
         title="Coleções"
         values={facets.data.category}
         selected={params.category}
+        counts={facets.data.counts.category}
         change={category => update({ category })}
       />
       <PriceFilter
@@ -69,6 +85,8 @@ export function CatalogFilters({ params, update, clear }: Props) {
         title="Rede"
         values={facets.data.network}
         selected={params.network}
+        counts={facets.data.counts.network}
+        labels={{ ethereum: 'Ethereum', polygon: 'Polygon', solana: 'Solana' }}
         change={network => update({ network: network as CatalogParams['network'] })}
       />
       {Boolean(hasFilters) && <Button variant="ghost" onClick={clear}>Limpar filtros</Button>}

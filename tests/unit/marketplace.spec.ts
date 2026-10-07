@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { OrderInput, Quote } from '../../src/contracts/marketplace'
 import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
-import { listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
+import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
 import { addCartItem, advanceClock, createQuote, getStoredCart, readCart, readOrder, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
 import { BASE_TIME } from '../../src/mocks/state'
@@ -176,4 +176,17 @@ test('expired or unknown coupon is rejected by quote creation without changing t
     expect(readCart(state, 'user:user-a').totals.discount).toBe('0')
   }
   expect(state.now).toBe(BASE_TIME)
+})
+
+test('facet counts represent NFTs once and follow changes to catalog categories and networks', async () => {
+  const state = await createFixtures()
+  const initial = catalogFacets(state)
+  expect(initial.counts.category).toEqual({ 'Arte digital': 12, Fotografia: 12, Generativa: 12 })
+  expect(initial.counts.network).toEqual({ ethereum: 12, polygon: 12, solana: 12 })
+  state.nfts[0]!.network = 'polygon'
+  state.nfts[0]!.category = 'Fotografia'
+  const updated = catalogFacets(state)
+  expect(updated.counts.network).toEqual({ ethereum: 11, polygon: 13, solana: 12 })
+  expect(updated.counts.category).toEqual({ 'Arte digital': 11, Fotografia: 13, Generativa: 12 })
+  expect(Object.values(updated.counts.category).reduce((sum, count) => sum + count, 0)).toBe(36)
 })

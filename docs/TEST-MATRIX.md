@@ -78,3 +78,5 @@ Revisão UI-01, item 1: slider de preço implementado; 14 testes unitários, typ
 Revisão UI-01, item 2: E2E de busca/histórico/resposta antiga adaptados para abrir a lupa e submeter o diálogo. Typecheck, lint e build passaram; testes E2E adaptados não foram executados nesta etapa. Validação visual e foco do diálogo pendentes no navegador local.
 
 Revisão UI-01, item 3: TEST-01 adaptado para combinar busca, rede e duas categorias via grupo Coleções; restauração e ordenação mantidas. E2E adaptado ainda não executado; comparação visual dos três grupos pendente.
+
+Revisão de contagens/aparência UI-01: 15 testes unitários passaram, incluindo contagem única de NFTs e atualização após mudanças de categoria/rede. Typecheck, lint e build passaram. TEST-01 adaptado para seleção por botões e `aria-pressed`; E2E/cores/alinhamento ainda sem validação no navegador.

@@ -148,3 +148,7 @@ A barra permanente acima do catálogo foi removida conforme revisão solicitada.
 ### Revisão UI-01 — grupos de filtros
 
 A interface oferece apenas Coleções, Faixa de preço e Rede. Apesar do título Coleções, os itens mostrados no PNG são categorias de arte; portanto esse grupo envia `category` à API (Arte digital, Fotografia, Generativa na fixture atual). Os nomes reais de coleções, como Cosmic Shapes, continuam no detalhe/recomendações. `collection`, `creator` e `availableOnly` continuam aceitos por URL/API, mas não têm controles nesta sidebar. Remover controles não altera os parâmetros aplicados ao trocar outro filtro; Limpar filtros restaura todos ao padrão, inclusive os adicionais. Seleções múltiplas mantêm OR dentro do grupo e AND entre grupos conforme API-03.
+
+### Revisão UI-01 — aparência e contagens dos filtros
+
+Coleções e Rede usam botões de alternância sem borda/fundo ou checkbox visível. `aria-pressed` expressa seleção múltipla, Enter/Espaço alternam e a contagem é descrição acessível. Tokens `text-muted-foreground` (`#CFB28C`) e `text-accent` (`#E89B55`) reproduzem as cores solicitadas; semibold também diferencia a seleção visualmente. O DTO compartilhado `CatalogFacets` inclui contagens calculadas no MSW, com um NFT por categoria/rede, independentemente das edições, filtros ou página. As contagens representam o inventário completo, não o resultado de uma combinação atual. Uma opção da URL ausente do catálogo aparece com zero e pode ser desmarcada.

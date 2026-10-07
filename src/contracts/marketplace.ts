@@ -60,3 +60,12 @@ export type ResourceEvent<T> = {
 }
 export type NftUpdated = ResourceEvent<{ nft: Nft }>
 export type OrderUpdated = ResourceEvent<{ order: Order }> & { userId: string; sessionId: string }
+
+export type CatalogFacets = {
+  category: string[]
+  collection: string[]
+  creator: string[]
+  network: string[]
+  counts: { category: Record<string, number>; network: Record<string, number> }
+  priceRange: { min: Money; max: Money }
+}
