@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** preparação documental inicial concluída; TASK-01 concluída como análise e definição de abordagem; TASK-02 concluída; TASK-03 em andamento; TASK-04 a TASK-15 ainda a fazer. Os fluxos de negócio não foram implementados ou testados. Os documentos de contratos, arquitetura e cenários descrevem propostas, não código entregue; sua atualização final permanece na TASK-15.
+**Resumo:** TASK-01, TASK-02 e TASK-03 concluídas; TASK-04 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. Os fluxos de negócio não foram implementados ou testados. Os contratos e cenários de domínio permanecem propostas; sua atualização final pertence à TASK-15.
 
 ## Tarefas
 
@@ -24,7 +24,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | --- | --- | --- | --- | --- | --- | --- |
 | TASK-01 | 1 / 1 | Analisar referências; preencher frames, tokens e assets em UI-SPEC; documentar pendências sem inventar medidas | — | REQ-004, REQ-037, REQ-040 | TEST-14 (posterior, na TASK-12) | Concluído |
 | TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind; escolher fonte local semelhante (DEC-16) e preparar placeholders (DEC-17) | — | REQ-001, REQ-025, REQ-050 | TEST-16 parcial + smoke shell | Concluído |
-| TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | Em andamento |
+| TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | Concluído |
 | TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | A fazer |
 | TASK-05 | 1 / 3 | Início/detalhe completos; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | A fazer |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
@@ -96,20 +96,20 @@ Bloqueio inicial de instalação resolvido pelo usuário. `npm ls --depth=0`, `n
 
 O runner desta sessão não conseguiu iniciar o preview por `listen EPERM 127.0.0.1:4173`. O usuário executou o smoke Playwright em seu terminal local e confirmou que passou em Chromium desktop/mobile. Registro como aprovado pelo usuário; o resultado observado pela execução local do agente continua bloqueado pela sandbox. Nenhum fluxo de negócio REST/socket foi exercitado pelo smoke.
 
-TASK-02 concluída. TASK-03 em andamento para provar Axios→MSW e MSW→Socket.IO→cliente; primeiro deploy permanece sujeito ao acesso ao provedor.
+TASK-02 concluída. A prova de integração e o deploy inicial foram concluídos na TASK-03, conforme registro abaixo.
 
 
 ### Smoke shell — confirmação do usuário
 
 O usuário informou em 07/10/2026 que `npm run test:e2e` passou após instalar Chromium em seu terminal local. Resultado da execução local do agente não disponível: preview bloqueado por EPERM da sandbox. Suíte é apenas o smoke do shell; não comprova integração REST/socket nem os E2E dos 12 grupos.
 
-### TASK-03 — prova técnica parcial
+### TASK-03 — concluída em 07/10/2026
 
 - [x] Gerar worker MSW e inicializá-lo antes de montar o Router quando `VITE_MOCKS_ENABLED=true`.
 - [x] Criar `GET /api/__proof` atendido por MSW e chamado pela instância Axios.
 - [x] Integrar `socket.io-client` à prova usando o `@mswjs/socket.io-binding`; o mock envia `proof.event` através do WebSocket interceptado. O cliente é importado dinamicamente após a inicialização do worker para respeitar a ordem de patch do WebSocket.
 - [x] Preparar teste Playwright REST e Socket.IO em desktop/mobile em `tests/e2e/integration-proof.spec.ts`.
-- [x] Executar a prova no navegador local: o usuário confirmou que o reteste Socket.IO passou em 07/10/2026; a prova REST também havia passado anteriormente.
-- [ ] Fazer primeira publicação com `/__proof` e validar rota, worker, REST e evento Socket.IO no ambiente publicado. CLI/provedor e credenciais não estão disponíveis nesta sessão.
+- [x] Executar `npm run test:e2e`: o usuário confirmou em 07/10/2026 que a suíte passou. REST e Socket.IO também foram confirmados no navegador local.
+- [x] Publicar na Vercel e validar acesso direto/refresh de `/__proof`, REST e evento Socket.IO, inclusive em janela anônima. URL: https://jungle-gaming-code-challenge.vercel.app. Commit publicado: `4047da3`; deployment: `dpl_HLZFEAJ95RT29n9ipfAHJHzKaMnj`. Evidência: TEST-18 em TEST-MATRIX e REL-04 em RELEASE.
 
-Tipo, lint e build passaram depois da integração. O matcher do MSW foi validado isoladamente: o handler Socket.IO na raiz corresponde à URL padrão `/socket.io/`. O primeiro log do usuário confirmou handshake e envio de `proof.request`, mas não resposta; a causa era escutar o lado servidor do binding. O listener foi corrigido para usar o lado cliente, e o usuário confirmou o reteste bem-sucedido no navegador em 07/10/2026. A prova não cobre os eventos de domínio `nft.updated`/`order.updated`, que são tarefas seguintes. TASK-03 permanece **Em andamento** até validar a primeira publicação.
+Tipo, lint e build passaram depois da integração. O matcher do MSW foi validado isoladamente: o handler Socket.IO na raiz corresponde à URL padrão `/socket.io/`. O primeiro log do usuário confirmou handshake e envio de `proof.request`, mas não resposta; a causa era escutar o lado servidor do binding. O listener foi corrigido para usar o lado cliente, e o usuário confirmou o reteste bem-sucedido no navegador e a aprovação de `npm run test:e2e` em 07/10/2026. O agente confirmou REST e Socket.IO no deploy público, com acesso direto e refresh funcionando. A prova não cobre os eventos de domínio `nft.updated`/`order.updated`, que são tarefas seguintes. TASK-03 está **Concluída**; a entrega final dos fluxos de negócio permanece na TASK-15.

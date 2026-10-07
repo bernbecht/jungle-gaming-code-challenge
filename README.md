@@ -1,6 +1,8 @@
 # NFT Marketplace — desafio frontend
 
-Projeto com **TASK-02 concluída**: base, tipos, lint e build aprovados; dependências instaladas e lockfile presente. O smoke Playwright desktop/mobile foi executado e aprovado pelo usuário no terminal local. A sandbox desta sessão bloqueou a repetição do teste (EPERM na porta de preview). Catálogo, autenticação, compra, mocks e tempo real ainda não estão implementados. Não há deploy.
+Projeto com **TASK-03 concluída**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Catálogo, autenticação, compra e eventos de domínio ainda serão implementados.
+
+Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integração](https://jungle-gaming-code-challenge.vercel.app/__proof). Deploy inicial na Vercel do commit `4047da3`; evidências em [RELEASE](docs/RELEASE.md).
 
 ## Documentação e ordem de trabalho
 
@@ -17,7 +19,7 @@ Projeto com **TASK-02 concluída**: base, tipos, lint e build aprovados; depend�
 | [docs/TEST-MATRIX.md](docs/TEST-MATRIX.md) | Cobertura TEST, assertions e registro de evidências |
 | [docs/RELEASE.md](docs/RELEASE.md) | Gates REL, auditoria, publicação e entrega |
 
-TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 concluída. TASK-03 em andamento para a prova técnica REST/MSW e Socket.IO/MSW. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
+TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 e TASK-03 concluídas. Próxima etapa: TASK-04, contratos e banco simulado. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
 
 Exemplo de rastreabilidade: REQ-015 (cotação revalidada) → TASK-08/TASK-10 → DEC-08 → API-08/API-09 e EVT-01 → UI-04 → SCN-10/SCN-17 → TEST-09 → REL-02.
 
@@ -43,7 +45,7 @@ npm run build
 npm run dev
 ```
 
-`nvm use` é opcional se o Node compatível já estiver instalado. `package-lock.json` está disponível. Tipos, lint e build passaram após instalação pelo usuário; `npm ci --dry-run` também passou. A instalação real em checkout limpo e os testes no navegador ainda precisam ser realizados.
+`nvm use` é opcional se o Node compatível já estiver instalado. `package-lock.json` está disponível. Tipos, lint e build passaram após instalação pelo usuário; `npm ci --dry-run` também passou. E2E local e smoke do deploy inicial passaram; a instalação real em checkout limpo permanece pendente na TASK-15.
 
 | Comando | Finalidade / estado |
 | --- | --- |
@@ -52,7 +54,7 @@ npm run dev
 | `npm run preview` | Servir `dist` em `http://127.0.0.1:4173` após build |
 | `npm run typecheck` | TypeScript dos arquivos da aplicação/configuração/testes |
 | `npm run lint` | ESLint sem warnings permitidos |
-| `npm run test:e2e` | Smoke do shell; instalar Chromium com `npx playwright install chromium` antes |
+| `npm run test:e2e` | Smoke do shell e provas REST/Socket.IO em desktop/mobile; instalar Chromium com `npx playwright install chromium` antes |
 | `npm run test:visual` | Filtro `@visual`; ainda não há testes visuais, portanto não deve ser considerado aprovado |
 | `npm run test:report` | Abrir relatório HTML após execução Playwright |
 | `npm run audit:lighthouse` | Auditoria exploratória da home; iniciar preview e disponibilizar Chrome antes. Não executa ainda a matriz final da TASK-14 |
@@ -66,10 +68,10 @@ O shell tem home inicial e rotas em preparação para detalhe, carrinho, login/c
 | Variável | Padrão | Uso |
 | --- | --- | --- |
 | `VITE_API_BASE_URL` | `/api` | Base da instância Axios |
-| `VITE_MOCKS_ENABLED` | `true` | Lida/validada, mas ativação MSW será implementada em TASK-03 |
+| `VITE_MOCKS_ENABLED` | `true` | Inicia o worker MSW antes de montar as rotas; habilitada no deploy Vercel |
 | `VITE_MOCK_SCENARIO` | `SCN-01` | Reservada para cenários; handlers/banco ainda não existem |
 
-Não há chamadas de negócio nem worker MSW inicializado nesta etapa. `true` na configuração ainda não significa mocks funcionais. Socket.IO e MSW estão declarados como dependências; prova de transporte/binding e bootstrap fazem parte da TASK-03.
+O worker MSW atende `GET /api/__proof` e responde ao evento Socket.IO `proof.request` com `proof.event`. Para verificar, abra `/__proof` e execute as duas provas. Os handlers de negócio e o banco simulado entram na TASK-04.
 
 ## Fonte e assets
 
@@ -85,6 +87,6 @@ Seleção/reset será pelo painel de demonstração e controles MSW descritos em
 
 ## Testes, relatórios e entrega
 
-O usuário confirmou que o smoke Playwright passou no terminal local em desktop/mobile. A sandbox impediu repetição pelo agente; o resultado local não deve ser confundido com execução dos fluxos REST/socket. Tipos/lint/build passaram; TEST-16 segue parcial. Não há auditoria Lighthouse realizada. A matriz exige os 12 grupos E2E, baselines de quatro telas e revisão em 390/768/1440. Lighthouse terá 12 medições e medianas por página/perfil. Guardar evidências nos registros de TEST-MATRIX e RELEASE.
+O usuário confirmou aprovação do smoke e das provas E2E REST/Socket.IO no terminal local em desktop/mobile. O agente validou manualmente REST e Socket.IO no deploy público, incluindo acesso direto/refresh de `/__proof` e janela anônima. Tipos/lint/build passaram; TEST-16 segue parcial. Não há auditoria Lighthouse realizada. A matriz exige os 12 grupos E2E, baselines de quatro telas e revisão em 390/768/1440. Lighthouse terá 12 medições e medianas por página/perfil. Guardar evidências nos registros de TEST-MATRIX e RELEASE.
 
-Repositório remoto, URL pública, commit e provedor final: **pendentes**. TASK-03 valida primeira publicação; TASK-15 conclui a entrega. Limitações e desvios reais devem constar em ARCHITECTURE, sem tratar propostas como resultados medidos.
+Repositório: https://github.com/bernbecht/jungle-gaming-code-challenge. Publicação inicial na Vercel validada na TASK-03; TASK-15 concluirá a entrega e registrará o commit final. Limitações e desvios reais devem constar em ARCHITECTURE, sem tratar propostas como resultados medidos.

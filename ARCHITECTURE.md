@@ -1,6 +1,6 @@
 # Arquitetura e decisões
 
-Status: **base da TASK-02 com dependências instaladas, tipos/lint/build aprovados; verificação no navegador pendente**. Providers/router, cliente Axios, tokens e shell estão preparados. Demais decisões de domínio permanecem propostas. Decisões abaixo guiam o desenvolvimento e devem ser atualizadas quando o código trouxer evidência diferente. Fonte de obrigações: [REQUIREMENTS.md](REQUIREMENTS.md). Payloads: [CONTRACTS](docs/CONTRACTS.md).
+Status: **TASK-03 concluída: base e provas REST/Socket.IO validadas localmente e no deploy Vercel**. Providers/router, cliente Axios, tokens e shell estão preparados. Demais decisões de domínio permanecem propostas. Decisões abaixo guiam o desenvolvimento e devem ser atualizadas quando o código trouxer evidência diferente. Fonte de obrigações: [REQUIREMENTS.md](REQUIREMENTS.md). Payloads: [CONTRACTS](docs/CONTRACTS.md).
 
 ## Estrutura e limites
 
@@ -22,7 +22,7 @@ docs/
 
 | ID | Decisão e motivação | Requisitos |
 | --- | --- | --- |
-| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões resolvidas em package-lock.json; integração de prova REST/socket implementada na TASK-03, E2E e deploy inicial pendentes | REQ-001, REQ-050 |
+| DEC-01 | Vite + React + TypeScript, npm e lockfile; stack obrigatória sem biblioteca global adicional de estado. Versões resolvidas em package-lock.json; integração de prova REST/socket, E2E e deploy inicial Vercel validados na TASK-03 | REQ-001, REQ-050 |
 | DEC-02 | URL guarda busca/filtros/ordenação/página; Query guarda estado remoto; estado local guarda edição/formulários/diálogos. Não duplicar carrinho em outro store | REQ-005, REQ-025, REQ-027 |
 | DEC-03 | Componentes → hooks Query → serviços Axios → handlers MSW → domínio/banco simulado. Eventos e REST usam o mesmo domínio. UI não importa fixtures | REQ-025, REQ-029, REQ-030, REQ-032 |
 | DEC-04 | Inicialização aguarda ativação dos mocks, depois recupera sessão e resolve guards. Token fictício opaco persistido; handlers verificam dono e expiração em toda operação privada | REQ-021, REQ-022, REQ-023 |
@@ -94,7 +94,7 @@ Contrato em EVT-01 e EVT-02. Atualizar banco antes de emitir. Ignorar versão me
 
 Listeners pertencem a um único provedor por geração de sessão; cleanup deve funcionar também durante remount em desenvolvimento. `order.updated` é privado e validado por usuário/sessão; catálogo pode ter atualização pública. Reconexão revalida sessão primeiro e só então recursos privados.
 
-Limitação da prova do mock: transporte WebSocket, eventos textuais e namespace padrão; comportamento de polling/upgrade não será uma evidência coberta. O binding documenta que não suporta namespaces personalizados, acknowledgements ou anexos binários. O teste E2E da TASK-03 ainda precisa ser executado. O desafio permite a integração compatível descrita; não permite substituir socket por callbacks na UI.
+Limitação da prova do mock: transporte WebSocket, eventos textuais e namespace padrão; comportamento de polling/upgrade não será uma evidência coberta. O binding documenta que não suporta namespaces personalizados, acknowledgements ou anexos binários. O usuário confirmou aprovação do E2E da TASK-03; o agente validou o evento no deploy público. O desafio permite a integração compatível descrita; não permite substituir socket por callbacks na UI.
 
 ## Decisões de UX, desvios e limitações
 

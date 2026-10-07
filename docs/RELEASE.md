@@ -1,6 +1,6 @@
 # Verificação e entrega
 
-Status: **procedimento planejado; nenhuma publicação ou auditoria foi realizada**. [TASK-15](../TASKS.md), [requisitos](../REQUIREMENTS.md), [matriz de testes](TEST-MATRIX.md).
+Status: **deploy inicial da TASK-03 publicado e validado; auditoria e entrega final ainda pendentes**. [TASK-15](../TASKS.md), [requisitos](../REQUIREMENTS.md), [matriz de testes](TEST-MATRIX.md).
 
 ## Gates de entrega
 
@@ -25,7 +25,15 @@ Diretório proposto: `artifacts/lighthouse/<pagina>/<perfil>/run-<n>.{html,json}
 
 ## Publicação — REL-04
 
-Escolha proposta: Vercel, aceita pelo enunciado. `vercel.json` já configura fallback da SPA para rotas internas conforme orientação oficial para Vite; build `dist` é gerado por `npm run build`. Publicação e smoke público ainda pendentes, pois o CLI/autenticação do provedor não estão disponíveis neste ambiente. Netlify/Cloudflare Pages também são aceitos; registrar escolha final e URL no README após deploy.
+Provedor escolhido pelo usuário em 07/10/2026: **Vercel**. `vercel.json` configura o fallback da SPA para rotas internas; o build `dist` é gerado por `npm run build`. Repositório importado pelo painel web conectado ao GitHub, com preset Vite e `VITE_MOCKS_ENABLED=true` em Production/Preview.
+
+Deploy inicial aprovado em 07/10/2026 após o usuário liberar o acesso ao repositório:
+
+- URL pública: https://jungle-gaming-code-challenge.vercel.app
+- Commit: `4047da30e6ceab18c71461c1039f3cf8018efe55` (branch `main`).
+- Deployment: `dpl_HLZFEAJ95RT29n9ipfAHJHzKaMnj`.
+- Smoke manual pelo agente no Chrome: home, acesso direto/refresh de `/__proof`, respostas REST e Socket.IO aprovadas. Repetido em janela anônima, sem autenticação na Vercel. As provas confirmam que o worker e a interceptação funcionam no build hospedado.
+- Limite: demonstração de transporte; ainda não comprova os fluxos de negócio do deploy final (TASK-15).
 
 Configurar build, diretório de saída, fallback SPA para rotas internas e entrega de assets/worker sem rewrite indevido. Variáveis públicas devem habilitar mocks sem conter segredos. Conferir que carregamento do worker e interceptação Socket.IO funcionam no build hospedado antes de prosseguir com funcionalidades.
 
@@ -33,9 +41,9 @@ No deploy final, testar rotas públicas e privadas por acesso direto/refresh, co
 
 ## Registro final a preencher
 
-- Repositório: pendente.
-- URL pública / provedor: pendente.
-- Commit entregue / identificador do deploy: pendente.
+- Repositório: https://github.com/bernbecht/jungle-gaming-code-challenge.
+- URL pública / provedor: https://jungle-gaming-code-challenge.vercel.app / Vercel.
+- Commit/deployment inicial: registrados em REL-04 acima; versão final ainda pendente.
 - Runtime, npm, browser, Playwright e Lighthouse: pendentes.
 - Relatórios E2E / traces / baselines: pendentes.
 - Relatórios Lighthouse / medianas / causas de desvios: pendentes.
