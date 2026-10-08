@@ -47,11 +47,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("tablet keeps catalog filters available in a dialog", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(isMobile, "This viewport is covered by the mobile catalog project.");
+test("tablet keeps catalog filters available in a dialog", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await page.goto("/");
 
