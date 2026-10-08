@@ -136,7 +136,7 @@ O relógio começa em `2026-01-15T12:00:00Z` e avança explicitamente pelo contr
 
 Facetas são derivadas pelo MSW do catálogo, nunca importadas das fixtures pelos componentes. Mobile/tablet usa `<dialog>` modal nativo com foco contido, Escape e retorno ao botão; desktop usa sidebar a partir de 1024 px. As mesmas opções ficam na URL. Galeria mantém seleção local; troca de NFT reinicia seleção e quantidade, que fica limitada à disponibilidade da edição atual. Compra/favorito estão desabilitados com explicação até integrar as operações.
 
-Home inclui banners com links internos de filtro e quatro blocos explicativos no lugar de artigos sem conteúdo navegável. Avaliações mostram apenas agregados presentes no contrato. Compartilhamento copia a URL com feedback, sem integração social externa. Estes ajustes e placeholders precisam de revisão visual na TASK-12; nenhuma fidelidade pixel a pixel foi comprovada.
+Home inclui banners com links internos de filtro e quatro blocos explicativos no lugar de artigos sem conteúdo navegável. Avaliações mostram apenas agregados presentes no contrato. No detalhe, o compartilhamento segue os três canais ilustrados no Figma: links de intenção para LinkedIn/Twitter e link `mailto:` para email, todos usando a URL atual do NFT. Estes ajustes e placeholders precisam de revisão visual na TASK-12; nenhuma fidelidade pixel a pixel foi comprovada.
 
 ### Detalhe mobile — UI-02 / TASK-05
 

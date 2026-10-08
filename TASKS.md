@@ -168,3 +168,5 @@ Revisão UI-02 mobile: detalhe reorganizado com voltar/favoritar no topo, header
 Revisão UI-02 — rating: desktop agora mostra cinco estrelas sólidas, com a camada base em `#CFB28C` (`text-muted-foreground`) e preenchimento cobre proporcional à nota; ao lado, “N avaliações de colecionadores”, conforme PNG. Mobile preserva a cápsula com uma estrela, nota e contagem. A variante desktop expõe nota/contagem num único rótulo acessível. Removido também o parâmetro `updating` que havia ficado sem uso. Lint, typecheck e build passaram; E2E não executado.
 
 Ajuste dos steppers do detalhe: os controles de quantidade desktop e mobile usam `size="stepper"` da variante do Button. A geometria responde ao breakpoint (`h-7 w-5` no mobile, `md:h-11 md:w-7` no desktop); o tamanho dos sinais é ajustado separadamente.
+
+Revisão UI-02 — compartilhar: botão de copiar link substituído pela composição do PNG desktop, com o texto “Compartilhar este NFT:” e links iconográficos acessíveis para LinkedIn, email e Twitter. Os links compartilham a URL atual sem simular confirmação de publicação. Validação visual e lint/build pendentes.

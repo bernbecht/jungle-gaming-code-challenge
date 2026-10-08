@@ -16,8 +16,11 @@ import {
   ChevronLeft,
   Heart,
   HeartIcon,
+  Linkedin,
+  Mail,
   ShoppingCart,
   Star,
+  Twitter,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -100,7 +103,6 @@ function NftDetail({ nft }: { nft: Nft }) {
   const [editionId, setEditionId] = useState(lowestEdition(nft).id);
   const [requestedQuantity, setQuantity] = useState(1);
   const [panel, setPanel] = useState<"details" | "reviews">("details");
-  const [shareMessage, setShareMessage] = useState("");
   const edition =
     nft.editions.find((e) => e.id === editionId) ?? lowestEdition(nft);
   const quantity = Math.max(
@@ -296,24 +298,44 @@ function NftDetail({ nft }: { nft: Nft }) {
               </div>
             ))}
           </dl>
-          <Button
-            variant="ghost"
-            className="mt-3 hidden md:block"
-            onClick={() => {
-              void navigator.clipboard.writeText(window.location.href).then(
-                () => setShareMessage("Link copiado."),
-                () =>
-                  setShareMessage(
-                    "Não foi possível copiar o link. Copie o endereço do navegador.",
-                  ),
-              );
-            }}
-          >
-            Compartilhar NFT
-          </Button>
-          <p role="status" className="text-sm">
-            {shareMessage}
-          </p>
+          <div className="mt-3 hidden items-center gap-2 text-sm md:flex">
+            <span className="mr-1">Compartilhar este NFT:</span>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Compartilhar no LinkedIn"
+              className="inline-flex size-8 items-center justify-center text-foreground hover:text-primary"
+            >
+              <Linkedin
+                size={16}
+                aria-hidden="true"
+                fill="currentColor"
+                stroke="none"
+              />
+            </a>
+            <a
+              href={`mailto:?subject=${encodeURIComponent(`Confira este NFT: ${nft.name}`)}&body=${encodeURIComponent(window.location.href)}`}
+              aria-label="Compartilhar por email"
+              className="inline-flex size-8 items-center justify-center text-foreground hover:text-primary"
+            >
+              <Mail size={16} aria-hidden="true" />
+            </a>
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(nft.name)}`}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Compartilhar no Twitter"
+              className="inline-flex size-8 items-center justify-center text-foreground hover:text-primary"
+            >
+              <Twitter
+                size={16}
+                fill="currentColor"
+                stroke="none"
+                aria-hidden="true"
+              />
+            </a>
+          </div>
         </div>
       </section>
       <section className="mt-12 hidden md:block">
