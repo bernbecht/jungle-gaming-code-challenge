@@ -4,7 +4,25 @@
 
 Durante o desenvolvimento, usei o protótipo como referência visual e o enunciado como referência de comportamento. Ao transformar as telas em uma aplicação funcional, encontrei situações que exigiam decisões sobre clareza, consistência, recuperação de erros e regras do domínio. Este documento explica as principais escolhas, suas motivações e as evidências disponíveis no repositório.
 
-Minha intenção foi demonstrar a capacidade de avaliar a experiência completa: o que acontece antes e depois de um clique, como a interface comunica seu estado e como o usuário retoma uma operação. As diferenças descritas abaixo têm consequências visuais e funcionais; apresento essas consequências para que possam ser consideradas na avaliação.
+As escolhas consideram o que acontece antes e depois de um clique, como a interface comunica seu estado e como o usuário retoma uma operação. Cada seção apresenta a diferença em relação à referência, sua motivação, o custo introduzido e as evidências para conferência.
+
+## As escolhas em uma leitura
+
+Para uma primeira avaliação, os exemplos mais relevantes são **compra por rede (1)**, **recibo recuperável (2)** e **salvamento de perfil separado da senha (9)**. Os detalhes abaixo permitem aprofundar cada escolha.
+
+| Seção | Escolha | Problema que procura resolver | Consequência |
+| --- | --- | --- | --- |
+| 1 | Compra por rede | Combinações incompatíveis entre NFTs e carteira | Mais de uma finalização em carrinhos multirrede |
+| 2 | Pedido em rota própria | Resultado assíncrono e acesso posterior ao recibo | Saída por navegação explícita, sem X de modal |
+| 3 | Checkout mobile em etapas | Dados e revisão ausentes do frame mobile | Passos adicionais antes do envio |
+| 4 | Remoção textual e componentes compartilhados | Ação pouco explícita e variantes visuais duplicadas | Controles mobile diferentes da referência |
+| 5 | Dados de carteira somente para leitura | Preenchimento redundante e dados divergentes | Edição no cadastro, não nesses campos do checkout |
+| 6 | ENS completo e opcional | Entrada fragmentada e obrigatoriedade de um metadado | Divergência do asterisco do protótipo |
+| 7 | Indicadores coerentes com os dados | Raridade sem critério e números/estado ilustrativos | Selo omitido e valores dinâmicos |
+| 8 | Explicação das ações simuladas | Expectativa de integrações reais fora do escopo | Textos alterados e ações indisponíveis identificadas |
+| 9 | Perfil e senha com ações independentes | Resultado parcial sob um único salvamento | Dois envios para alterar ambos os grupos |
+| 10 | Ícones descritivos no rodapé | Interpretação das letras W/C/D | Símbolos diferentes, com textos preservados |
+| 11 | Slots de carteira independentes | Ambiguidade de principal/secundária e da cópia de dados | Limite de dois registros por conta |
 
 ## Como interpretar as evidências
 
@@ -108,11 +126,23 @@ Essa limitação transacional pertence à API simulada que defini para o projeto
 
 **Referência e mudança.** Na [screenshot desktop da home](../design/screenshots/Desktop/Início.png), os três blocos de benefícios do rodapé usam as letras maiúsculas “W”, “C” e “D” dentro de círculos. Substituí essas letras por ícones associados ao conteúdo: escudo com confirmação para “Segurança da carteira”, pessoas para “Criadores em destaque” e sino para “Alertas de lançamentos”.
 
-**Motivação.** Optei por uma iconografia que exemplifica o significado de cada bloco, para facilitar a associação visual entre o símbolo e a mensagem sem exigir que o usuário interprete as letras. Essa intenção foi explicitada pelo autor durante a revisão deste documento.
+**Motivação.** Optei por uma iconografia que exemplifica o significado de cada bloco, para facilitar a associação visual entre o símbolo e a mensagem sem exigir que o usuário interprete as letras.
 
 **Experiência e consequência.** A expectativa é favorecer o reconhecimento dos temas ao percorrer o rodapé. Os títulos e descrições continuam presentes, e os ícones usam `aria-hidden="true"` por serem complementares ao texto. A escolha altera os símbolos do protótipo; seu benefício de compreensão não foi medido em testes com usuários. Os ícones ilustram os temas e não representam comprovação de segurança ou funcionalidades adicionais da demo.
 
 **Evidências:** lista `benefits` e renderização dos componentes `ShieldCheck`, `UsersRound` e `Bell` em [SiteFooter](../src/components/layout/site-footer.tsx), comparadas com a referência local. O teste em [home-editorial.spec.ts](../tests/e2e/home-editorial.spec.ts) exercita o rodapé e a newsletter, mas não verifica a compreensão dessa iconografia.
+
+## 11. Carteiras principais e secundárias com slots independentes
+
+**Referência e mudança — DEC-31.** O protótipo apresenta carteiras principal e secundária, mas não detalha todas as regras dos campos nem fornece um frame mobile. A implementação apresenta duas seções com formulário responsivo para nome do perfil, rede, endereço, provedor, ENS opcional e código de indicação opcional.
+
+**Motivação e regra adotada.** Interpretei principal e secundária como dois slots independentes, com um registro em cada. O apelido é derivado do slot e permanece estável após criação. “Igual à carteira principal” copia valores para o formulário secundário, sem compartilhar o registro nem salvar automaticamente. Essa escolha evita que a edição de uma carteira altere a outra implicitamente.
+
+**Experiência e consequência.** As carteiras salvas atualizam o cache utilizado no checkout. Endereços Ethereum/Polygon usam formato EVM; Solana usa Base58 e comprimento compatível. Essa validação verifica a forma, sem comprovar propriedade ou existência on-chain. Cadastro e edição tratam conflitos de slot/endereço e versão obsoleta.
+
+O enunciado pede cadastro e edição de carteiras principal e secundária, mas não declara um máximo de duas. O limite implementado é uma interpretação do escopo visível, não uma restrição explícita do requisito. Se o produto precisar de mais carteiras, será necessário ampliar o modelo e a interface para além desses dois papéis.
+
+**Evidências:** DEC-31 em [ARCHITECTURE](../ARCHITECTURE.md); contrato API-11 em [CONTRACTS](CONTRACTS.md); implementação em [WalletsPage](../src/routes/wallets-page.tsx), [API de carteiras](../src/features/wallets/api.ts) e [mock de domínio](../src/mocks/wallets.ts). A execução de [wallets.spec.ts](../tests/e2e/wallets.spec.ts) em Chromium desktop/mobile está registrada na [matriz de testes](TEST-MATRIX.md).
 
 ## 12. Página de favoritos para completar a navegação
 
@@ -131,24 +161,25 @@ Essa limitação transacional pertence à API simulada que defini para o projeto
 - **Fonte e imagens — DEC-16/DEC-17.** IBM Plex Mono local aproxima a aparência monoespaçada, e quatro SVGs abstratos substituem temporariamente as artes. Origem e licença estão em [ASSETS](ASSETS.md). Essas escolhas facilitam execução local e desenvolvimento, mas não comprovam equivalência visual e não devem ser defendidas como uma melhoria de UX já demonstrada.
 - **Bordas e acessibilidade.** A arquitetura registra a borda de input `#79583E` para melhorar a identificação dos controles; o token está em [styles.css](../src/styles.css). Contraste final, fidelidade visual, zoom e áreas de toque ainda precisam da revisão prevista. A existência do ajuste não comprova conformidade completa.
 
-## O que estas decisões demonstram e como avaliá-las
+## Como conferir as decisões na aplicação
 
-Os exemplos mostram decisões sobre regras de produto, coerência entre interface e dados, recuperação de operações e manutenção de componentes. Minha contribuição está em identificar uma ambiguidade, assumir uma escolha explícita, implementá-la nas camadas necessárias e deixar evidências para revisão.
+Use o ambiente e as credenciais descritos no [README de avaliação](../README.avaliacao.md). O roteiro abaixo verifica comportamentos observáveis; não substitui a revisão dos testes e dos contratos.
 
-Para verificar rapidamente, recomendo montar um carrinho Ethereum + Polygon e concluir somente Polygon; percorrer as três etapas do pagamento em mobile; conferir a remoção textual no carrinho; e abrir um pedido confirmado pelo seu endereço. No perfil, é possível verificar o campo ENS completo e sua descrição de opcionalidade.
+| Ação | Resultado a observar | Seções |
+| --- | --- | --- |
+| Adicionar `nft-001` e `nft-002`; concluir apenas Polygon | Checkout inclui só Polygon; Ethereum permanece no carrinho | 1 |
+| Comprar em mobile | Etapas Dados → Carteira → Revisão; CTA após o conteúdo | 3, 5 |
+| Consultar a URL gerada para um pedido da própria conta | Estado do pedido e recibo sob o mesmo identificador | 2, 8 |
+| Remover um item no carrinho mobile | Ação com ícone e texto “Remover” | 4 |
+| Salvar dados do perfil sem preencher o grupo de senha | Perfil salvo por sua própria ação; senha com envio separado | 9 |
+| Preencher o ENS no perfil | Um campo completo e descrição de opcionalidade | 6 |
+| Usar “Igual à carteira principal” no formulário secundário | Valores copiados para edição; salvamento continua explícito | 11 |
+| Percorrer os benefícios do rodapé | Escudo, pessoas e sino junto dos títulos e descrições | 10 |
 
-A [matriz de testes](TEST-MATRIX.md) registra aprovações locais reportadas pelo usuário para checkout confirmado/recusado/multirrede e perfil/avatar, com limitações de evidência anexada. Este levantamento não reexecutou essas suítes. Cenários avançados de tempo real, timeout e reconexão, baselines visuais e auditoria Lighthouse permanecem pendentes conforme os registros do projeto.
+## Evidências e limites desta revisão
 
-Uma justificativa documentada torna a decisão avaliável, mas não altera os critérios do desafio. Peço que estas escolhas sejam consideradas pelo problema que procuram resolver, pelo comportamento implementado e pelos custos que introduzem, junto da fidelidade visual e dos requisitos ainda em aberto.
+A [matriz de testes](TEST-MATRIX.md) registra execuções locais aprovadas de checkout confirmado/recusado/multirrede e gestão de perfil, avatar, senha e carteiras, com limitações quanto aos relatórios anexados. Esta revisão documental não reexecutou essas suítes.
 
-## 11. Carteiras principais e secundárias com slots independentes
+O [backlog](../TASKS.md) registra emissão e consumo versionado dos eventos de domínio concluídos nas TASK-10A/B. Isolamento completo entre sessões está em andamento; reconciliação após reconexão, recuperação avançada de pedidos e controles de falha ainda têm trabalho previsto. Baselines visuais, revisão abrangente de acessibilidade e auditoria Lighthouse também aguardam fechamento. O estado detalhado e a publicação devem ser conferidos em [TASKS](../TASKS.md) e [RELEASE](RELEASE.md).
 
-**Referência e mudança — DEC-31.** A tela de carteiras não tem uma especificação completa de campos nem frames mobile. A implementação apresenta seções para carteira principal e secundária, com formulário responsivo para nome do perfil, rede, endereço, provedor, ENS opcional e código de indicação opcional.
-
-**Decisão de domínio.** Cada slot é único por conta. Seu apelido é derivado do slot e permanece estável após criação. O controle “Igual à carteira principal” copia os valores atuais para o formulário da secundária, que continua sendo um registro independente. Os endereços Ethereum/Polygon usam formato EVM; Solana usa Base58 e comprimento compatível. Isso apenas valida forma, sem verificar propriedade ou estado on-chain.
-
-**Limite que deve ser discutido na avaliação.** O enunciado solicita cadastro e edição de carteiras principal e secundária, mas não declara literalmente um máximo de duas. REQ-014 fala em selecionar uma carteira cadastrada; REQ-024 pede validação e persistência, sem especificar quantidade. O protótipo oferece somente os dois slots nomeados, portanto hoje cada conta pode registrar até duas carteiras. Essa escolha interpreta o escopo visível e não deve ser apresentada como uma restrição explícita do requisito. Pergunta sugerida ao avaliador: “Ao pedir carteira principal e secundária, o desafio espera exatamente dois slots ou a possibilidade de cadastrar mais carteiras além desses papéis?”
-
-**Efeito e limitações.** Edição usa versão otimista; cadastro e edição retornam erros de validação, conflito de slot/endereço e versão obsoleta. As carteiras salvas compartilham cache com o checkout, que passa a preencher endereço e metadados a partir do registro atualizado. A regra de formato não comprova que a carteira existe ou pertence ao usuário.
-
-**Evidências:** DEC-31 em [ARCHITECTURE](../ARCHITECTURE.md); contrato API-11 em [CONTRACTS](CONTRACTS.md); implementação em [WalletsPage](../src/routes/wallets-page.tsx), [API de carteiras](../src/features/wallets/api.ts) e [mock de domínio](../src/mocks/wallets.ts). [wallets.spec.ts](../tests/e2e/wallets.spec.ts) foi aprovado pelo usuário em Chromium desktop e mobile.
+As decisões mostram como tratei ambiguidades do protótipo e conectei interface, regras de domínio e evidências de implementação. Suas justificativas não alteram os critérios do desafio: a avaliação deve considerar o problema resolvido, o custo da escolha, a fidelidade visual e os requisitos ainda em aberto.

@@ -1,54 +1,99 @@
 # Cenários da simulação
 
-Status: **prova de transporte REST e Socket.IO validada localmente e no deploy Vercel (TASK-03); checkout básico implementado na TASK-08, E2E local pendente; cenários avançados de domínio ainda planejados**. O bootstrap do worker e `GET /api/__proof` exercitam Axios→MSW. A rota `/__proof` conecta `socket.io-client` após o worker iniciar; `@mswjs/socket.io-binding` converte o evento `proof.event` no mock. O WebSocket padrão `/socket.io/` é normalizado pelo MSW para `/` antes de buscar o handler. Esse transporte usa WebSocket interceptado, namespace padrão e eventos textuais; não cobre namespaces personalizados, acknowledgements ou binário. TASK-04 implementa banco IndexedDB, fixtures e reset integral. O núcleo e as rotas básicas de cotação/pedidos foram validados por testes unitários; a suíte de checkout está preparada. Contratos de controle: [API-13](CONTRACTS.md). Uso nos testes: [TEST-MATRIX](TEST-MATRIX.md). REQ-029, REQ-030, REQ-031, REQ-032, REQ-044; DEC-05, DEC-15.
+Guia para reproduzir comportamentos e avaliar a aplicação com dados conhecidos. Os IDs SCN-01 a SCN-18 identificam casos de avaliação; **somente SCN-01 é aceito como configuração de inicialização/reset**. Os demais casos podem ser provocados pela interface, pelos controles disponíveis ou, quando indicado, dependem de controles planejados.
 
-## Fixture padrão
+Consulte os formatos de requisição em [CONTRACTS.md](CONTRACTS.md), os resultados registrados em [TEST-MATRIX.md](TEST-MATRIX.md) e o progresso em [TASKS.md](../TASKS.md). “Reproduzível” abaixo significa que existe um caminho na implementação atual; não significa que todo o cenário passou em E2E ou foi validado no deploy público.
 
-Implementado em `src/mocks/fixtures.ts`: 36 NFTs, três categorias, três coleções, três redes e quatro criadores, preços distintos e edições com estoque normal/baixo/zero. IDs estáveis `nft-001` a `nft-036`, página com 12 itens. `nft-001` disponível para compra e auditoria. Quatro placeholders SVG locais são reutilizados conforme DEC-17.
+## Dados de partida
 
-Dois usuários seed: `collector-a@example.test` e `collector-b@example.test`, senha fictícia `DemoNft!2026` para ambos. Login e favoritos são atendidos por handlers MSW na TASK-06; o banco persiste apenas verificadores/salts. A possui carteira principal e secundária; B possui carteira principal e favoritos distintos. Carrinhos iniciais vazios, nenhum pedido. Cupom válido `NFT10` (10%), `EXPIRED` expirado e qualquer código desconhecido inválido.
+As [fixtures](../src/mocks/fixtures.ts) criam 36 NFTs, três categorias, três coleções, três redes e quatro criadores. Os IDs vão de `nft-001` a `nft-036`; a página padrão contém 12 itens. Há edições com estoque normal, baixo e zero. Quatro placeholders SVG locais são reutilizados conforme DEC-17.
 
-Relógio-base implementado: `2026-01-15T12:00:00Z`, seed fixo 1. O mock resolve pagamentos após 2 s reais por padrão, configuráveis via `POST /api/__mock/payment`; `POST /api/__mock/clock` também resolve operações vencidas. Somente o controle básico de pagamento e SCN-01 estão disponíveis; sessão expirada e demais cenários entram na TASK-11. Esses valores são escolhas de teste, não requisitos do desafio.
+| Dado | Valor / uso |
+| --- | --- |
+| Conta A | `collector-a@example.test`; carteiras principal Ethereum e secundária Polygon; favorito inicial `nft-001` |
+| Conta B | `collector-b@example.test`; carteira principal Ethereum; favorito inicial `nft-002` |
+| Senha das duas contas | `DemoNft!2026` — fictícia; o banco persiste salts/verificadores, sem senha em texto claro |
+| Compra Ethereum | `nft-001`, edição `1/10`, disponível após reset |
+| Compra Polygon | `nft-002`, edição `1/10`; usar carteira secundária de A |
+| Cupons | `NFT10`: 10%; `EXPIRED`: expirado; código desconhecido: inválido |
+| Estado inicial | Carrinhos vazios, nenhum pedido e nenhuma sessão ativa |
+| Relógio-base / seed | `2026-01-15T12:00:00Z` / `1` |
+| Pagamento padrão | Confirmado após 2 segundos reais; configurável pelo controle de pagamento |
 
-## Controles — base implementada e próximos passos
+Esses valores são escolhas de teste, não exigências do desafio. O banco IndexedDB pertence à origem do navegador: desenvolvimento local e deploy possuem estados independentes. Refresh preserva o banco compatível; reset restaura as fixtures e desfaz alterações da demonstração.
 
-Implementados: controles TASK-04 `GET /api/__mock/status`, `POST /api/__mock/reset` e `POST /api/__mock/clock`; TASK-05 `POST /api/__mock/catalog-network`; TASK-06 `POST /api/__mock/favorite-network`; TASK-08 `POST /api/__mock/payment` com `{outcome:'confirmed'|'declined',delayMs:0..10000}`. Reset restaura o banco e os controles locais, e fecha sockets desta aba. Clock resolve pedidos vencidos no núcleo; emissão de eventos ainda não implementada. Cada teste browser tem contexto isolado. O painel e controles avançados entram na TASK-11. O bootstrap preserva o banco existente quando o schema é compatível.
+## Como preparar uma avaliação
 
-O comportamento final dos controles descritos abaixo inclui cenários, sessões, fila de eventos e painel ainda planejados para as próximas tarefas:
+1. Abra a aplicação com mocks habilitados e aguarde a inicialização. A rota `/__proof` permite conferir REST e Socket.IO separadamente.
+2. Em `/__proof`, clique em **Resetar demonstração**. O controle restaura SCN-01, apaga sessão e tentativas salvas, descarta o ID de visitante anterior e cria um novo quando a home iniciar; a recarga limpa caches em memória.
+3. Entre com a conta indicada, execute o caso e observe o resultado na interface. Para outro caso independente, repita o reset.
 
-Todos são handlers MSW chamados via Axios pelo painel de demonstração ou harness no navegador. Não criar fallback de negócio em hooks. Painel disponível no build de demonstração com rótulo claro de simulação.
+O botão é o caminho recomendado para preparar uma avaliação manual. `POST /api/__mock/reset` isoladamente restaura o banco/worker, mas não pode limpar o storage nem o cache React do documento que fez a chamada.
 
-- `POST /api/__mock/reset` com `{scenarioId,seed,now}`: fechar sessões/conexões anteriores e restaurar integralmente banco, idempotência, pedidos/reservas, carrinhos, favoritos, perfil/carteiras, relógio e fila de eventos. O harness limpa storage do navegador por contexto antes do bootstrap. O painel recarrega a aplicação após reset.
-- `POST /api/__mock/scenario` com `{scenarioId}`: selecionar falha/comportamento sem reset implícito; informar no painel o cenário ativo.
-- `POST /api/__mock/clock` com `{advanceMs}`: avançar relógio do domínio, resolver pedidos/expirações vencidos e emitir os eventos correspondentes.
-- `POST /api/__mock/actions` com `{action,payload}`: ações nomeadas para atualizar NFT, expirar sessão, resolver pedido, interromper conexão ou repetir evento. Atualizações reais escrevem o banco primeiro; duplicatas/eventos antigos apenas reemitem pelo socket.
-- Configuração proposta `VITE_MOCK_SCENARIO=SCN-01`, aplicada somente na criação do banco/reset, para não destruir persistência a cada refresh. Falhas one-shot são consumidas uma vez e ficam registradas na simulação.
+Os controles são interceptados pelo MSW no navegador; chamadas externas com `curl` não exercitam esse mock. Não é necessário editar fixtures ou cache da aplicação para os casos reproduzíveis abaixo.
 
-Cada teste tem BrowserContext/storage independentes. Controles de relógio de browser e domínio devem avançar juntos quando ambos afetam o caso. Não usar sleeps arbitrários para disparar/assertar transições.
+## Controles disponíveis
 
-## Catálogo de cenários
+Os [handlers](../src/mocks/handlers.ts) oferecem estes controles sem sessão. `/__proof` já permite resetar a demonstração; ainda não há painel visual para selecionar os 18 cenários nem para configurar todas as ações.
 
-| ID | Preparação / gatilho | Resultado esperado | Testes |
+| Controle | Entrada e efeito |
+| --- | --- |
+| `GET /api/__mock/status` | Mostra cenário, versão do schema, relógio e quantidades de NFTs/usuários |
+| `POST /api/__mock/reset` | `{scenarioId?:'SCN-01',seed?:1,now?:string}`; restaura banco, controles e fecha sockets da aba |
+| `POST /api/__mock/clock` | `{advanceMs:number}` inteiro não negativo; avança o relógio do domínio e resolve pedidos vencidos, publicando os eventos correspondentes |
+| `POST /api/__mock/catalog-network`, `/detail-network`, `/cart-network`, `/favorite-network` | `{delayMs?:number,failuresRemaining?:number,failureMode?:'http'|'network',statusCode?:400..599}`; atraso 0–10000 ms e até 10 falhas na próxima operação daquele recurso; `network` simula ausência de resposta HTTP |
+| `POST /api/__mock/payment` | `{outcome?:'confirmed'|'declined',delayMs?:number,loseResponseOnce?:boolean}`; configura novos pedidos, atraso 0–10000 ms e resposta ambígua uma vez |
+
+Catálogo, detalhe, carrinho e favoritos usam controles transitórios por aba/worker, perdidos no refresh. A configuração de pagamento persiste no IndexedDB. Reset restaura os defaults. O relógio simulado rege cotação, cupom e resolução por avanço; atraso de rede/pagamento também pode usar tempo real. Avançar o relógio do domínio não avança os timers do navegador.
+
+`loseResponseOnce:true` não produz um timeout real: após criar o pedido e reservar estoque, o handler retorna **504 `RESPONSE_UNKNOWN`**, sem entregar o objeto do pedido. A próxima consulta da tentativa pode recuperá-lo pela mesma chave. O sinalizador é consumido na criação de um pedido novo; replay não cria outro pedido. Esse fluxo foi implementado na TASK-10E e confirmado em E2E desktop/mobile. Uma resposta HTTP apenas atrasada além do timeout real do cliente não é simulada.
+
+### Exemplo: pagamento recusado — SCN-12
+
+Após o reset, configure no console antes de confirmar a compra:
+
+```js
+const payment = await fetch('/api/__mock/payment', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ outcome: 'declined', delayMs: 0 }),
+});
+if (!payment.ok) throw new Error(await payment.text());
+```
+
+Entre com A, compre uma unidade de `nft-001`, conecte a carteira Ethereum, revise e confirme. Espere a recusa, sem recibo confirmado, e confira que o item permanece no carrinho. Para a variante de resposta ambígua de SCN-11, use `{outcome:'confirmed',delayMs:8000,loseResponseOnce:true}`: após o 504, recarregue e use **Recuperar tentativa**. A mesma chave deve levar ao pedido existente.
+
+## Catálogo de casos
+
+**Reproduzível:** caminho disponível na interface/controles. **Parcial:** parte disponível, com gatilhos ou variantes ainda pendentes. **Planejado:** preparação completa depende de implementação adicional. As colunas de teste indicam rastreabilidade, não aprovação.
+
+| ID | Disponibilidade e preparação | Resultado esperado | Testes |
 | --- | --- | --- | --- |
-| SCN-01 | Reset padrão; pagamento confirma após dois segundos reais (ou avanço do relógio) | Fluxo completo com dados estáveis | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-08, TEST-11, TEST-13, TEST-14, TEST-15, TEST-18 |
-| SCN-02 | Busca sem correspondência; catálogo continua preenchido | Estado vazio sem erro; limpar filtro recupera resultados | TEST-01 |
-| SCN-03 | Primeira busca demora 1500 ms; segunda 100 ms | Resposta antiga não substitui busca atual/URL | TEST-01 |
-| SCN-04 | Catálogo, detalhe e carrinho demoram 2000 ms | Skeletons preservam dimensões; conteúdo aparece ao resolver | TEST-12 |
-| SCN-05 | Falha de conexão one-shot em GET; depois sucesso | Feedback de rede, retry controlado e recuperação | TEST-12 |
-| SCN-06 | GET 503; mutation favorito 503; detalhe 404; recurso alheio 403, selecionáveis | Erros distintos, rollback, retry somente quando aplicável | TEST-02, TEST-03, TEST-04, TEST-12 |
-| SCN-07 | Expirar sessão durante navegação ou revisão do checkout | 401, login com retorno; contexto só retoma para dono | TEST-03 |
-| SCN-08 | Email seed repetido, perfil inválido, senha atual incorreta, avatar inválido e carteira inválida | 409/422 associados aos campos; sem persistência parcial | TEST-03, TEST-08 |
-| SCN-09 | Aplicar código desconhecido ou EXPIRED | Cupom recusado sem desconto indevido; remoção funciona | TEST-05 |
-| SCN-10 | NFT no carrinho; ação altera preço ou esgota edição | Banco e EVT-01 sincronizados; resumo muda e checkout exige revisão/correção | TEST-09 |
-| SCN-11 | POST pedido persiste e cria pending, mas resposta demora além do timeout Axios | Recuperação pela mesma chave encontra exatamente um pedido | TEST-07 |
-| SCN-12 | Resultado programado declined | Recusa terminal, sem recibo confirmado, carrinho preservado | TEST-07 |
-| SCN-13 | Emitir atualização v3, repeti-la e depois emitir payload antigo v2 | Estado mantém v3; efeitos não repetidos; REST permanece v3 | TEST-10 |
-| SCN-14 | Desconectar socket em pending; resolver pedido no banco; reconectar ou recarregar | REST recupera terminal sem criar compra nova | TEST-10 |
-| SCN-15 | A inicia request/evento privado atrasado, sai; B autentica antes da entrega | B não vê dados de A; listeners e cache de A limpos | TEST-03, TEST-10 |
-| SCN-16 | Recusar conexão de carteira; em variante, conectar e desconectar antes do envio | Checkout bloqueado e orientação de reconexão; nenhum pedido indevido | TEST-07 |
-| SCN-17 | Após revisar cotação, alterar taxa de rede ou validade de cupom sem evento NFT | POST revalida e exige revisão mesmo sem evento | TEST-09 |
-| SCN-18 | Adicionar ao carrinho pelo menos um NFT Ethereum e um Polygon; finalizar somente o grupo Polygon | Cotação/recibo contêm apenas itens Polygon; confirmação remove esse grupo e mantém o Ethereum; rede e carteira permanecem compatíveis | TEST-06, TEST-17 |
+| SCN-01 | **Reproduzível.** Reset; A compra `nft-001` com carteira Ethereum e pagamento padrão | Pedido confirmado, recibo com snapshot e remoção dos itens comprados | TEST-01 a TEST-06, TEST-08, TEST-11, TEST-13 a TEST-15, TEST-18 |
+| SCN-02 | **Reproduzível.** Buscar um termo sem correspondência | Estado vazio sem erro; limpar busca recupera resultados | TEST-01 |
+| SCN-03 | **Reproduzível por controle/harness.** Configurar primeira listagem com 1500 ms e segunda com 100 ms; disparar buscas diferentes sem aguardar a primeira | Resposta antiga não substitui busca atual/URL | TEST-01 |
+| SCN-04 | **Reproduzível.** Configurar `delayMs:2000` em catálogo, detalhe ou carrinho antes de abrir a rota | Skeleton visível durante carga e conteúdo após a resposta; verificar preservação de dimensões | TEST-12 |
+| SCN-05 | **Reproduzível.** Configurar `failureMode:'network'` e falhas suficientes para cobrir a tentativa e retry automático em catálogo, detalhe ou carrinho | Erro sem resposta HTTP, mensagem de falha e recuperação por retry explícito | TEST-12 |
+| SCN-06 | **Parcial.** Configurar 503 em catálogo/favoritos; abrir detalhe inexistente. Recurso privado alheio requer requisição autenticada no harness | Erros distintos, rollback de favorito e retry quando aplicável | TEST-02, TEST-03, TEST-04, TEST-12 |
+| SCN-07 | **Reproduzível.** Faça login, avance `/api/__mock/clock` em `86400001` ms e acesse `/profile`; a API retorna 401, o token é removido e a rota de login preserva `returnTo`. Entre novamente para retomar o perfil | Sessão expirada não autoriza a rota; autenticação nova retoma o destino protegido | TEST-03 |
+| SCN-08 | **Reproduzível.** Cadastrar email seed; editar perfil com dados inválidos; informar senha atual incorreta; enviar avatar/carteira inválidos | 409/422 e erros dos campos; operação inválida não salva dados. Perfil e senha são operações separadas | TEST-03, TEST-08 |
+| SCN-09 | **Reproduzível.** Carrinho com item; aplicar código desconhecido ou `EXPIRED`, depois `NFT10` e remover | Cupom inválido recusado; desconto válido e remoção refletidos nos totais | TEST-05 |
+| SCN-10 | **Parcial.** Reservas e resolução de pedidos já emitem disponibilidade via EVT-01; ação dedicada para alterar preço/esgotar edição ainda planejada | Banco/evento coerentes; resumo e validação da compra refletem disponibilidade. Revisão de todas as variantes ainda pendente | TEST-09 |
+| SCN-11 | **Parcial.** `loseResponseOnce:true` faz o POST retornar 504 `RESPONSE_UNKNOWN` depois de persistir o pedido; a tela pode recuperar a tentativa pela mesma chave, inclusive após refresh. Não simula um timeout HTTP real por atraso de resposta | Recuperar pela mesma chave encontra um único pedido, sem duplicar pedido ou baixa de estoque | TEST-07 |
+| SCN-12 | **Reproduzível.** Configurar `outcome:'declined'` antes de confirmar | Recusa terminal, sem recibo confirmado, carrinho preservado | TEST-07 |
+| SCN-13 | **Parcial.** Validação/deduplicação do consumidor coberta em unidade; controle público de emissão v3/duplicata/v2 ainda planejado | Estado mantém versão mais nova; efeitos não repetidos; REST não é revertido por reemissão | TEST-10 |
+| SCN-14 | **Parcial.** Reconexão REST implementada e teste de carrinho/cotação confirmado na TASK-10D; variante de pedido pending resolvido durante desconexão requer verificação própria | REST recupera estado atual sem criar nova compra | TEST-10 |
+| SCN-15 | **Parcial.** Logout/troca A→B e descarte de eventos antigos implementados na TASK-10C; controle de resposta privada atrasada ainda planejado | B não vê dados de A; cache/listeners anteriores limpos | TEST-03, TEST-10 |
+| SCN-16 | **Parcial.** Desconectar carteira pela interface antes de confirmar; recusa programada de conexão ainda planejada | Checkout bloqueado até conexão válida; nenhum pedido indevido | TEST-07 |
+| SCN-17 | **Parcial.** Cotação expira pelo relógio; alteração de cupom participa do teste de reconciliação. Controle dedicado de mudança de taxa ainda planejado | POST revalida mesmo sem evento NFT e exige revisão dos termos alterados | TEST-09 |
+| SCN-18 | **Reproduzível.** A adiciona `nft-001` e `nft-002`; finaliza somente Polygon com carteira secundária | Cotação/recibo apenas Polygon; confirmação preserva Ethereum no carrinho | TEST-06, TEST-17 |
 
-## Procedimento de reprodução
+## Evidência e limites
 
-Selecionar/resetar cenário no painel → executar o fluxo indicado na matriz → acionar gatilho/avançar relógio quando necessário → observar UI e respostas → voltar a SCN-01 com reset. Na implementação, substituir este procedimento geral por nomes reais dos controles e incluir os comandos verificados no README. Nenhum cenário está marcado como entregue ainda.
+Os testes em [catalog.spec.ts](../tests/e2e/catalog.spec.ts), [auth.spec.ts](../tests/e2e/auth.spec.ts), [cart.spec.ts](../tests/e2e/cart.spec.ts), [checkout.spec.ts](../tests/e2e/checkout.spec.ts), [profile.spec.ts](../tests/e2e/profile.spec.ts) e [wallets.spec.ts](../tests/e2e/wallets.spec.ts) contêm preparações e assertions dos fluxos. A publicação de eventos após persistência é exercitada em [domain-events.spec.ts](../tests/e2e/domain-events.spec.ts); validação de versões, identidade e duplicatas também aparece nos [testes unitários](../tests/unit/domain-events.spec.ts).
+
+TASKS registra confirmações do usuário para eventos/isolamento nas TASK-10A/B/C, reconciliação na TASK-10D, recuperação idempotente na TASK-10E e fluxos desktop/mobile dos grupos afetados pela TASK-11. Essas confirmações não substituem relatórios HTML/traces anexados nem comprovam as variantes marcadas como parciais. A prova REST/Socket.IO no deploy inicial comprova o transporte; a avaliação pública dos fluxos atuais pertence ao smoke final da TASK-15.
+
+Ainda não existem os endpoints `/api/__mock/scenario` e `/api/__mock/actions`, nem um painel para selecionar os 18 cenários ou controlar todas as ações. O reset visual disponível restaura somente SCN-01; `VITE_MOCK_SCENARIO` também aceita somente SCN-01. Alguns cenários permanecem parciais porque dependem de gatilhos ausentes, como alteração arbitrária de preço/taxa, reemissão manual de eventos ou atraso artificial da resposta além do timeout do cliente.
+
+O transporte usa WebSocket, namespace padrão e mensagens textuais. A persistência é compartilhada por origem, mas os eventos do mock são publicados para conexões da própria aba; não há broadcast geral entre abas. Testes usam contextos isolados para evitar interferência entre dados mutáveis.

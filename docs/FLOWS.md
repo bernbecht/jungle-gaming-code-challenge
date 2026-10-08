@@ -4,7 +4,9 @@ Este documento descreve as ações do usuário, estados, alternativas e resultad
 
 Fonte normativa: [desafio](../challenge-description.md) e [REQUIREMENTS](../REQUIREMENTS.md). Detalhes da API: [CONTRACTS](CONTRACTS.md). Decisões técnicas: [ARCHITECTURE](../ARCHITECTURE.md). Implementação simulada: [MOCKS-GUIDE](MOCKS-GUIDE.md). Progresso e evidências: [TASKS](../TASKS.md) e [TEST-MATRIX](TEST-MATRIX.md).
 
-Os fluxos abaixo são a especificação do comportamento esperado. A implementação de cada fluxo está indicada em TASKS e na matriz de evidências.
+Os fluxos descrevem o comportamento esperado e indicam os limites atuais da implementação. Caminhos básicos de catálogo, conta, carrinho, compra, perfil e carteiras estão implementados; a retomada de rota protegida após expiração de sessão está coberta na TASK-11A. Redirecionamento global após 401 de mutations e variantes avançadas de falha continuam fora da cobertura. Para reproduzir casos, use [SCENARIOS](SCENARIOS.md). Para evidência de execução, consulte TASKS e TEST-MATRIX; descrever um caminho não significa que todas as suas variantes passaram em teste.
+
+Para avaliar uma compra, percorra FLOW-06 → FLOW-03 → FLOW-01; use FLOW-02 para o resultado desconhecido. FLOW-04/FLOW-05 cobrem exploração, e FLOW-07/FLOW-08 cobrem manutenção dos dados da conta.
 
 ## Índice e rastreabilidade
 
@@ -16,14 +18,16 @@ Os fluxos abaixo são a especificação do comportamento esperado. A implementa�
 | FLOW-04 | Consultar e alternar favoritos com autenticação | REQ-008, REQ-021, REQ-023, REQ-027 | API-02, API-04 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-15; TEST-03, TEST-04 |
 | FLOW-05 | Filtrar e explorar o catálogo | REQ-005, REQ-006, REQ-026 | API-03 | TASK-05, TASK-12 | TEST-01, TEST-12, TEST-14 |
 | FLOW-06 | Manter, revisar e agrupar o carrinho de visitante ou usuário por rede | REQ-009, REQ-010, REQ-011, REQ-012 | API-05, API-06, API-07, API-08 | TASK-07, TASK-08, TASK-11 | SCN-01, SCN-09; TEST-05, TEST-06, TEST-17 |
+| FLOW-07 | Editar perfil, avatar e senha com operações independentes | REQ-024 | API-10 | TASK-09A/B/C | SCN-01, SCN-08; TEST-08A/B/C |
+| FLOW-08 | Cadastrar e editar carteiras usadas no checkout | REQ-014, REQ-024 | API-11, API-12 | TASK-09D | SCN-01, SCN-08, SCN-18; TEST-08D |
 
 ## FLOW-01: Compra
 
-**Objetivo:** comprar as quantidades revisadas e mostrar o resultado real da simulação, preservando o carrinho em caso de falha.
+**Objetivo:** comprar as quantidades revisadas e mostrar o resultado registrado pela simulação, preservando o carrinho em caso de falha.
 
 **Pré-condições:** usuário autenticado, carrinho com itens, dados do colecionador válidos e carteira cadastrada na rede do grupo selecionado. O carrinho pode conter NFTs de redes diferentes; a pessoa escolhe um grupo no carrinho e cada pedido/cotação inclui somente os NFTs dessa rede (DEC-24). As demais redes permanecem no carrinho para finalizações independentes. A revisão usa uma cotação da API, com preços, disponibilidade, cupom, taxa e total daquele grupo.
 
-No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobile, o header e o footer globais ficam ocultos nesta rota (o footer mobile só aparece na home); a compra avança em três passos — dados, carteira/rede e revisão. Nas etapas Carteira e Revisão, o CTA principal fica após o conteúdo no fluxo da página, sem flutuar sobre ele (DEC-26). Em ambos os tamanhos, conexão e pagamento são simulações locais; não há chamada a uma carteira real. A cotação exibida expira após cinco minutos.
+No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobile, o header e o footer globais ficam ocultos nesta rota; a compra avança em três passos — dados, carteira/rede e revisão. Nas etapas Carteira e Revisão, o CTA principal fica após o conteúdo no fluxo da página, sem flutuar sobre ele (DEC-26). Em ambos os tamanhos, conexão e pagamento são simulações locais; não há chamada a uma carteira real. A cotação tem validade de cinco minutos no relógio do domínio; a interface também bloqueia a confirmação após seu prazo local.
 
 **Gatilho:** o usuário confirma a compra após revisar os dados e os valores.
 
@@ -62,10 +66,10 @@ flowchart TD
 
 ### Alternativas e falhas
 
-- **Preço, cupom ou taxa alterados:** mostrar a diferença e exigir revisão e nova confirmação; não criar pedido com a cotação antiga.
+- **Preço, cupom ou taxa alterados:** atualizar a cotação e mostrar aviso de revisão antes de uma nova confirmação; não criar pedido com a cotação antiga. A comparação visual detalhada entre valores antigos e novos não está implementada.
 - **Disponibilidade insuficiente:** informar os itens afetados e permitir corrigir o carrinho antes de uma nova cotação.
 - **Campos inválidos ou carteira desconectada:** indicar o problema e permitir correção/reconexão antes de enviar novamente.
-- **Sessão expirada:** pedir autenticação e preservar o contexto para retomada pelo mesmo usuário. Revalidar a cotação ao retomar.
+- **Sessão expirada:** ao consultar a sessão e receber 401, remover o token, encaminhar à autenticação com retorno interno e buscar novamente o destino após o login. A tentativa e os recursos privados continuam limitados à identidade autenticada; uma cotação do checkout precisa ser revisada novamente. A retomada após 401 na rota protegida está coberta na TASK-11A; mutações 401 não têm redirecionamento global.
 - **Pagamento recusado:** mostrar a recusa, liberar a reserva e preservar o carrinho; não exibir recibo de sucesso. Outra compra é uma nova tentativa.
 - **Clique repetido ou reenvio da mesma tentativa:** recuperar o mesmo resultado. Uma chave reutilizada com conteúdo diferente gera conflito.
 - **Timeout, queda de conexão ou refresh:** seguir FLOW-02 para descobrir o resultado da tentativa existente.
@@ -82,17 +86,17 @@ Se o usuário adicionar itens enquanto um pedido está pendente, essas novas inc
 
 **Objetivo:** descobrir e acompanhar o resultado de uma compra existente sem criar outra compra por causa de uma resposta perdida.
 
-**Pré-condições:** existe uma tentativa identificada por usuário, chave de idempotência e conteúdo original. O cliente deve preservar essa identificação antes do envio para recuperá-la após refresh.
+**Pré-condições:** existe uma tentativa identificada por usuário, chave de idempotência e conteúdo original. O cliente preserva essa identificação antes do envio para recuperá-la após refresh. A TASK-10E registra teste aprovado pelo usuário para a variante 504 após persistência e refresh; isso não comprova todas as causas possíveis de timeout ou queda de conexão.
 
 **Gatilhos:** timeout do envio, queda de conexão, refresh/reabertura da página ou reconexão enquanto o resultado é desconhecido ou o pedido está pendente.
 
 ### Caminho principal
 
-1. Informar que o resultado está sendo recuperado. Timeout não é prova de recusa e não autoriza mostrar sucesso.
-2. Recuperar a sessão e a identificação da tentativa do usuário autenticado.
-3. Consultar a tentativa existente pela chave de idempotência.
-4. Se encontrar um pedido pendente, continuar acompanhando esse pedido, com reconciliação pela API REST após reconexão.
-5. Se encontrar um pedido confirmado, mostrar seu recibo e reconsultar o carrinho. Se encontrar um pedido recusado, mostrar a recusa e preservar os itens.
+1. Quando o envio tem resultado desconhecido, mostrar aviso e a ação **“Recuperar tentativa”**. Timeout não é prova de recusa e não autoriza mostrar sucesso.
+2. Após refresh do checkout, recuperar a sessão e indicar que há uma tentativa anterior da conta atual. A consulta da tentativa depende de acionar sua recuperação; não há reenvio automático ao abrir a página.
+3. Ao acionar **“Recuperar tentativa”**, consultar a tentativa existente pela chave original.
+4. Se encontrar um pedido, navegar para `/orders/:orderId`. Se estiver pendente, acompanhar esse mesmo pedido, com reconciliação REST após reconexão. O refresh direto dessa rota consulta o pedido pelo ID, sem novo POST de compra.
+5. Se encontrar um pedido confirmado, mostrar o recibo; se recusado, mostrar a recusa e preservar os itens. A confirmação revalida o carrinho pelo consumidor de eventos; ao abrir o carrinho, a interface consulta seus dados conforme as regras do cache.
 
 ```mermaid
 flowchart TD
@@ -110,11 +114,13 @@ flowchart TD
 
 - **Tentativa não encontrada (404):** o envio original ainda pode estar em andamento. O usuário pode tentar recuperar reenviando o mesmo conteúdo com a mesma chave; não gerar outra chave automaticamente.
 - **Conflito já registrado sem pedido:** mostrar o resultado anterior. Uma nova confirmação após corrigir/revisar os dados usa uma nova tentativa, depois de resolver a anterior.
-- **Sessão expirada:** autenticar novamente e retomar somente com o mesmo usuário. Outro usuário não acessa o pedido, a tentativa ou os dados privados do anterior.
+- **Sessão expirada:** após um 401 de consulta, novo login pode retomar a rota protegida indicada por `returnTo`; pedido e tentativa continuam restritos à conta autenticada. A TASK-11A valida o retorno ao perfil. A variante de expiração enquanto se recupera uma tentativa de pedido não possui um E2E dedicado.
 - **Falha durante a consulta:** manter o resultado como desconhecido, preservar o contexto e permitir repetir a recuperação. Não converter uma falha de rede em pagamento recusado.
 - **Evento duplicado ou antigo:** não regredir o estado nem reaplicar efeitos. A API é usada para reconciliar os recursos ativos após reconexão.
 
 **Resultado:** a tentativa original é recuperada ou continua em recuperação explícita. A perda de uma resposta não cria uma nova compra nem limpa o carrinho.
+
+**Limite atual:** o caso determinístico de SCN-11 devolve 504 depois de criar o pedido; não simula um timeout real. Um conflito registrado retornado pela consulta é mostrado como erro. A resolução de todas as variantes de conflito e retomada ainda precisa de cobertura própria.
 
 ## FLOW-03: Cadastro, login, sessão e logout
 
@@ -168,10 +174,12 @@ flowchart TD
 - **Cadastro inválido:** indicar que os dados precisam de correção. E-mail ou nome de usuário já usado não cria outra conta nem uma sessão.
 - **Sessão ausente ou expirada:** não abrir a rota privada; encaminhar ao login mantendo somente um retorno interno validado. Após autenticar, buscar os dados privados novamente.
 - **Falha de rede no login/cadastro:** manter os valores do formulário e oferecer nova tentativa; não indicar autenticação concluída.
-- **Troca de identidade:** cancelar consultas e limpar cache antes de mostrar recursos do novo usuário. Uma resposta privada de sessão anterior não pode preencher a interface atual.
+- **Troca de identidade:** cancelar consultas e limpar cache antes de mostrar recursos do novo usuário. O consumidor descarta callbacks de eventos anteriores; a cobertura geral de respostas REST privadas atrasadas permanece pendente.
 - **Falha de rede ao sair:** remover a sessão local e o cache privado mesmo sem confirmação do servidor, e não mostrar a conta anterior como autenticada neste navegador.
 
 **Resultado:** pessoa autenticada com sessão recuperável na aba atual ou visitante sem dados privados expostos. Senhas não são persistidas em claro; a autenticação é simulada pelos handlers MSW e não representa um serviço de produção.
+
+**Limite atual:** a consulta de sessão trata 401 removendo o token e a proteção de rota encaminha ao login com retorno interno. Não existe tratamento global de toda resposta 401 de mutations. O E2E da TASK-11A cobre expiração durante acesso ao perfil protegido, não a retomada automática de cada mutation. A autenticação não reaplica automaticamente o clique de favorito que abriu o login.
 
 ## FLOW-04: Consultar e alternar favoritos
 
@@ -179,7 +187,7 @@ flowchart TD
 
 **Pré-condições:** catálogo ou detalhe do NFT carregado. O NFT existe. Favoritos pertencem ao usuário autenticado.
 
-**Gatilho:** abrir o catálogo/detalhe ou acionar o controle de coração.
+**Gatilho:** abrir o catálogo/detalhe ou acionar o controle de coração. Há também uma página protegida `/favorites` em implementação na árvore atual, para reunir os NFTs salvos e removê-los da lista; o aceite dessa nova página ainda precisa ser registrado.
 
 ### Caminho principal
 
@@ -209,12 +217,14 @@ flowchart TD
 
 - **API rejeita a alteração ou falha:** restaurar o snapshot anterior, informar que não foi possível salvar e permitir nova tentativa.
 - **A pessoa troca de conta ou encerra sessão:** cancelar consultas privadas e limpar o cache antes de carregar favoritos de outra identidade.
-- **Sessão expira entre a leitura e a alteração:** a API responde 401; limpar a sessão local e encaminhar para autenticação, sem manter o estado otimista como persistido.
+- **Sessão expira entre a leitura e a alteração:** a API responde 401 e a alteração otimista é revertida. O token é limpo quando a consulta de sessão recebe 401; como não há interceptor global para 401 de mutations, encaminhar automaticamente esse caso ao login continua fora da cobertura atual.
 - **NFT inexistente:** a API responde 404 e a interface reverte a alteração.
 - **Dois usuários:** consultas usam identidade própria e handlers derivam autorização da sessão. Nunca aceitar `userId` do corpo para selecionar a lista.
 - **Alterações repetidas:** definir explicitamente `favorite: true` ou `false` torna a operação idempotente; não alternar no servidor por simples inversão de estado.
 
 **Resultado:** favorito confirmado e persistido para o usuário atual ou restauração do estado anterior com erro compreensível. Não há confirmação visual permanente quando a API falha.
+
+**Limite atual:** o controle acionado fica desabilitado durante sua mutation; não há serialização global de controles simultâneos do mesmo NFT em lugares diferentes. A nova página `/favorites` oferece loading, erro com retry, lista vazia e rollback de remoção; sua existência no código não representa aprovação E2E.
 
 ## FLOW-05: Filtrar e explorar o catálogo
 
@@ -271,10 +281,6 @@ flowchart TD
 
 **Resultado:** resultados correspondem aos filtros/ordenação/página na URL, ou o catálogo comunica vazio/erro sem esconder os controles de recuperação.
 
-## Como manter este documento
-
-Ao mudar um comportamento, atualize o fluxo e confira seus vínculos com requisitos, contratos, tarefas e testes. Novos fluxos recebem novos IDs; os existentes não são renumerados. Tempos específicos, bibliotecas, funções e armazenamento pertencem à arquitetura/guia técnico, enquanto este documento descreve o que o usuário deve observar.
-
 ## FLOW-06: Carrinho e cupom
 
 **Objetivo:** permitir montar e revisar o carrinho antes de autenticar, sem perder itens ao atualizar a página ou entrar na conta.
@@ -283,11 +289,69 @@ Ao mudar um comportamento, atualize o fluxo e confira seus vínculos com requisi
 
 ### Caminho principal
 
-1. O detalhe envia NFT, edição, quantidade e versão do carrinho à API. A API valida edição, inteiro positivo, versão e estoque.
-2. Carrinho e cupom ficam no IndexedDB do mock. A página consulta a API ao abrir/atualizar, e subtotais, descontos, taxa estimada e total são calculados no servidor usando wei inteiro.
-3. Alterar/remover quantidade envia a versão lida. Conflito de versão ou estoque mantém o estado do servidor e pede nova consulta; não aplica uma alteração local silenciosa.
+1. A pessoa escolhe edição e quantidade no detalhe e aciona **“Comprar”**. Após inclusão bem-sucedida, segue para `/cart`; se a API rejeitar, permanece no detalhe com erro. O controle adicional de inclusão no mobile permite adicionar sem navegar.
+2. A página mostra itens agrupados por rede, quantidades, cupom e resumo. Carrinho e cupom persistem no banco simulado; os totais são calculados pelas regras do mock com precisão inteira e devolvidos pela API.
+3. Alterar/remover quantidade envia a versão lida. Conflito de versão ou estoque mantém o estado persistido, informa o erro e reconsulta o carrinho; não aplica uma alteração local silenciosa.
 4. Aplicar cupom válido atualiza a versão e o resumo. Código inválido/expirado retorna erro sem alterar o carrinho; remover cupom é uma operação explícita.
 5. No login/cadastro, o cliente captura a versão do carrinho visitante antes de autenticar e chama o merge privado. Merge repetido para a mesma versão não duplica linhas. Estoque insuficiente e conflito entre cupons aparecem como avisos, sem ocultar itens sem explicação.
 6. O carrinho da conta passa a ser a origem após autenticar. Checkout continua uma etapa protegida e separada (FLOW-01/TASK-08).
+7. Cada grupo disponível oferece **“Finalizar [rede]”**; grupos com estoque insuficiente ficam bloqueados até correção. Visitante pode montar o carrinho e só autentica ao iniciar o checkout. Confirmar um grupo não compra os demais.
+
+### Alternativas e estados
+
+- **Carrinho vazio:** orientar a explorar o catálogo, sem oferecer uma compra sem itens.
+- **Erro ao carregar:** mostrar falha e retry; não apresentar a falha como carrinho vazio.
+- **Operação em andamento:** desabilitar controles de alteração para evitar envios concorrentes na página.
+- **Merge falha após login:** manter a autenticação e informar que a sincronização não foi concluída; não apresentar os itens como transferidos com sucesso.
 
 **Resultado:** carrinho permanece disponível em refresh, visitante pode começar sem conta, e totais exibidos refletem a resposta da API. Preço/estoque podem mudar e serão revalidados na cotação de checkout.
+
+## FLOW-07: Perfil, avatar e senha
+
+**Objetivo:** permitir atualizar dados da conta sem exigir uma troca de senha para salvar o perfil (DEC-30).
+
+**Pré-condições:** usuário autenticado em `/profile`; perfil carregado pela API.
+
+### Caminho principal
+
+1. A pessoa edita nome de exibição, nome de usuário, email e ENS opcional e aciona **“Salvar”**. A API valida campos, unicidade e versão; sucesso atualiza o perfil exibido e os dados da sessão em cache.
+2. Para o avatar, escolhe **“Alterar”** e seleciona PNG, JPEG ou WebP de até 2 MiB. A imagem só é persistida após validação do arquivo e da versão. **“Remover”** exclui o avatar existente.
+3. Para a senha, informa senha atual, nova senha e confirmação e aciona **“Alterar senha”**. A confirmação é validada no formulário; a API valida a senha atual e exige uma nova senha diferente, com ao menos oito caracteres.
+4. Sucesso na troca de senha preserva a sessão atual e limpa os campos de senha. Em um login posterior, a senha antiga é rejeitada e a nova funciona.
+
+### Alternativas e estados
+
+- **Dados inválidos ou email/usuário já usado:** indicar o problema; a operação rejeitada não altera o perfil persistido.
+- **Perfil alterado em outra sessão:** informar conflito de versão; a edição obsoleta não sobrescreve o estado mais recente.
+- **Avatar inválido:** manter a imagem anterior e informar formato, tamanho ou conteúdo inválido.
+- **Senha atual incorreta ou confirmação divergente:** informar erro; nenhuma troca é concluída.
+- **Operações independentes:** salvar perfil não envia os campos de senha; avatar e senha possuem ações próprias. Não há uma transação única envolvendo os três formulários.
+
+**Resultado:** cada operação tem confirmação ou erro próprio; perfil/avatar persistem após refresh e a senha é armazenada apenas como verificador com salt. Evidências: TEST-08A/B/C.
+
+## FLOW-08: Gestão de carteiras
+
+**Objetivo:** manter carteiras que possam ser selecionadas de forma compatível com a rede da compra.
+
+**Pré-condições:** usuário autenticado em `/wallets`. A conta possui até dois espaços de carteira, principal e secundária, conforme a interpretação registrada em DEC-31.
+
+### Caminho principal
+
+1. A pessoa consulta as carteiras existentes e escolhe cadastrar um espaço vazio ou editar uma carteira.
+2. Informa nome do perfil da carteira, endereço, rede, provedor e metadados opcionais ENS/indicação.
+3. Se usar a opção de copiar os dados da principal, recebe valores iniciais para edição; a carteira secundária continua sendo um registro independente.
+4. Ao salvar, a API valida formato do endereço, rede, espaço disponível, duplicidade de endereço na mesma rede e versão nas edições.
+5. Após sucesso, a lista reflete os dados persistidos. No checkout, a seleção de carteira considera a rede dos NFTs; editar uma carteira altera os dados usados nas próximas compras.
+
+### Alternativas e estados
+
+- **Endereço ou campos inválidos:** indicar os campos e manter a operação sem persistência parcial.
+- **Espaço ocupado ou endereço repetido na mesma rede:** informar conflito; não criar uma segunda carteira nesse espaço.
+- **Versão obsoleta:** rejeitar edição concorrente em vez de sobrescrever dados atuais.
+- **Sem carteira compatível:** orientar o cadastro na rede da compra; não confirmar com carteira de outra rede.
+
+**Resultado:** carteiras persistidas por conta e disponíveis no checkout. O espaço e o apelido principal/secundária permanecem estáveis na edição. Cadastro e conexão validam a simulação, sem provar posse do endereço nem acessar um provedor real. Evidência: TEST-08D.
+
+## Como manter este documento
+
+Ao mudar um comportamento, atualize o fluxo e confira seus vínculos com requisitos, contratos, tarefas e testes. Novos fluxos recebem novos IDs; os existentes não são renumerados. Detalhes de bibliotecas, funções e armazenamento pertencem à arquitetura/guia técnico. Registre separadamente comportamento implementado, comportamento esperado e evidência de teste.
