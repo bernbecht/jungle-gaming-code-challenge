@@ -14,6 +14,7 @@ Os fluxos abaixo são a especificação do comportamento esperado. A existência
 | FLOW-02 | Recuperar uma tentativa após timeout, refresh ou reconexão | REQ-016, REQ-017, REQ-019, REQ-022, REQ-023, REQ-036 | API-02, API-09, EVT-02 | TASK-04 (núcleo), TASK-08, TASK-10 | SCN-07, SCN-11, SCN-14, SCN-15; TEST-03, TEST-07, TEST-10 |
 | FLOW-03 | Criar conta, autenticar, recuperar sessão e sair | REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | API-01, API-02 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-08; TEST-03 |
 | FLOW-04 | Consultar e alternar favoritos com autenticação | REQ-008, REQ-021, REQ-023, REQ-027 | API-02, API-04 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-15; TEST-03, TEST-04 |
+| FLOW-05 | Filtrar e explorar o catálogo | REQ-005, REQ-006, REQ-026 | API-03 | TASK-05, TASK-12 | TEST-01, TEST-12, TEST-14 |
 
 ## FLOW-01: Compra
 
@@ -209,6 +210,61 @@ flowchart TD
 - **Alterações repetidas:** definir explicitamente `favorite: true` ou `false` torna a operação idempotente; não alternar no servidor por simples inversão de estado.
 
 **Resultado:** favorito confirmado e persistido para o usuário atual ou restauração do estado anterior com erro compreensível. Não há confirmação visual permanente quando a API falha.
+
+## FLOW-05: Filtrar e explorar o catálogo
+
+**Objetivo:** combinar filtros e ordenar os NFTs sem perder a seleção ao atualizar ou navegar no histórico do browser.
+
+**Pré-condições:** catálogo aberto em `/`; a API disponibiliza facetas, contagens e a lista correspondente aos parâmetros da URL.
+
+**Gatilho:** abrir o catálogo e selecionar categorias/redes, ajustar preços, buscar ou mudar a aba/ordenação.
+
+### Apresentação dos filtros por viewport
+
+- Em telas a partir de 1024 px, os filtros ficam permanentemente visíveis na sidebar à esquerda.
+- Abaixo de 1024 px, incluindo tablet (768–1023 px) e mobile, o botão “Abrir filtros do catálogo” abre um dialog lateral.
+- O dialog fecha por X, Escape ou “Ver resultados”. Fechar não desfaz seleções já aplicadas; após fechar, o foco volta ao botão que abriu o dialog.
+
+### Caminho principal
+
+1. A pessoa escolhe uma ou mais opções em Coleções (categorias de arte) e Rede. Cada clique aplica a seleção imediatamente, atualiza a URL e consulta os resultados; a pessoa pode manter o dialog aberto enquanto seleciona várias opções.
+2. Dentro de cada grupo, opções selecionadas combinam por OR; entre grupos, combinam por AND. Assim, duas categorias aceitam NFTs de qualquer uma delas, enquanto uma categoria junto de Ethereum exige que ambas as condições sejam atendidas.
+3. Para restringir preços, a pessoa move os controles de mínimo e máximo. O texto do intervalo acompanha o rascunho local, mas resultados e URL só mudam ao acionar “Aplicar”. Mínimo e máximo não se cruzam.
+4. Ao aplicar filtros, busca, aba ou ordenação, a página volta para 1. Os demais filtros permanecem ativos.
+5. A pessoa pode mudar abas, ordenação e paginação junto dos filtros. A URL representa a combinação aplicada e permite refresh e voltar/avançar no histórico sem perder o estado.
+6. “Limpar filtros” restaura todos os parâmetros do catálogo aos padrões, inclusive parâmetros aceitos pela URL que não têm controle visível na sidebar.
+
+As contagens ao lado de Coleções e Rede representam a quantidade de NFTs no catálogo inteiro para cada opção; não diminuem conforme outros filtros ou a página atual. Uma opção selecionada que não exista nas facetas atuais continua visível com contagem zero para que possa ser removida.
+
+```mermaid
+flowchart TD
+    A[Abrir catálogo] --> B{Viewport >= 1024 px?}
+    B -->|Sim| C[Usar sidebar fixa]
+    B -->|Não| D[Abrir dialog pelo botão]
+    C --> E[Selecionar categoria ou rede]
+    D --> E
+    E --> F[Atualizar URL e resultados imediatamente]
+    F --> G{Ajustar faixa de preço?}
+    G -->|Sim| H[Mover mínimo/máximo no rascunho]
+    H --> I[Aplicar faixa]
+    I --> J[Atualizar URL, resultados e página 1]
+    G -->|Não| K[Continuar explorando]
+    J --> K
+    K --> L{Dialog aberto?}
+    L -->|Sim| M[Fechar por X, Escape ou Ver resultados]
+    L -->|Não| N[Usar catálogo]
+    M --> N
+```
+
+### Alternativas e estados
+
+- **Nenhum resultado:** manter os filtros selecionados e oferecer limpeza/ajuste para a pessoa recuperar itens.
+- **Erro de facetas ou catálogo:** mostrar erro e opção de tentar novamente; não representar falha como lista vazia.
+- **Resposta antiga chega depois de uma consulta mais nova:** ela não substitui os resultados associados à URL atual.
+- **Parâmetro inválido em URL:** normalizar para valores permitidos; chamadas diretas inválidas à API retornam 422.
+- **Atualizar ou usar histórico:** recarregar os parâmetros da URL; no slider, os valores aplicados são restaurados.
+
+**Resultado:** resultados correspondem aos filtros/ordenação/página na URL, ou o catálogo comunica vazio/erro sem esconder os controles de recuperação.
 
 ## Como manter este documento
 

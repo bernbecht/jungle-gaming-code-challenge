@@ -71,7 +71,7 @@ TASK-05A implementa a composição descrita abaixo do catálogo e o destaque na 
 
 Mobile: busca explícita e botão de filtros no topo; hero compacto com duas artes sobrepostas, título diferente e fundo decorativo. Abas horizontais; catálogo de duas colunas com deslocamento vertical aparente entre elas. Há favorito sobre imagem e badge RARO. Barra inferior com início, favorito, ação central circular, carrinho e perfil. O significado da ação central não pode ser inferido com segurança; não atribuir compra/scan real sem definição.
 
-Proposta: filtro em drawer no mobile e busca expansível no desktop. Não deduzir carrossel automático apenas pelos indicadores. Escolher grade de duas colunas com deslocamento decorativo controlado, preservando ordem de leitura, antes de introduzir masonry. A barra inferior exige espaço de respiro no conteúdo e safe-area. Abas, rede e ordenação precisam integrar URL/API; os contratos iniciais ainda não representam todos esses controles.
+Proposta: filtro em drawer no mobile/tablet abaixo de 1024 px; sidebar persistente no desktop a partir de 1024 px. As opções selecionadas ficam na URL; categorias/redes aplicam no clique e faixa de preço aplica ao submeter o rascunho. Consulte [FLOW-05](FLOWS.md#flow-05-filtrar-e-explorar-o-catálogo) para combinações, fechamento e persistência. Não deduzir carrossel automático apenas pelos indicadores. Escolher grade de duas colunas com deslocamento decorativo controlado, preservando ordem de leitura, antes de introduzir masonry. A barra inferior exige espaço de respiro no conteúdo e safe-area. Abas, rede e ordenação precisam integrar URL/API; os contratos iniciais ainda não representam todos esses controles.
 
 ### UI-02 — Detalhe
 
