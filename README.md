@@ -1,6 +1,6 @@
 # NFT Marketplace — desafio frontend
 
-Projeto com **TASK-01 a TASK-04 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou aprovação da suíte E2E local; o agente validou as duas provas no deploy público. Catálogo e detalhe estão implementados na TASK-05 na árvore de trabalho, aguardando validação local. Autenticação, compra e eventos de domínio ainda serão implementados.
+Projeto com **TASK-01 a TASK-05 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou que a suíte E2E atual passou e que início/detalhe foram verificados em 390/768/1440. A finalização visual dos componentes abaixo do catálogo está separada na TASK-05A. Autenticação, compra e eventos de domínio ainda serão implementados.
 
 Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integração](https://jungle-gaming-code-challenge.vercel.app/__proof). Deploy inicial na Vercel do commit `4047da3`; evidências em [RELEASE](docs/RELEASE.md).
 
@@ -23,7 +23,7 @@ TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários 
 | [docs/TEST-MATRIX.md](docs/TEST-MATRIX.md) | Cobertura TEST, assertions e registro de evidências |
 | [docs/RELEASE.md](docs/RELEASE.md) | Gates REL, auditoria, publicação e entrega |
 
-TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 a TASK-04 concluídas. Etapa atual: TASK-05, telas de início/detalhe, filtros e estados; E2E local e revisão visual pendentes. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
+TASK-01 concluída como análise das 15 screenshots e definição da abordagem: fonte semelhante, placeholders temporários e adaptações próprias para telas sem referência (DEC-16, DEC-17, DEC-18). A execução dessas decisões permanece nas tarefas de implementação. TASK-02 a TASK-05 concluídas. Próxima tarefa: TASK-05A, finalização dos componentes da home abaixo do catálogo. Criar testes enquanto implementa fluxos. Atualizar a documentação no mesmo trabalho que alterar comportamento ou contrato.
 
 Exemplo de rastreabilidade: REQ-015 (cotação revalidada) → TASK-08/TASK-10 → DEC-08 → API-08/API-09 e EVT-01 → UI-04 → SCN-10/SCN-17 → TEST-09 → REL-02.
 

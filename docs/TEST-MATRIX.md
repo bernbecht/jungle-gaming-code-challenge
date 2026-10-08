@@ -1,6 +1,6 @@
 # Matriz de testes e evidências
 
-Status: **smoke do shell, E2E REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 12 testes unitários do núcleo aprovados pelo agente**. Os E2E dos fluxos de negócio na interface ainda serão implementados. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
+Status: **smoke do shell, E2E de catálogo/detalhe (TEST-01/02 e parte de TEST-12), revisão responsiva da TASK-05 em 390/768/1440, REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 14 testes unitários do catálogo/núcleo aprovados pelo agente**. Os demais fluxos de negócio na interface ainda serão implementados. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
 
 Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENARIOS.md). Contratos: [CONTRACTS](CONTRACTS.md). Execução: TASK-13 a TASK-15 em [TASKS](../TASKS.md).
 
@@ -71,7 +71,7 @@ Após instalação pelo usuário, npm ls, typecheck completo, lint e build passa
 
 - 14 testes unitários passaram na árvore de trabalho: 12 anteriores e dois de normalização/serialização de URL (`tests/unit/catalog-search.spec.ts`). Typecheck, lint e build passaram.
 - `tests/e2e/catalog.spec.ts` prepara TEST-01 (busca/filtros/ordenação/paginação/histórico), TEST-02 (detalhe/galeria/limites/404) e parte de TEST-12 (shimmer lento, resposta antiga, falha 503 e retry), em desktop/mobile, com reset por teste e controle MSW de rede.
-- E2E **não executado**: servidor preview bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. Aprovação da TASK-04 não valida estes novos testes. Execução local e revisão visual 390/768/1440 pendentes; sem screenshots/baselines desta etapa.
+- Execuções locais reportadas pelo usuário: primeiro 13/22 passaram, depois 19/22; após os ajustes finais para consultar a saída de quantidade visível e acessar `/login` diretamente no cenário mobile, o usuário confirmou que `npm run test:e2e` passou. O usuário também confirmou que a validação das resoluções 390/768/1440 passou para as telas da TASK-05. Relatório/trace e screenshots não anexados. A execução do agente segue bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`. A fidelidade visual dos componentes abaixo do catálogo segue separada na TASK-05A.
 
 Revisão UI-01, item 1: slider de preço implementado; 14 testes unitários, typecheck, lint, build e `git diff --check` passaram. E2E adicional em `catalog.spec.ts` verifica teclado, aplicação explícita e restauração de preços após refresh; preparado, não executado. Comparação visual e teste de arrastar os dois controles permanecem pendentes no navegador local.
 

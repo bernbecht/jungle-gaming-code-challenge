@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-04 concluídas; TASK-05 em andamento; TASK-06 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. O núcleo de domínio e catálogo simulado existem, e as telas de catálogo/detalhe estão implementadas na árvore de trabalho, aguardando validação E2E local. Sua entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05 concluídas; TASK-05A (finalização visual da home) e TASK-06 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. O núcleo de domínio e catálogo simulado existem; a fidelidade da home abaixo do catálogo será acompanhada separadamente na TASK-05A. Sua entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -26,14 +26,15 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-02 | 1 / 1 | Inicializar Vite/React/TS e stack; providers/router; scripts, lockfile e env; shell com shadcn/Tailwind; escolher fonte local semelhante (DEC-16) e preparar placeholders (DEC-17) | — | REQ-001, REQ-025, REQ-050 | TEST-16 parcial + smoke shell | Concluído |
 | TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | Concluído |
 | TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | Concluída |
-| TASK-05 | 1 / 3 | Início/detalhe completos; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Em andamento |
+| TASK-05 | 1 / 3 | Base da home (hero/catálogo) e detalhe; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Concluída |
+| TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | Comparação com UI-01 em TEST-14 (TASK-12) | A fazer |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | A fazer |
 | TASK-08 | 1 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | A fazer |
 | TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
 | TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
-| TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
+| TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
 | TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
 | TASK-14 | 2 / 11 | Auditar cedo; concluir 12 medições no build final, medianas/métricas, HTML/JSON e análise de desvios | TASK-12 | REQ-001, REQ-045, REQ-046 | TEST-15 | A fazer |
 | TASK-15 | 2 / 12 | Atualizar docs para implementação real, checkout limpo, entregar artefatos, deploy final e smoke público | TASK-13, TASK-14 | REQ-028, REQ-033, REQ-047, REQ-048, REQ-049, REQ-050 | TEST-16, TEST-18 | A fazer |
@@ -128,7 +129,7 @@ Tipo, lint e build passaram depois da integração. O matcher do MSW foi validad
 
 API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 a TASK-08; eventos de domínio na TASK-10. Esta entrega é a base dessas funcionalidades, não a implementação dos seus fluxos de interface. TASK-04 está **Concluída**. A tentativa do agente foi bloqueada antes dos testes por `listen EPERM` em `127.0.0.1:4173`; a aprovação E2E corresponde à execução local confirmada pelo usuário.
 
-### TASK-05 — implementada, validação E2E/visual pendente
+### TASK-05 — concluída
 
 - [x] UI-01: catálogo Axios→MSW, busca submetida, filtros combinados, abas, ordenação e paginação na URL; alterações reiniciam a página (REQ-005).
 - [x] Parâmetros inválidos usam defaults seguros; histórico/refresh restauram os controles. Facetas vêm da API, sem importar fixtures na interface.
@@ -138,8 +139,15 @@ API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 
 - [x] Cards/recomendações compartilhados, banners da home e blocos explicativos; placeholders locais conforme DEC-17.
 - [x] 14 testes unitários, typecheck, lint e build passaram na execução do agente.
 - [x] E2E TEST-01/TEST-02 e parte de TEST-12 preparados em `tests/e2e/catalog.spec.ts`, incluindo latência, resposta obsoleta e erro/retry pela rede MSW.
-- [ ] Validar `npm run test:e2e` localmente: tentativa do agente bloqueada antes dos testes por `listen EPERM` em `127.0.0.1:4173`.
-- [ ] Revisar visualmente início/detalhe em 390/768/1440 px; fidelidade final/baselines permanecem na TASK-12/TASK-13.
+- [x] `npm run test:e2e` passou após os ajustes; confirmação do usuário nesta conversa. As execuções anteriores tiveram 13/22 e 19/22 testes passando, antes das últimas correções.
+- [x] Revisar início/detalhe em 390/768/1440 px; o usuário confirmou que as resoluções passaram. Baselines e aceite visual final do projeto permanecem na TASK-12/TASK-13.
+
+### TASK-05A — finalização visual da homepage
+
+- [ ] Comparar os elementos abaixo do catálogo com o PNG desktop de UI-01: conteúdo, ordem, hierarquia, dimensões, cores, tipografia, imagens, fundos e espaçamento dos dois banners, quatro cards editoriais e footer em faixas.
+- [ ] Ajustar os componentes existentes para se aproximarem da referência; manter links e ações coerentes e não inventar integrações/conteúdo editorial.
+- [ ] Definir e implementar a composição responsiva em 390/768 px seguindo os PNGs disponíveis e DEC-18; onde não houver referência, registrar a decisão em UI-SPEC.
+- [ ] Registrar screenshots e desvios restantes para o aceite visual da TASK-12/TEST-14.
 
 Compra e favorito têm indicação de indisponibilidade nesta etapa; serão conectados nas TASK-06/TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
 
@@ -151,7 +159,7 @@ Revisão UI-01, item 3: grupos visíveis limitados a Coleções (categorias de a
 
 Revisão UI-01, item 4: Ordenar por estilizado como texto discreto, sem borda/fundo, com seta pequena e foco visível ao teclado. Select nativo e comportamento URL/API preservados. Validação visual pendente; item 5 segue para a próxima alteração.
 
-Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#241612`), padding de 16 px e altura ajustada ao conteúdo. Os cinco itens solicitados estão implementados; revisão visual e execução E2E local permanecem pendentes. TASK-05 não está concluída por estas alterações isoladas.
+Revisão UI-01, item 5: sidebar desktop com card retangular usando `bg-card` (`#241612`), padding de 16 px e altura ajustada ao conteúdo. Os cinco itens solicitados estão implementados; à época, revisão visual e execução E2E local permaneciam pendentes. A suíte E2E atual e a verificação responsiva da TASK-05 foram aprovadas posteriormente. A comparação final/baselines seguem na TASK-12/TASK-13.
 
 Revisão adicional UI-01: Coleções/Rede com texto clicável e contagens à direita; removidos checkboxes visíveis. Cores exatas de estado, teclado e seleção múltipla via `aria-pressed`; contagens calculadas pela API. 15 testes unitários, typecheck, lint e build passaram. TEST-01 adaptado para botões; execução E2E e revisão visual continuam pendentes.
 
