@@ -5,6 +5,7 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
 import { changePassword, updateAvatar, updateProfile } from '../../src/mocks/auth'
+import { nftUpdatedEvent, orderUpdatedEvent } from '../../src/mocks/domain-events'
 import { createWallet, updateWallet } from '../../src/mocks/wallets'
 import { MockError } from '../../src/mocks/errors'
 import { BASE_TIME } from '../../src/mocks/state'
@@ -44,6 +45,32 @@ test('fixtures have stable IDs, distinct private resources and no stored plainte
   expect(state.favorites['user-a']).not.toEqual(state.favorites['user-b'])
   expect(JSON.stringify(state)).not.toContain('DemoNft!2026')
   expect(state.users[0]!.password.verifier).not.toBe(state.users[1]!.password.verifier)
+})
+
+test('domain event envelopes carry stable resource versions and private order identity', async () => {
+  const state = await createFixtures()
+  const nft = state.nfts[0]!
+  const nftEvent = nftUpdatedEvent(nft, new Date(state.now).toISOString())
+  expect(nftEvent).toMatchObject({
+    eventId: `nft:${nft.id}:v${nft.version}`,
+    resourceId: nft.id,
+    version: nft.version,
+    data: { nft },
+  })
+  expect(nftUpdatedEvent(nft, new Date(state.now).toISOString()).eventId).toBe(nftEvent.eventId)
+
+  const { state: purchaseState, input } = await purchase()
+  const submitted = submitOrder(purchaseState, 'user-a', 'event-key', input, 'confirmed', 1000, 'session-a')
+  if ('status' in submitted) throw new Error('Expected order submission to succeed')
+  const orderEvent = orderUpdatedEvent(submitted.order, 'session-a')
+  expect(orderEvent).toMatchObject({
+    eventId: `order:${submitted.order.id}:v1`,
+    resourceId: submitted.order.id,
+    version: 1,
+    userId: 'user-a',
+    sessionId: 'session-a',
+    data: { order: { id: submitted.order.id, userId: 'user-a', status: 'pending' } },
+  })
 })
 
 test('wallet slots are unique, addresses follow their network, and updates use optimistic versions', async () => {

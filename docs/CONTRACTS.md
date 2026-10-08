@@ -75,6 +75,8 @@ Comportamento esperado: [FLOW-01: Compra](FLOWS.md#flow-01-compra) e [FLOW-02: R
 
 Envelope proposto: `{eventId, resourceId, version, occurredAt, data}`. Eventos privados acrescentam `userId` e `sessionId`. Versão refere-se ao recurso, não ao evento global. O cliente confere identidade e geração de sessão antes de aplicar.
 
+No Socket.IO, o cliente envia `session.authenticate` com `{token}` depois de conectar. O mock valida a sessão no IndexedDB e responde `session.authenticated` com `{sessionId}`; tokens inválidos recebem `session.authenticationFailed`. Somente conexões autenticadas com o mesmo `userId` e `sessionId` recebem `order.updated`. `nft.updated` é público. Eventos são emitidos depois de a transação IndexedDB correspondente completar; IDs determinísticos por recurso/versão preservam a identidade em reemissões.
+
 | ID | Nome e payload `data` | Ação do cliente | Requisitos |
 | --- | --- | --- | --- |
 | EVT-01 | `nft.updated`: `{nft:Nft}` | Comparar versão; atualizar detalhe, reconsultar listagens afetadas, invalidar carrinho/cotação; anunciar mudança relevante | REQ-013, REQ-015, REQ-034, REQ-035 |

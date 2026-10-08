@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08 e TASK-09A/B/C/D concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08 e TASK-09A/B/C/D concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10A em andamento; TASK-10B a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -36,7 +36,12 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-09B | 2 / 7 | Implementar envio, validação e remoção do avatar; validar arquivo/tamanho, persistir a escolha e mostrar erros sem salvar parcialmente | TASK-09A | REQ-003, REQ-024 | TEST-08B | Concluída |
 | TASK-09C | 2 / 7 | Implementar alteração de senha com senha atual/nova; atualizar verificador com salt, sem persistir texto em claro; confirmar que senha antiga falha e nova autentica | TASK-09A | REQ-024 | TEST-08C, TEST-03 | Concluída |
 | TASK-09D | 2 / 7 | Implementar cadastro e edição das carteiras principal/secundária; validar endereço/rede/slot, persistir e refletir alterações no checkout | TASK-08 | REQ-014, REQ-024 | TEST-08D, TEST-06 | Concluída |
-| TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
+| TASK-10 (épico) | 2 / 8 | Implementar eventos de domínio versionados, isolamento de sessão, reconciliação REST após reconexão e recuperação idempotente de pedidos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | Em andamento |
+| TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Em andamento |
+| TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | A fazer |
+| TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | A fazer |
+| TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | A fazer |
+| TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
 | TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
 | TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
@@ -275,6 +280,40 @@ Decisão de implementação: as imagens da demo ficam em uma URL `data:` dentro 
 - [x] Preservar a sessão ativa e exibir erros da API sem alterar a senha quando validação falha.
 - [x] Adicionar teste unitário de rejeição de senha atual incorreta/versão obsoleta e E2E para nova autenticação e senha antiga rejeitada.
 - [x] Executar E2E desktop/mobile; usuário confirmou que passaram em 08/10/2026; resultado registrado em `docs/TEST-MATRIX.md`.
+
+### TASK-10 — Eventos, reconexão e recuperação (épico)
+
+Quebrada em cinco entregas por camada: TASK-10A (emissão após persistência), TASK-10B (consumo versionado), TASK-10C (isolamento de sessão), TASK-10D (reconciliação após reconexão) e TASK-10E (recuperação idempotente de pedidos). A expiração de sessão e os controles determinísticos de falha permanecem na TASK-11; a TASK-10C cobre logout e troca de usuário.
+
+### TASK-10A — Emissão de eventos de domínio
+
+- [ ] Emitir EVT-01 quando preço ou disponibilidade do NFT mudar e EVT-02 quando o status do pedido mudar, apenas depois da gravação atômica no IndexedDB.
+- [ ] Montar envelopes com `eventId`, `resourceId`, versão monotônica, horário e snapshot correspondente; eventos de pedido incluem `userId` e `sessionId`.
+- [ ] Cobrir versão e payload dos dois eventos em testes de domínio/integração.
+
+### TASK-10B — Consumo seguro de eventos
+
+- [ ] Registrar listeners de catálogo/pedido e comparar identidade e versão antes de alterar caches.
+- [ ] Ignorar duplicatas e eventos antigos sem regredir NFT, pedido terminal, carrinho ou disponibilidade.
+- [ ] Invalidar consultas derivadas de alteração relevante e comunicar mudanças que exigem revisão, sem repetir efeitos financeiros localmente.
+
+### TASK-10C — Isolamento de recursos privados entre sessões
+
+- [ ] No logout e na troca de conta, cancelar requests, remover queries privadas e limpar listeners/conexões associados à identidade anterior.
+- [ ] Descartar resultados tardios e eventos privados iniciados na sessão anterior, mesmo quando o cancelamento não interromper a resposta.
+- [ ] Verificar que trocar de usuário não revela pedido, tentativa, dados do checkout nem eventos da conta anterior. Expiração/401 fica na TASK-11.
+
+### TASK-10D — Reconciliação REST depois de reconectar
+
+- [ ] Detectar reconexão Socket.IO e refazer consultas REST para os recursos que podem ter mudado durante a desconexão.
+- [ ] Reconciliar pedidos pendentes e dados do carrinho/catálogo com versões atuais; REST prevalece quando eventos foram perdidos.
+- [ ] Se a atualização alterar preço, estoque, cupom ou taxa da cotação, bloquear envio até a pessoa revisar a nova cotação.
+
+### TASK-10E — Recuperação idempotente de pedido
+
+- [ ] Recuperar tentativa pendente após timeout, resposta perdida ou refresh pela mesma chave de idempotência; não criar uma chave nova automaticamente.
+- [ ] Consultar tentativa/pedido por REST e mostrar pending/confirmed/declined sem assumir resultado com base apenas no cliente.
+- [ ] Verificar que reenvio e eventos repetidos não duplicam pedido, reserva/baixa de estoque, remoção do carrinho ou recibo.
 
 
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026

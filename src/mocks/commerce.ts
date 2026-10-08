@@ -409,6 +409,7 @@ export function submitOrder(
   input: OrderInput,
   outcome: "confirmed" | "declined" = "confirmed",
   delayMs = PAYMENT_DELAY_MS,
+  sessionId = "",
 ): Submission {
   requireUser(state, userId);
   if (!key.trim() || key.length > 200)
@@ -479,6 +480,7 @@ export function submitOrder(
     delayMs,
     outcome,
     cartId: quote.cartId,
+    sessionId,
     lots: structuredClone(storedQuote.lots),
     effectsApplied: false,
   };

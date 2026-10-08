@@ -6,15 +6,56 @@ import { resetDatabase, transact } from './database'
 import { createWallet, updateWallet } from './wallets'
 import { invalid, MockError } from './errors'
 import { AVATAR_MAX_BYTES, AVATAR_TYPES, changePassword, login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateAvatar, updateProfile } from './auth'
-import type { Network, OrderInput, UpdateWalletInput, WalletInput } from '../contracts/marketplace'
+import { nftUpdatedEvent, orderUpdatedEvent } from './domain-events'
+import type { Network, NftUpdated, OrderInput, OrderUpdated, UpdateWalletInput, WalletInput } from '../contracts/marketplace'
 
 const scheduledOrders = new Set<string>()
+type MockSocketClient = ReturnType<typeof toSocketIo>['client']
+const domainClients = new Map<MockSocketClient, { userId: string; sessionId: string } | null>()
+
+function publishNftUpdated(event: NftUpdated) {
+  for (const client of domainClients.keys()) client.emit('nft.updated', event)
+}
+
+async function publishOrderUpdated(event: OrderUpdated) {
+  const sessionIsActive = await transact(state => {
+    const session = state.sessions[event.sessionId]
+    return session?.userId === event.userId && session.expiresAt > state.now
+  })
+  if (!sessionIsActive) return
+  for (const [client, identity] of domainClients) {
+    if (identity?.userId === event.userId && identity.sessionId === event.sessionId)
+      client.emit('order.updated', event)
+  }
+}
+
+async function publishOrderChanges(changes: { nfts: NftUpdated[]; order?: OrderUpdated }) {
+  changes.nfts.forEach(publishNftUpdated)
+  if (changes.order) await publishOrderUpdated(changes.order)
+}
+
+async function resolveScheduledOrder(orderId: string) {
+  const changes = await transact(state => {
+    const stored = state.orders[orderId]
+    if (!stored) return { nfts: [] as NftUpdated[] }
+    const previousVersion = stored.order.version
+    const order = settleOrder(state, orderId)
+    if (order.version === previousVersion) return { nfts: [] as NftUpdated[] }
+    const occurredAt = new Date(state.now).toISOString()
+    const nftIds = [...new Set(order.snapshot.items.map(item => item.nftId))]
+    return {
+      nfts: nftIds.map(id => nftUpdatedEvent(readNft(state, id), occurredAt)),
+      order: orderUpdatedEvent(order, stored.sessionId ?? ''),
+    }
+  })
+  await publishOrderChanges(changes)
+}
 
 function scheduleOrderResolution(orderId: string, delayMs: number) {
   if (scheduledOrders.has(orderId)) return
   scheduledOrders.add(orderId)
   setTimeout(() => {
-    void transact(state => settleOrder(state, orderId)).catch(() => undefined).finally(() => scheduledOrders.delete(orderId))
+    void resolveScheduledOrder(orderId).catch(() => undefined).finally(() => scheduledOrders.delete(orderId))
   }, delayMs)
 }
 
@@ -230,8 +271,25 @@ export const handlers = [
     const body = await readBody(request)
     const input = parseOrderInput(body)
     const key = request.headers.get('Idempotency-Key') ?? ''
-    const { userId } = await transact(state => ({ userId: requireSession(state, readToken(request)).userId }))
-    const result = await transact(state => submitOrder(state, userId, key, input, state.paymentSimulation.outcome, state.paymentSimulation.delayMs))
+    const { userId, sessionId } = await transact(state => {
+      const { userId, session } = requireSession(state, readToken(request))
+      return { userId, sessionId: session.id }
+    })
+    const submission = await transact(state => {
+      const result = submitOrder(state, userId, key, input, state.paymentSimulation.outcome, state.paymentSimulation.delayMs, sessionId)
+      if ('status' in result || result.replayed) return { result, changes: { nfts: [] as NftUpdated[] } }
+      const occurredAt = new Date(state.now).toISOString()
+      const nftIds = [...new Set(result.order.snapshot.items.map(item => item.nftId))]
+      return {
+        result,
+        changes: {
+          nfts: nftIds.map(id => nftUpdatedEvent(readNft(state, id), occurredAt)),
+          order: orderUpdatedEvent(result.order, sessionId),
+        },
+      }
+    })
+    await publishOrderChanges(submission.changes)
+    const result = submission.result
     if ('status' in result) throw new MockError(result.status, result.body.error.code, result.body.error.message, result.body.error.details)
     if (result.order.status === 'pending') scheduleOrderResolution(result.order.id, await transact(state => state.orders[result.order.id]!.delayMs))
     return HttpResponse.json(result.order, { status: result.replayed ? 200 : 201 })
@@ -403,13 +461,29 @@ export const handlers = [
     scheduledOrders.clear()
     for (const close of closeSockets) close()
     closeSockets.clear()
+    domainClients.clear()
     return { scenarioId: 'SCN-01', reset: true }
   })),
   http.post('/api/__mock/clock', ({ request }) => respond(async () => {
     const body = await readBody(request)
     const advanceMs = body.advanceMs
     if (typeof advanceMs !== 'number') invalid('Avanço de relógio inválido.')
-    return transact(state => { const orders = advanceClock(state, advanceMs); return { now: new Date(state.now).toISOString(), resolvedOrderIds: orders.map(order => order.id) } })
+    const result = await transact(state => {
+      const previousVersions = new Map(Object.values(state.orders).map(stored => [stored.order.id, stored.order.version]))
+      const orders = advanceClock(state, advanceMs)
+      const changedOrders = orders.filter(order => order.version > (previousVersions.get(order.id) ?? order.version))
+      const occurredAt = new Date(state.now).toISOString()
+      const nftIds = [...new Set(changedOrders.flatMap(order => order.snapshot.items.map(item => item.nftId)))]
+      return {
+        nfts: nftIds.map(id => nftUpdatedEvent(readNft(state, id), occurredAt)),
+        orders: changedOrders.map(order => orderUpdatedEvent(order, state.orders[order.id]!.sessionId ?? '')),
+        now: occurredAt,
+        resolvedOrderIds: changedOrders.map(order => order.id),
+      }
+    })
+    publishOrderChanges({ nfts: result.nfts })
+    await Promise.all(result.orders.map(publishOrderUpdated))
+    return { now: result.now, resolvedOrderIds: result.resolvedOrderIds }
   })),
   http.post('/api/__mock/payment', async ({ request }) => respond(async () => {
     const body = await readBody(request)
@@ -432,6 +506,21 @@ export const handlers = [
     closeSockets.add(close)
     connection.client.addEventListener('close', () => closeSockets.delete(close))
     const { client } = toSocketIo(connection)
+    domainClients.set(client, null)
+    connection.client.addEventListener('close', () => domainClients.delete(client))
+    client.on('session.authenticate', (payload: unknown) => {
+      domainClients.set(client, null)
+      const token = payload && typeof payload === 'object' && 'token' in payload && typeof payload.token === 'string'
+        ? payload.token
+        : null
+      void transact(state => {
+        const { userId, session } = requireSession(state, token)
+        return { userId, sessionId: session.id }
+      }).then(identity => {
+        domainClients.set(client, identity)
+        client.emit('session.authenticated', { sessionId: identity.sessionId })
+      }).catch(() => client.emit('session.authenticationFailed', { code: 'SESSION_INVALID' }))
+    })
     // The binding's `client` wrapper receives frames sent by socket.io-client
     // and sends mock frames back to that same client connection.
     client.on('proof.request', () => {

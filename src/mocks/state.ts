@@ -11,7 +11,7 @@ export type StoredUser = { profile: Profile; password: { salt: string; verifier:
 export type Connection = { id: string; userId: string; walletId: string; network: Network; provider: Wallet['provider']; active: boolean }
 export type StoredQuote = { userId: string; quote: Quote; lots: Record<string, QuantityLot[]> }
 export type StoredOrder = {
-  order: Order; resolveAt: number; delayMs: number; outcome: 'confirmed' | 'declined'; cartId: string
+  order: Order; resolveAt: number; delayMs: number; outcome: 'confirmed' | 'declined'; cartId: string; sessionId?: string
   lots: Record<string, QuantityLot[]>; effectsApplied: boolean
 }
 export type PaymentSimulation = { delayMs: number; outcome: 'confirmed' | 'declined' }
