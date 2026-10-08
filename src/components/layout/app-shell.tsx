@@ -37,6 +37,7 @@ export function AppShell() {
   });
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
+  const isFavorites = pathname === "/favorites";
   const isNftDetail = pathname.startsWith("/nfts/");
   const isMarketActive = isNftDetail || pathname === "/cart" || pathname === "/checkout" || (isHome && hash === "colecoes");
   const isHomeActive = isHome && !isMarketActive;
@@ -45,7 +46,7 @@ export function AppShell() {
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
-      <header className="page-container hidden min-h-20 items-center justify-between gap-4 md:flex">
+      <header className="page-container hidden min-h-20 items-center justify-between gap-2 md:flex lg:gap-4">
         <Link
           to="/"
           search={defaultCatalog}
@@ -56,7 +57,7 @@ export function AppShell() {
         </Link>
         <nav
           aria-label="Navegação principal"
-          className="hidden items-center gap-8 md:flex"
+          className="hidden items-center gap-2 text-xs md:flex lg:gap-8 lg:text-base"
         >
           <Link
             to="/"
@@ -94,6 +95,11 @@ export function AppShell() {
         </nav>
         <div className="flex items-center gap-2">
           <HeaderSearch />
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/favorites" aria-label="Favoritos" aria-current={isFavorites ? 'page' : undefined} className={isFavorites ? 'text-primary' : undefined}>
+              <Heart aria-hidden="true" />
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" asChild>
             <Link to="/cart" aria-label={cartLabel}>
               <span className="relative inline-flex">
@@ -146,14 +152,14 @@ export function AppShell() {
             <Home aria-hidden="true" size={20} />
             <span className="sr-only">Início</span>
           </Link>
-          <button
-            type="button"
-            disabled
-            aria-label="Favoritos indisponíveis nesta etapa"
-            className="text-muted-foreground disabled:opacity-100"
+          <Link
+            to="/favorites"
+            aria-label="Favoritos"
+            aria-current={isFavorites ? 'page' : undefined}
+            activeProps={{ className: "text-primary" }}
           >
             <Heart aria-hidden="true" size={20} />
-          </button>
+          </Link>
           <button
             type="button"
             className="mobile-nav-center"

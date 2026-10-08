@@ -333,3 +333,20 @@ TASK-10C concluída. Typecheck, lint, build e 27 testes unitários passaram; o u
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026
 
 Implementado em `src/routes/nft-detail-page.tsx`: Comprar adiciona edição/quantidade e navega para o carrinho somente após sucesso da API; erro mantém o detalhe. Removido botão adicional desktop; ícone mobile mantém inclusão sem navegação. E2Es de carrinho/checkout atualizados para o botão Comprar. Build, TypeScript, ESLint e revisão do diff passaram. Os seis E2Es de carrinho passaram em desktop/mobile. Sem commit nesta etapa.
+
+### Página de favoritos — DEC-32 — 08/10/2026 — Concluído
+
+Solicitada pelo usuário para completar a navegação sugerida pelo coração mobile, embora a página não esteja entre as nove telas obrigatórias do enunciado. `/favorites` é protegida por sessão e acessível no header desktop e na barra mobile. Reutiliza os cards e favoritos persistentes por usuário, com acesso ao detalhe, remoção otimista/rollback, mensagem de erro visível, carregamento, retry e vazio com acesso ao catálogo. Espaçamento do header ajustado no tablet para acomodar o novo atalho sem overflow.
+
+Motivação registrada em DEC-32 no documento de decisões para avaliação e em ARCHITECTURE; UI-SPEC atualizada. Typecheck, lint, build e revisão do diff passaram. Os 18 E2Es de favoritos/autenticação/shell passaram em desktop/mobile; seis cobrem a página nova. Capturas revisadas em 390/768/1440 px e overflow horizontal verificado. Evidências e limitações em TEST-MATRIX. Sem commit nesta etapa.
+
+### Follow-up — Navegação global mobile — A fazer
+
+Por solicitação do usuário, a página de favoritos adota temporariamente o padrão atual de carrinho e perfil: sem barra inferior e com voltar ao início. O coração da barra da homepage continua abrindo favoritos; “Explorar catálogo” fica abaixo da lista no mobile. Removido o espaço reservado para a barra na página de favoritos.
+
+Ajuste temporário verificado: seis E2Es de favoritos passaram em desktop/mobile, incluindo ausência da barra e presença do controle de voltar no mobile; typecheck, build, lint e diff check passaram. Sem commit. A revisão global abaixo permanece pendente.
+
+- [ ] Revisar a navegação global de início, favoritos, carrinho e perfil para permitir troca consistente entre as telas principais, com indicação da seção ativa.
+- [ ] Definir o comportamento no detalhe do NFT e no checkout, considerando os controles de compra e a concentração no fluxo de pagamento.
+- [ ] Resolver a coexistência com o resumo fixo do carrinho, garantindo que navegação e ações não se sobreponham, inclusive com safe-area.
+- [ ] Validar em mobile navegação por toque/teclado, retorno, foco, rolagem e ausência de conteúdo coberto; atualizar UI-SPEC e os E2Es após a decisão.

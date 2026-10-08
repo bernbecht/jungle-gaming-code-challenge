@@ -16,6 +16,7 @@ import { CartPage } from '@/routes/cart-page'
 import { CheckoutPage } from '@/routes/checkout-page'
 import { OrderPage } from '@/routes/order-page'
 import { WalletsPage } from '@/routes/wallets-page'
+import { FavoritesPage } from '@/routes/favorites-page'
 import type { Network } from '@/contracts/marketplace'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -68,6 +69,12 @@ const walletsRoute = createRoute({
   beforeLoad: requireUser,
   component: WalletsPage,
 })
+const favoritesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/favorites',
+  beforeLoad: requireUser,
+  component: FavoritesPage,
+})
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/checkout',
@@ -90,7 +97,7 @@ const orderRoute = createRoute({
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
     homeRoute, integrationProofRoute, cartRoute, loginRoute, registerRoute, profileRoute,
-    walletsRoute, checkoutRoute, nftRoute, orderRoute,
+    walletsRoute, favoritesRoute, checkoutRoute, nftRoute, orderRoute,
   ]),
   context: { queryClient },
   scrollRestoration: true,

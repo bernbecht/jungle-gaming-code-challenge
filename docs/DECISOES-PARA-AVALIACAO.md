@@ -114,6 +114,16 @@ Essa limitação transacional pertence à API simulada que defini para o projeto
 
 **Evidências:** lista `benefits` e renderização dos componentes `ShieldCheck`, `UsersRound` e `Bell` em [SiteFooter](../src/components/layout/site-footer.tsx), comparadas com a referência local. O teste em [home-editorial.spec.ts](../tests/e2e/home-editorial.spec.ts) exercita o rodapé e a newsletter, mas não verifica a compreensão dessa iconografia.
 
+## 12. Página de favoritos para completar a navegação
+
+**Referência e mudança — DEC-32.** O enunciado exige favoritos autenticados persistentes e consulta, inclusão e remoção por API, mas não inclui uma página de favoritos entre as nove telas obrigatórias. A barra mobile já mostrava um coração dedicado à navegação, que permanecia desabilitado. Criamos `/favorites` por solicitação do usuário para completar esse fluxo e permitir reencontrar os NFTs salvos sem percorrer o catálogo.
+
+**Motivação e comportamento.** Os corações nos cards e no detalhe salvam um NFT; o coração da navegação abre a coleção pessoal. A página usa os mesmos cards, cores e componentes da aplicação, com duas colunas no mobile, três no tablet e quatro no desktop. O acesso fica disponível no header desktop e na barra inferior da homepage mobile. Por decisão temporária do usuário, favoritos segue carrinho e perfil: sem barra inferior na própria página e com controle de voltar ao início. A revisão da navegação global mobile ficou registrada como follow-up em TASKS. Sem sessão, o login preserva `/favorites` como destino de retorno.
+
+**Experiência e consequência.** A pessoa pode abrir o detalhe ou remover um favorito pela lista. No mobile, “Explorar catálogo” aparece abaixo dos NFTs salvos, seguindo a ordem de leitura solicitada pelo usuário; no desktop, permanece junto ao título. Na lista vazia, “Descobrir NFTs” oferece o acesso ao catálogo. A remoção atualiza a lista imediatamente, restaura o item e mostra erro visível se a API falhar. Há estados de carregamento, erro com nova tentativa e lista vazia com acesso ao catálogo. A consulta privada usa o cache existente por usuário; os detalhes dos NFTs reutilizam as consultas públicas, sem alterar os contratos REST. Esta tela é uma extensão de experiência solicitada, não um novo requisito atribuído ao desafio nem uma reprodução de um frame específico.
+
+**Evidências:** [FavoritesPage](../src/routes/favorites-page.tsx), rota protegida em [router](../src/app/router.ts) e navegação em [AppShell](../src/components/layout/app-shell.tsx). [favorites.spec.ts](../tests/e2e/favorites.spec.ts) cobre retorno após login, refresh, detalhe, remoção com rollback e nova tentativa, inclusão a partir do detalhe e isolamento entre contas nos projetos desktop/mobile. Resultados da execução ficam registrados na [matriz de testes](TEST-MATRIX.md).
+
 ## Adaptações e limitações que também devem ser consideradas
 
 - **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil, gestão de carteiras e recibo têm composições responsivas; a gestão de carteiras foi aprovada em E2E desktop/mobile na TASK-09D.

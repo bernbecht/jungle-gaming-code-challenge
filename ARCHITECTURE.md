@@ -63,6 +63,10 @@ As decisões abaixo complementam DEC-14 e substituem a espera por informações 
 
 A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
 
+### DEC-32 — Página de favoritos
+
+`/favorites` complementa os favoritos persistentes com uma lista pessoal protegida por sessão, acessível no header desktop e na barra da homepage mobile. Temporariamente, a própria página não exibe barra inferior, seguindo carrinho e perfil, e oferece voltar ao início; a revisão da navegação global mobile está no backlog. A página não está entre as nove telas obrigatórias do enunciado; foi solicitada para tornar funcional o destino sugerido pelo coração da navegação. Reutiliza `['favorites', userId]`, consultas de detalhe e cards existentes. A remoção usa snapshot otimista, rollback e erro visível na página; os controles de remoção ficam desabilitados durante o envio para evitar remoções concorrentes nessa lista. Motivação e consequências em [DEC-32](docs/DECISOES-PARA-AVALIACAO.md#12-página-de-favoritos-para-completar-a-navegação).
+
 ### DEC-30 — Salvar perfil e alterar senha como ações separadas
 
 O botão **Salvar** grava nome de exibição, nome de usuário, e-mail e ENS pelo `PATCH /profile`. O botão **Alterar senha** envia somente a senha atual e a nova pelo `PUT /profile/password`; a confirmação é validada no cliente e não é enviada à API. As duas ações ficam em formulários independentes porque têm pré-condições e resultados diferentes: uma alteração de senha exige provar conhecimento da credencial atual, e os erros devem permanecer junto ao grupo de senha.
