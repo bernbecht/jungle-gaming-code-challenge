@@ -22,7 +22,7 @@ import {
   Star,
   Twitter,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function CollectorRating({ rating, count }: { rating: number; count: number }) {
   return (
@@ -103,6 +103,7 @@ function NftDetail({ nft }: { nft: Nft }) {
   const [editionId, setEditionId] = useState(lowestEdition(nft).id);
   const [requestedQuantity, setQuantity] = useState(1);
   const [panel, setPanel] = useState<"details" | "reviews">("details");
+  const detailTabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const edition =
     nft.editions.find((e) => e.id === editionId) ?? lowestEdition(nft);
   const quantity = Math.max(
@@ -340,39 +341,81 @@ function NftDetail({ nft }: { nft: Nft }) {
       </section>
       <section className="mt-12 hidden md:block">
         <div
-          role="group"
+          role="tablist"
           aria-label="Informações do NFT"
-          className="flex flex-wrap gap-4 border-b border-border pb-3"
+          className="flex flex-wrap gap-8 border-b border-border"
+          onKeyDown={(event) => {
+            const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+            if (!keys.includes(event.key)) return;
+            event.preventDefault();
+            const currentIndex = panel === "details" ? 0 : 1;
+            const nextIndex =
+              event.key === "Home"
+                  ? 0
+                  : event.key === "End"
+                    ? 1
+                    : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + 2) % 2;
+            const nextPanel = nextIndex === 0 ? "details" : "reviews";
+            setPanel(nextPanel);
+            detailTabRefs.current[nextIndex]?.focus();
+          }}
         >
-          <Button
-            variant="ghost"
-            aria-pressed={panel === "details"}
+          <button
+            ref={(element) => {
+              detailTabRefs.current[0] = element;
+            }}
+            type="button"
+            role="tab"
+            id="nft-details-tab"
+            aria-controls="nft-details-panel"
+            aria-selected={panel === "details"}
+            tabIndex={panel === "details" ? 0 : -1}
+            className={`-mb-px border-b-2 px-0 pb-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${panel === "details" ? "border-primary text-primary" : "border-transparent text-foreground"}`}
             onClick={() => setPanel("details")}
           >
             Detalhes do NFT
-          </Button>
-          <Button
-            variant="ghost"
-            aria-pressed={panel === "reviews"}
+          </button>
+          <button
+            ref={(element) => {
+              detailTabRefs.current[1] = element;
+            }}
+            type="button"
+            role="tab"
+            id="nft-reviews-tab"
+            aria-controls="nft-reviews-panel"
+            aria-selected={panel === "reviews"}
+            tabIndex={panel === "reviews" ? 0 : -1}
+            className={`-mb-px border-b-2 px-0 pb-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${panel === "reviews" ? "border-primary text-primary" : "border-transparent text-foreground"}`}
             onClick={() => setPanel("reviews")}
           >
-            Avaliações de colecionadores
-          </Button>
+            Avaliações de colecionadores ({nft.rating.count})
+          </button>
         </div>
-        {panel === "details" ? (
-          <div className="space-y-4 py-5 text-sm leading-7 text-muted-foreground">
+        <div
+          role="tabpanel"
+          id="nft-details-panel"
+          aria-labelledby="nft-details-tab"
+          tabIndex={0}
+          hidden={panel !== "details"}
+          className="space-y-4 py-5 text-sm leading-7 text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
             <p>{nft.description}</p>
             <p>
               Rede: {nft.network}. Dados e disponibilidade desta demonstração
               são simulados.
             </p>
-          </div>
-        ) : (
-          <p className="py-5 text-sm text-muted-foreground">
+        </div>
+        <div
+          role="tabpanel"
+          id="nft-reviews-panel"
+          aria-labelledby="nft-reviews-tab"
+          tabIndex={0}
+          hidden={panel !== "reviews"}
+          className="py-5 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
             Nota média: {nft.rating.average.toFixed(1)} em {nft.rating.count}{" "}
             avaliações simuladas. Comentários individuais não estão disponíveis.
-          </p>
-        )}
+        </div>
       </section>
       <section className="mt-10" aria-labelledby="related-title">
         <h2

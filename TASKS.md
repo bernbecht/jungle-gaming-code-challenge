@@ -170,3 +170,5 @@ Revisão UI-02 — rating: desktop agora mostra cinco estrelas sólidas, com a c
 Ajuste dos steppers do detalhe: os controles de quantidade desktop e mobile usam `size="stepper"` da variante do Button. A geometria responde ao breakpoint (`h-7 w-5` no mobile, `md:h-11 md:w-7` no desktop); o tamanho dos sinais é ajustado separadamente.
 
 Revisão UI-02 — compartilhar: botão de copiar link substituído pela composição do PNG desktop, com o texto “Compartilhar este NFT:” e links iconográficos acessíveis para LinkedIn, email e Twitter. Os links compartilham a URL atual sem simular confirmação de publicação. Validação visual e lint/build pendentes.
+
+Revisão UI-02 — tabs: removido o aspecto de botões; abas usam texto plano, selecionada em cobre com sublinhado, contagem de avaliações no rótulo e navegação por setas/Home/End. Estado ligado aos respectivos painéis acessíveis. Lint/build pendentes.

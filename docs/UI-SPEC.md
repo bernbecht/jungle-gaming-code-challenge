@@ -73,7 +73,7 @@ Proposta: filtro em drawer no mobile e busca expansível no desktop. Não deduzi
 
 ### UI-02 — Detalhe
 
-Desktop: quatro miniaturas à esquerda, arte principal, informações à direita; preço, cinco estrelas preenchidas conforme a nota média e quantidade seguida de “avaliações de colecionadores”, descrição, chips de edição (1/1, 1/10, 1/50, ABERTA), quantidade, Comprar e Favoritar. Metadados: ID do token, coleção e atributos; o compartilhamento aparece como o texto “Compartilhar este NFT:” seguido por ícones de LinkedIn, email e Twitter. Abaixo, tabs de detalhes/avaliações, texto técnico, cinco recomendações e footer.
+Desktop: quatro miniaturas à esquerda, arte principal, informações à direita; preço, cinco estrelas preenchidas conforme a nota média e quantidade seguida de “avaliações de colecionadores”, descrição, chips de edição (1/1, 1/10, 1/50, ABERTA), quantidade, Comprar e Favoritar. Metadados: ID do token, coleção e atributos; o compartilhamento aparece como o texto “Compartilhar este NFT:” seguido por ícones de LinkedIn, email e Twitter. Abaixo, tabs de detalhes/avaliações sem superfície de botão; a selecionada usa texto cobre e sublinhado. Texto técnico, cinco recomendações e footer vêm em seguida.
 
 Mobile: header global e navegação inferior não aparecem. Há voltar/favorito no topo, imagem grande, painel de informações sobreposto visualmente à base da imagem e bloco inferior com quantidade/preço/Comprar NFT/carrinho. Rating aparece como cápsula com uma estrela, nota e contagem. A barra está ancorada visualmente ao rodapé nesta captura; comportamento fixo durante rolagem deve ser confirmado em uso. Não há evidência de miniaturas, tabs ou recomendações no trecho visível; não concluir que foram removidas do fluxo completo.
 
