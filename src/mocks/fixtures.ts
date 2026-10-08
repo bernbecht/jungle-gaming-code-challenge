@@ -59,7 +59,7 @@ export async function createFixtures(now = BASE_TIME): Promise<DatabaseState> {
     },
     mergedGuestCarts: {},
     sessions: {}, connections: {}, quotes: {}, orders: {}, attempts: {}, reservations: {},
-    paymentSimulation: { delayMs: DEFAULT_PAYMENT_DELAY_MS, outcome: 'confirmed' },
+    paymentSimulation: { delayMs: DEFAULT_PAYMENT_DELAY_MS, outcome: 'confirmed', loseResponseOnce: false },
     coupons: { NFT10: { discountBps: 1000, expiresAt: now + 365 * 86_400_000 }, EXPIRED: { discountBps: 1000, expiresAt: now - 1 } },
     networkFees: { ethereum: '0.001', polygon: '0.0001', solana: '0.00001' },
   }

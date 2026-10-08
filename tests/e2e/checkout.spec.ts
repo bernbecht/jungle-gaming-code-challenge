@@ -122,6 +122,61 @@ test('checkout reconciles a missed cart change after the socket reconnects and r
   await expect(page.getByRole('region', { name: 'Seus NFTs' }).getByText('Cupom NFT10 aplicado', { exact: true })).toBeVisible()
 })
 
+test('checkout recovers a committed order after its response is lost and refresh keeps the same attempt', async ({ page, isMobile }) => {
+  await loginAndAddItem(page)
+  if (isMobile) await page.getByRole('button', { name: 'Continuar', exact: true }).click()
+  await page.getByRole('button', { name: 'Revisar compra' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
+
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ outcome: 'confirmed', delayMs: 8000, loseResponseOnce: true }),
+    })
+    if (!response.ok) throw new Error('Could not configure the lost order response')
+  })
+
+  let orderPostCount = 0
+  page.on('request', request => {
+    if (request.url().endsWith('/api/orders') && request.method() === 'POST') orderPostCount += 1
+  })
+  const lostResponse = page.waitForResponse(response => response.url().endsWith('/api/orders') && response.request().method() === 'POST')
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+  expect((await lostResponse).status()).toBe(504)
+  await expect(page.getByRole('button', { name: 'Recuperar tentativa' })).toBeVisible()
+
+  const storedKey = await page.evaluate(() => {
+    const key = Object.keys(localStorage).find(candidate => candidate.startsWith('kurio-order-attempt:'))
+    return key ? (JSON.parse(localStorage.getItem(key) ?? 'null') as { key?: string } | null)?.key : null
+  })
+  if (!storedKey) throw new Error('The idempotency key was not saved before submission')
+  expect(storedKey).toEqual(expect.any(String))
+
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'Recuperar tentativa' })).toBeVisible()
+  const keyAfterRefresh = await page.evaluate(() => {
+    const key = Object.keys(localStorage).find(candidate => candidate.startsWith('kurio-order-attempt:'))
+    return key ? (JSON.parse(localStorage.getItem(key) ?? 'null') as { key?: string } | null)?.key : null
+  })
+  expect(keyAfterRefresh).toBe(storedKey)
+
+  const attemptResponse = page.waitForResponse(response => response.url().endsWith(`/api/order-attempts/${storedKey}`) && response.request().method() === 'GET')
+  await page.getByRole('button', { name: 'Recuperar tentativa' }).click()
+  const recovery = await attemptResponse
+  expect(recovery.status()).toBe(200)
+  const { order } = await recovery.json()
+  await expect(page).toHaveURL(new RegExp(`/orders/${order.id}$`))
+  await expect(page.getByRole('heading', { name: 'Aguardando confirmação do pagamento' })).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'Aguardando confirmação do pagamento' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' })).toBeVisible({ timeout: 12_000 })
+  expect(orderPostCount).toBe(1)
+
+  await page.goto('/cart')
+  await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
+})
+
 test('mixed-network cart finalizes one network and preserves the other group', async ({ page, isMobile }) => {
   await page.goto('/login')
   await page.getByLabel(/^E-mail/).fill('collector-a@example.test')

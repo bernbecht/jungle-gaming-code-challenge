@@ -1,6 +1,6 @@
 import type { ApiError, Network, Nft, Order, Profile, Quote, Wallet } from '../contracts/marketplace'
 
-export const SCHEMA_VERSION = 4
+export const SCHEMA_VERSION = 5
 export const BASE_TIME = Date.parse('2026-01-15T12:00:00Z')
 export const DEFAULT_PAYMENT_DELAY_MS = 2_000
 export type QuantityLot = { id: string; quantity: number }
@@ -14,7 +14,7 @@ export type StoredOrder = {
   order: Order; resolveAt: number; delayMs: number; outcome: 'confirmed' | 'declined'; cartId: string; sessionId?: string
   lots: Record<string, QuantityLot[]>; effectsApplied: boolean
 }
-export type PaymentSimulation = { delayMs: number; outcome: 'confirmed' | 'declined' }
+export type PaymentSimulation = { delayMs: number; outcome: 'confirmed' | 'declined'; loseResponseOnce: boolean }
 export type AttemptResult = { orderId: string } | { status: number; body: ApiError }
 export type DatabaseState = {
   schemaVersion: number; sequence: number; scenarioId: 'SCN-01'; now: number

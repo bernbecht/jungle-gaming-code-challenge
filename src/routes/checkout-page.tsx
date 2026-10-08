@@ -186,9 +186,10 @@ export function CheckoutPage() {
   const [connected, setConnected] = useState<{ id: string; walletId: string; network: Network } | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [quoteExpired, setQuoteExpired] = useState(false);
-  const [notice, setNotice] = useState(() => userId && localStorage.getItem(`kurio-order-attempt:${userId}`) ? "Há uma tentativa de compra anterior que pode ser recuperada com segurança." : "");
+  const [notice, setNotice] = useState("");
   const [problem, setProblem] = useState("");
-  const [recoverAvailable, setRecoverAvailable] = useState(() => Boolean(userId && localStorage.getItem(`kurio-order-attempt:${userId}`)));
+  const [recoverAvailable, setRecoverAvailable] = useState(false);
+  const [recoveringAttempt, setRecoveringAttempt] = useState(false);
   const [collector, setCollector] = useState<Collector>(() => ({
     displayName: session.data?.displayName ?? "",
     username: session.data?.username ?? "",
@@ -208,6 +209,17 @@ export function CheckoutPage() {
     const timer = window.setTimeout(() => setQuoteExpired(true), 5 * 60_000);
     return () => window.clearTimeout(timer);
   }, [quote]);
+
+  useEffect(() => {
+    if (!userId) {
+      setRecoverAvailable(false);
+      return;
+    }
+    const hasSavedAttempt = Boolean(localStorage.getItem(`kurio-order-attempt:${userId}`));
+    setRecoverAvailable(hasSavedAttempt);
+    setNotice(hasSavedAttempt ? "Há uma tentativa de compra anterior que pode ser recuperada com segurança." : "");
+    setProblem("");
+  }, [userId]);
 
   const connectMutation = useMutation({
     mutationFn: connectWallet,
@@ -268,12 +280,13 @@ export function CheckoutPage() {
         setNotice("Os valores foram atualizados. Revise-os e confirme novamente.");
         setStep("review");
       }
-      setProblem(errorMessage(error));
       if (!axios.isAxiosError(error) || error.response === undefined || error.response.status >= 500) {
+        setProblem("");
         localStorage.setItem(`kurio-order-attempt:${userId}`, JSON.stringify({ key: variables.key, input: variables.input } satisfies Attempt));
         setNotice("O resultado ainda não foi recebido. Recupere esta mesma tentativa para evitar um pedido duplicado.");
         setRecoverAvailable(true);
       } else {
+        setProblem(errorMessage(error));
         localStorage.removeItem(`kurio-order-attempt:${userId}`);
         setRecoverAvailable(false);
       }
@@ -327,17 +340,36 @@ export function CheckoutPage() {
   }
 
   async function recoverAttempt() {
+    if (recoveringAttempt) return;
     const saved = localStorage.getItem(`kurio-order-attempt:${userId}`);
     if (!saved) return;
+    setRecoveringAttempt(true);
+    setProblem("");
+    setNotice("Consultando o resultado da tentativa de compra…");
+    let attempt: Attempt;
     try {
-      const attempt = JSON.parse(saved) as Attempt;
+      attempt = JSON.parse(saved) as Attempt;
+      if (typeof attempt.key !== "string" || !attempt.key || !attempt.input || typeof attempt.input !== "object")
+        throw new Error("Tentativa salva inválida.");
+    } catch {
+      setProblem("Não foi possível ler os dados da tentativa salva.");
+      setRecoverAvailable(false);
+      setRecoveringAttempt(false);
+      return;
+    }
+    try {
       const order = await readAttempt(attempt.key);
       await navigate({ to: "/orders/$orderId", params: { orderId: order.id } });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        const attempt = JSON.parse(saved) as Attempt;
-        orderMutation.mutate({ input: attempt.input, key: attempt.key });
+        try {
+          await orderMutation.mutateAsync({ input: attempt.input, key: attempt.key });
+        } catch {
+          // The mutation reports whether the original idempotent attempt can be replayed.
+        }
       } else setProblem(errorMessage(error));
+    } finally {
+      setRecoveringAttempt(false);
     }
   }
 
@@ -414,8 +446,8 @@ export function CheckoutPage() {
       <nav aria-label="Caminho da página" className="mb-8 hidden text-sm md:block"><Link to="/" search={defaultCatalog}>Início</Link> / <Link to="/" search={defaultCatalog}>Mercado</Link> / <Link to="/cart">Carrinho</Link> / <span aria-current="page">Pagamento</span></nav>
       <h1 className="mb-6 hidden text-2xl font-semibold md:block">Pagamento</h1>
       <div className="mb-5 grid grid-cols-3 text-center text-xs font-semibold md:hidden" aria-label="Etapas do pagamento"><span className={step === "data" ? "text-primary" : "text-secondary"}>1. Dados</span><span className={step === "wallet" ? "text-primary" : "text-secondary"}>2. Carteira</span><span className={step === "review" ? "text-primary" : "text-secondary"}>3. Revisão</span></div>
-      {problem && <div role="alert" className="mb-5 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">{problem}{recoverAvailable && <button type="button" className="ml-2 underline" onClick={() => void recoverAttempt()}>Recuperar tentativa</button>}</div>}
-      {notice && <p role="status" className="mb-5 rounded-md border border-primary/40 p-3 text-sm">{notice}{recoverAvailable && <button type="button" className="ml-2 underline" onClick={() => void recoverAttempt()}>Recuperar tentativa</button>}</p>}
+      {problem && <div role="alert" className="mb-5 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">{problem}{recoverAvailable && <button type="button" className="ml-2 underline" disabled={recoveringAttempt || orderMutation.isPending} onClick={() => void recoverAttempt()}>{recoveringAttempt || orderMutation.isPending ? "Recuperando tentativa…" : "Recuperar tentativa"}</button>}</div>}
+      {notice && <p role="status" className="mb-5 rounded-md border border-primary/40 p-3 text-sm">{notice}{recoverAvailable && <button type="button" className="ml-2 underline" disabled={recoveringAttempt || orderMutation.isPending} onClick={() => void recoverAttempt()}>{recoveringAttempt || orderMutation.isPending ? "Recuperando tentativa…" : "Recuperar tentativa"}</button>}</p>}
       <form onSubmit={(event) => void placeOrder(event)}>
         <div className="grid min-w-0 grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1.45fr)_minmax(350px,.75fr)] xl:gap-8">
           <div className={`min-w-0 ${step === "data" ? "block" : "hidden"} md:block`}>

@@ -277,11 +277,14 @@ export const handlers = [
     })
     const submission = await transact(state => {
       const result = submitOrder(state, userId, key, input, state.paymentSimulation.outcome, state.paymentSimulation.delayMs, sessionId)
-      if ('status' in result || result.replayed) return { result, changes: { nfts: [] as NftUpdated[] } }
+      if ('status' in result || result.replayed) return { result, changes: { nfts: [] as NftUpdated[] }, responseLost: false }
+      const responseLost = state.paymentSimulation.loseResponseOnce
+      if (responseLost) state.paymentSimulation.loseResponseOnce = false
       const occurredAt = new Date(state.now).toISOString()
       const nftIds = [...new Set(result.order.snapshot.items.map(item => item.nftId))]
       return {
         result,
+        responseLost,
         changes: {
           nfts: nftIds.map(id => nftUpdatedEvent(readNft(state, id), occurredAt)),
           order: orderUpdatedEvent(result.order, sessionId),
@@ -292,6 +295,8 @@ export const handlers = [
     const result = submission.result
     if ('status' in result) throw new MockError(result.status, result.body.error.code, result.body.error.message, result.body.error.details)
     if (result.order.status === 'pending') scheduleOrderResolution(result.order.id, await transact(state => state.orders[result.order.id]!.delayMs))
+    if (submission.responseLost)
+      return HttpResponse.json({ error: { code: 'RESPONSE_UNKNOWN', message: 'O resultado do pedido não foi recebido. Recupere a tentativa pela mesma chave.' } }, { status: 504 })
     return HttpResponse.json(result.order, { status: result.replayed ? 200 : 201 })
   })),
   http.get('/api/orders/:id', ({ request, params }) => respond(async () => {
@@ -489,10 +494,12 @@ export const handlers = [
     const body = await readBody(request)
     const outcome = body.outcome ?? 'confirmed'
     const delayMs = body.delayMs ?? PAYMENT_DELAY_MS
+    const loseResponseOnce = body.loseResponseOnce ?? false
     if (outcome !== 'confirmed' && outcome !== 'declined') invalid('Resultado de pagamento inválido.')
     if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10_000) invalid('Latência de pagamento inválida.')
+    if (typeof loseResponseOnce !== 'boolean') invalid('Configuração de resposta perdida inválida.')
     return transact(state => {
-      state.paymentSimulation = { outcome, delayMs }
+      state.paymentSimulation = { outcome, delayMs, loseResponseOnce }
       return state.paymentSimulation
     })
   })),
