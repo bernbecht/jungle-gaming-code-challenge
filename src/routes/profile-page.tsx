@@ -75,7 +75,7 @@ function EnsNameField({
     <FormField
       id="ensName"
       label="Nome ENS"
-      description="Opcional. Informe o nome completo, como ana.eth. Não verificamos o registro na demo."
+      description="Informe o nome completo, como ana.eth. Não verificamos o registro na demo."
       error={error}
     >
       <Input
@@ -306,11 +306,11 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
 
   return (
     <section
-      className="mx-auto grid max-w-[1120px] gap-8 py-8 md:grid-cols-[280px_minmax(0,1fr)] md:gap-10 md:py-10"
+      className="mx-auto grid max-w-[1120px] items-start gap-8 py-8 md:grid-cols-[280px_minmax(0,1fr)] md:gap-10 md:py-10"
       aria-labelledby="profile-title"
     >
       <aside
-        className="hidden overflow-hidden rounded-sm bg-card md:block"
+        className="hidden self-start overflow-hidden rounded-sm bg-card md:block"
         aria-label="Meu perfil"
       >
         <div className="border-b border-border px-5 py-4">
@@ -320,16 +320,16 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
           <Link
             to="/profile"
             aria-current="page"
-            className="flex min-h-11 items-center gap-3 border-l-4 border-primary bg-surface-dark/50 px-3 text-primary"
+            className="flex min-h-11 items-center gap-3 border-l-4 border-primary bg-surface-dark/50 px-3 text-accent"
           >
-            <CircleUserRound size={18} aria-hidden="true" />
+            <CircleUserRound size={18} className="text-accent" aria-hidden="true" />
             Dados do perfil
           </Link>
           <Link
             to="/wallets"
-            className="flex min-h-11 items-center gap-3 border-l-4 border-transparent px-3 text-muted-foreground hover:text-primary"
+            className="flex min-h-11 items-center gap-3 border-l-4 border-transparent px-3 text-accent hover:text-accent"
           >
-            <WalletCards size={18} aria-hidden="true" />
+            <WalletCards size={18} className="text-secondary" aria-hidden="true" />
             Carteiras
           </Link>
         </nav>

@@ -104,9 +104,19 @@ Essa limitação transacional pertence à API simulada que defini para o projeto
 
 **Evidências:** DEC-30 em [ARCHITECTURE](../ARCHITECTURE.md); formulários `profile-form` e de senha, `saveMutation`, `passwordMutation` e botão associado por `form="profile-form"` em [ProfilePage](../src/routes/profile-page.tsx); serviços em [api.ts](../src/features/profile/api.ts). O teste `password change validates current and matching passwords, then invalidates the old password` em [profile.spec.ts](../tests/e2e/profile.spec.ts) cobre senha atual incorreta, confirmação divergente e autenticação com a nova senha. [marketplace.spec.ts](../tests/unit/marketplace.spec.ts) cobre rejeição de credenciais incorretas e versão obsoleta. Esses testes dão suporte ao fluxo de senha; não são uma comparação de usabilidade entre um e dois botões e não foram reexecutados neste levantamento.
 
+## 10. Iconografia descritiva nos benefícios do rodapé
+
+**Referência e mudança.** Na [screenshot desktop da home](../design/screenshots/Desktop/Início.png), os três blocos de benefícios do rodapé usam as letras maiúsculas “W”, “C” e “D” dentro de círculos. Substituí essas letras por ícones associados ao conteúdo: escudo com confirmação para “Segurança da carteira”, pessoas para “Criadores em destaque” e sino para “Alertas de lançamentos”.
+
+**Motivação.** Optei por uma iconografia que exemplifica o significado de cada bloco, para facilitar a associação visual entre o símbolo e a mensagem sem exigir que o usuário interprete as letras. Essa intenção foi explicitada pelo autor durante a revisão deste documento.
+
+**Experiência e consequência.** A expectativa é favorecer o reconhecimento dos temas ao percorrer o rodapé. Os títulos e descrições continuam presentes, e os ícones usam `aria-hidden="true"` por serem complementares ao texto. A escolha altera os símbolos do protótipo; seu benefício de compreensão não foi medido em testes com usuários. Os ícones ilustram os temas e não representam comprovação de segurança ou funcionalidades adicionais da demo.
+
+**Evidências:** lista `benefits` e renderização dos componentes `ShieldCheck`, `UsersRound` e `Bell` em [SiteFooter](../src/components/layout/site-footer.tsx), comparadas com a referência local. O teste em [home-editorial.spec.ts](../tests/e2e/home-editorial.spec.ts) exercita o rodapé e a newsletter, mas não verifica a compreensão dessa iconografia.
+
 ## Adaptações e limitações que também devem ser consideradas
 
-- **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil e recibo têm composições responsivas no código. O cadastro/edição de carteiras ainda consta como pendente em TASK-09D; não deve ser apresentado como entregue.
+- **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil e recibo têm composições responsivas; a gestão de carteiras está em implementação na TASK-09D e ainda aguarda revisão E2E desktop/mobile.
 - **Autenticação com continuidade.** No desktop, os acionadores abrem diálogo sobre a página atual; no mobile, usam uma rota com retorno interno. Isso preserva o contexto e segue as referências disponíveis. [auth.spec.ts](../tests/e2e/auth.spec.ts) cobre abertura, fechamento, retorno de foco e navegação mobile. É uma adaptação de fluxo, não uma ruptura geral com o protótipo.
 - **Fonte e imagens — DEC-16/DEC-17.** IBM Plex Mono local aproxima a aparência monoespaçada, e quatro SVGs abstratos substituem temporariamente as artes. Origem e licença estão em [ASSETS](ASSETS.md). Essas escolhas facilitam execução local e desenvolvimento, mas não comprovam equivalência visual e não devem ser defendidas como uma melhoria de UX já demonstrada.
 - **Bordas e acessibilidade.** A arquitetura registra a borda de input `#79583E` para melhorar a identificação dos controles; o token está em [styles.css](../src/styles.css). Contraste final, fidelidade visual, zoom e áreas de toque ainda precisam da revisão prevista. A existência do ajuste não comprova conformidade completa.
@@ -120,3 +130,15 @@ Para verificar rapidamente, recomendo montar um carrinho Ethereum + Polygon e co
 A [matriz de testes](TEST-MATRIX.md) registra aprovações locais reportadas pelo usuário para checkout confirmado/recusado/multirrede e perfil/avatar, com limitações de evidência anexada. Este levantamento não reexecutou essas suítes. Cenários avançados de tempo real, timeout e reconexão, baselines visuais e auditoria Lighthouse permanecem pendentes conforme os registros do projeto.
 
 Uma justificativa documentada torna a decisão avaliável, mas não altera os critérios do desafio. Peço que estas escolhas sejam consideradas pelo problema que procuram resolver, pelo comportamento implementado e pelos custos que introduzem, junto da fidelidade visual e dos requisitos ainda em aberto.
+
+## 11. Carteiras principais e secundárias com slots independentes
+
+**Referência e mudança — DEC-31.** A tela de carteiras não tem uma especificação completa de campos nem frames mobile. A implementação apresenta seções para carteira principal e secundária, com formulário responsivo para nome do perfil, rede, endereço, provedor, ENS opcional e código de indicação opcional.
+
+**Decisão de domínio.** Cada slot é único por conta. Seu apelido é derivado do slot e permanece estável após criação. O controle “Igual à carteira principal” copia os valores atuais para o formulário da secundária, que continua sendo um registro independente. Os endereços Ethereum/Polygon usam formato EVM; Solana usa Base58 e comprimento compatível. Isso apenas valida forma, sem verificar propriedade ou estado on-chain.
+
+**Limite que deve ser discutido na avaliação.** O enunciado solicita cadastro e edição de carteiras principal e secundária, mas não declara literalmente um máximo de duas. REQ-014 fala em selecionar uma carteira cadastrada; REQ-024 pede validação e persistência, sem especificar quantidade. O protótipo oferece somente os dois slots nomeados, portanto hoje cada conta pode registrar até duas carteiras. Essa escolha interpreta o escopo visível e não deve ser apresentada como uma restrição explícita do requisito. Pergunta sugerida ao avaliador: “Ao pedir carteira principal e secundária, o desafio espera exatamente dois slots ou a possibilidade de cadastrar mais carteiras além desses papéis?”
+
+**Efeito e limitações.** Edição usa versão otimista; cadastro e edição retornam erros de validação, conflito de slot/endereço e versão obsoleta. As carteiras salvas compartilham cache com o checkout, que passa a preencher endereço e metadados a partir do registro atualizado. A regra de formato não comprova que a carteira existe ou pertence ao usuário.
+
+**Evidências:** DEC-31 em [ARCHITECTURE](../ARCHITECTURE.md); contrato API-11 em [CONTRACTS](CONTRACTS.md); implementação em [WalletsPage](../src/routes/wallets-page.tsx), [API de carteiras](../src/features/wallets/api.ts) e [mock de domínio](../src/mocks/wallets.ts). Os testes E2E em [wallets.spec.ts](../tests/e2e/wallets.spec.ts) aguardam execução local nos viewports desktop e mobile antes do aceite da tarefa.

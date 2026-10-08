@@ -3,9 +3,10 @@ import { delay, http, HttpResponse, ws } from 'msw'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { addCartItem, advanceClock, createQuote, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder, PAYMENT_DELAY_MS } from './commerce'
 import { resetDatabase, transact } from './database'
+import { createWallet, updateWallet } from './wallets'
 import { invalid, MockError } from './errors'
 import { AVATAR_MAX_BYTES, AVATAR_TYPES, changePassword, login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateAvatar, updateProfile } from './auth'
-import type { Network, OrderInput } from '../contracts/marketplace'
+import type { Network, OrderInput, UpdateWalletInput, WalletInput } from '../contracts/marketplace'
 
 const scheduledOrders = new Set<string>()
 
@@ -164,6 +165,34 @@ export const handlers = [
     const { userId } = requireSession(state, readToken(request))
     return { items: state.wallets[userId] ?? [] }
   }))),
+  http.post('/api/wallets', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    if (body.slot !== 'primary' && body.slot !== 'secondary') invalid('Espaço de carteira inválido.')
+    if (!validNetwork(body.network)) invalid('Rede inválida.')
+    const provider = body.provider
+    if (provider !== 'metamask' && provider !== 'walletconnect' && provider !== 'coinbase') invalid('Provedor de carteira inválido.')
+    const input: WalletInput = {
+      slot: body.slot, network: body.network, provider,
+      profileName: stringField(body, 'profileName'), address: stringField(body, 'address'),
+      ensName: typeof body.ensName === 'string' ? body.ensName : null,
+      referralCode: typeof body.referralCode === 'string' ? body.referralCode : null,
+    }
+    const wallet = await transact(state => createWallet(state, requireSession(state, readToken(request)).userId, input))
+    return HttpResponse.json(wallet, { status: 201 })
+  })),
+  http.patch('/api/wallets/:id', async ({ request, params }) => respond(async () => {
+    const body = await readBody(request)
+    if (!validNetwork(body.network)) invalid('Rede inválida.')
+    const provider = body.provider
+    if (provider !== 'metamask' && provider !== 'walletconnect' && provider !== 'coinbase') invalid('Provedor de carteira inválido.')
+    const input: UpdateWalletInput = {
+      network: body.network, provider, profileName: stringField(body, 'profileName'),
+      address: stringField(body, 'address'), ensName: typeof body.ensName === 'string' ? body.ensName : null,
+      referralCode: typeof body.referralCode === 'string' ? body.referralCode : null,
+      expectedVersion: numberField(body, 'expectedVersion'),
+    }
+    return transact(state => updateWallet(state, requireSession(state, readToken(request)).userId, String(params.id), input))
+  })),
   http.post('/api/wallet-connections', async ({ request }) => respond(async () => {
     const body = await readBody(request)
     const walletId = stringField(body, 'walletId')

@@ -5,6 +5,7 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
 import { changePassword, updateAvatar, updateProfile } from '../../src/mocks/auth'
+import { createWallet, updateWallet } from '../../src/mocks/wallets'
 import { MockError } from '../../src/mocks/errors'
 import { BASE_TIME } from '../../src/mocks/state'
 import type { DatabaseState } from '../../src/mocks/state'
@@ -43,6 +44,21 @@ test('fixtures have stable IDs, distinct private resources and no stored plainte
   expect(state.favorites['user-a']).not.toEqual(state.favorites['user-b'])
   expect(JSON.stringify(state)).not.toContain('DemoNft!2026')
   expect(state.users[0]!.password.verifier).not.toBe(state.users[1]!.password.verifier)
+})
+
+test('wallet slots are unique, addresses follow their network, and updates use optimistic versions', async () => {
+  const state = await createFixtures()
+  expect(() => createWallet(state, 'user-a', { slot: 'primary', profileName: 'Primary', address: `0x${'d'.repeat(40)}`, network: 'ethereum', provider: 'metamask', ensName: null, referralCode: null })).toThrow(/neste espaço/i)
+  try { createWallet(state, 'user-b', { slot: 'secondary', profileName: 'Reserva', address: 'invalid', network: 'polygon', provider: 'metamask', ensName: null, referralCode: null }); throw new Error('Expected the API validation to fail') }
+  catch (error) { expect((error as MockError).body.error.fieldErrors?.address).toEqual(['Informe um endereço EVM válido (0x seguido de 40 caracteres hexadecimais).']) }
+  const added = createWallet(state, 'user-b', { slot: 'secondary', profileName: 'Reserva', address: `0x${'d'.repeat(40)}`, network: 'polygon', provider: 'coinbase', ensName: null, referralCode: null })
+  expect(added.nickname).toBe('Secundária')
+  const updated = updateWallet(state, 'user-b', added.id, { profileName: 'Outra Reserva', address: `0x${'e'.repeat(40)}`, network: 'ethereum', provider: 'metamask', ensName: null, referralCode: null, expectedVersion: 1 })
+  expect(updated.version).toBe(2)
+  expect(() => updateWallet(state, 'user-b', added.id, { profileName: 'Reserva', address: `0x${'f'.repeat(40)}`, network: 'ethereum', provider: 'metamask', ensName: null, referralCode: null, expectedVersion: 1 })).toThrow(/outra sessão/i)
+  state.connections['old-wallet-session'] = { id: 'old-wallet-session', userId: 'user-b', walletId: added.id, network: 'polygon', provider: 'coinbase', active: true }
+  updateWallet(state, 'user-b', added.id, { profileName: 'Updated', address: `0x${'a'.repeat(40)}`, network: 'ethereum', provider: 'metamask', ensName: null, referralCode: null, expectedVersion: 2 })
+  expect(state.connections['old-wallet-session']?.active).toBe(false)
 })
 
 test('profile updates validate identity fields, increment versions and reject stale or duplicate changes', async () => {

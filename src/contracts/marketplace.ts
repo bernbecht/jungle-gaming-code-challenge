@@ -34,6 +34,8 @@ export type Wallet = {
   profileName: string; address: string; network: Network
   provider: 'metamask' | 'walletconnect' | 'coinbase'; ensName: string | null; referralCode: string | null
 }
+export type WalletInput = Pick<Wallet, 'slot' | 'profileName' | 'address' | 'network' | 'provider' | 'ensName' | 'referralCode'>
+export type UpdateWalletInput = Omit<WalletInput, 'slot'> & { expectedVersion: number }
 export type WalletConnection = {
   id: string; status: 'connected'; walletId: string; network: Network; provider: Wallet['provider']
 }

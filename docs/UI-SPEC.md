@@ -119,9 +119,9 @@ Mobile proposto: navegação de conta compacta, campos empilhados, avatar e aç�
 
 ### UI-09 — Carteiras
 
-Desktop: mesma sidebar, seção principal com Adicionar, formulário em duas colunas, Salvar carteira e seção secundária com Adicionar e Igual carteira principal. Campos extrapolam address/network/label do contrato inicial. O significado de Igual carteira principal precisa de decisão: proposta é copiar dados para edição, sem associar identidades de forma implícita nem criar cadastro duplicado silenciosamente.
+Desktop: mesma sidebar, seção principal com formulário em duas colunas e Salvar carteira, seguida da seção secundária. Os campos incluem nome do perfil, rede, endereço, tipo/provedor, ENS e código de indicação. ENS e indicação são opcionais; o endereço e os dados principais são necessários. “Igual à carteira principal” copia os campos da principal para o formulário secundário, mas continua sendo um cadastro independente e editável. A implementação permite um registro em cada slot nomeado; interpretar esses dois slots como limite máximo é uma decisão do protótipo, pois o enunciado não declara expressamente que não possam existir outras carteiras (DEC-31). O slot e o apelido associado não são editáveis depois do cadastro.
 
-Mobile proposto: cards de principal/secundária e formulário empilhado; manter cadastro/edição completos. Não há evidência visual para aceitar dados obrigatórios fictícios como código de indicação ou ENS: definir regra explícita antes de implementar validação.
+Mobile: manter os formulários empilhados em duas seções, sem largura fixa da sidebar; permitir editar os campos completos e criar o slot secundário quando ainda não existir. A validação de endereço depende da rede: EVM para Ethereum/Polygon, Base58 para Solana. Não se valida propriedade nem consulta ENS/blockchain na demo.
 
 ## Formulários e impactos nos contratos
 

@@ -8,14 +8,9 @@ import type {
   WalletConnection,
 } from "@/contracts/marketplace";
 import { http } from "@/lib/http";
+import { walletsQuery } from "@/features/wallets/api";
 
-export function walletsQuery(userId: string) {
-  return queryOptions({
-    queryKey: ["wallets", userId],
-    queryFn: async ({ signal }) =>
-      (await http.get<{ items: Wallet[] }>("/wallets", { signal })).data.items,
-  });
-}
+export { walletsQuery };
 
 export async function createQuote(input: {
   cartVersion: number;

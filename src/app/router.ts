@@ -6,7 +6,6 @@ import { AppShell } from '@/components/layout/app-shell'
 import { NftDetailPage } from '@/routes/nft-detail-page'
 import { validateCatalogSearch } from '@/features/catalog/search'
 import { HomePage } from '@/routes/home-page'
-import { UnavailablePage } from '@/routes/unavailable-page'
 import { ProfilePage } from '@/routes/profile-page'
 import { NotFoundPage } from '@/routes/not-found-page'
 import { ErrorPage } from '@/routes/error-page'
@@ -16,6 +15,7 @@ import { sessionQuery } from '@/features/auth/api'
 import { CartPage } from '@/routes/cart-page'
 import { CheckoutPage } from '@/routes/checkout-page'
 import { OrderPage } from '@/routes/order-page'
+import { WalletsPage } from '@/routes/wallets-page'
 import type { Network } from '@/contracts/marketplace'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -66,7 +66,7 @@ const walletsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/wallets',
   beforeLoad: requireUser,
-  component: () => createElement(UnavailablePage, { title: 'Suas carteiras' }),
+  component: WalletsPage,
 })
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,

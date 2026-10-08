@@ -343,13 +343,13 @@ export function CheckoutPage() {
       <div className="hidden text-sm md:block"><span className="block">Rede da compra</span><p className="mt-2 flex min-h-10 items-center rounded-md border border-input px-3">{networks.find((item) => item.id === network)?.label}</p><span className="mt-1 block text-xs text-secondary">Definida pelos NFTs deste grupo</span></div>
       <Field id="collector-profile-name" label="Nome do perfil" required value={selectedWallet?.profileName ?? ""} readOnly />
       <Field id="collector-wallet-address" label="Endereço da carteira" required value={selectedWallet?.address ?? ""} readOnly />
-      <Field id="collector-ens-secondary" label="ENS ou carteira secundária (opcional)" value={wallets.data.find((wallet) => wallet.network === network && wallet.id !== selectedWallet?.id)?.ensName ?? ""} readOnly />
+      <Field id="collector-ens-secondary" label="ENS ou carteira secundária" value={wallets.data.find((wallet) => wallet.network === network && wallet.id !== selectedWallet?.id)?.ensName ?? ""} readOnly />
       <Field id="collector-wallet-type" label="Tipo de carteira" required value={providers.find((item) => item.id === selectedWallet?.provider)?.label ?? ""} readOnly />
-      <Field id="collector-referral" label="Código de indicação (opcional)" value={collector.referralCode ?? ""} onChange={(value) => setCollectorField("referralCode", value)} />
+      <Field id="collector-referral" label="Código de indicação" value={collector.referralCode ?? ""} onChange={(value) => setCollectorField("referralCode", value)} />
       <Field id="collector-email" label="E-mail" required type="email" value={collector.email} onChange={(value) => setCollectorField("email", value)} />
-      <Field id="collector-ens" label="Nome ENS (opcional)" value={collector.ensName ?? ""} onChange={(value) => setCollectorField("ensName", value)} />
+      <Field id="collector-ens" label="Nome ENS" value={collector.ensName ?? ""} onChange={(value) => setCollectorField("ensName", value)} />
       <label className="flex min-h-11 items-center gap-3 text-sm sm:col-span-2"><input type="checkbox" checked={selectedWallet?.slot === "secondary"} onChange={(event) => { const next = wallets.data.find((wallet) => wallet.network === network && wallet.slot === (event.target.checked ? "secondary" : "primary")); if (next) chooseWallet(next); }} disabled={!wallets.data.some((wallet) => wallet.network === network && wallet.slot !== selectedWallet?.slot)} className="size-4 accent-primary" />Usar outra carteira?</label>
-      <label htmlFor="collector-note" className="block text-sm sm:col-span-2">Observação do colecionador (opcional)<textarea id="collector-note" maxLength={2000} value={collector.note} onChange={(event) => setCollectorField("note", event.target.value)} className="mt-2 min-h-28 w-full rounded-md border border-input bg-transparent px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-ring" /></label>
+      <label htmlFor="collector-note" className="block text-sm sm:col-span-2">Observação do colecionador<textarea id="collector-note" maxLength={2000} value={collector.note} onChange={(event) => setCollectorField("note", event.target.value)} className="mt-2 min-h-28 w-full rounded-md border border-input bg-transparent px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-ring" /></label>
     </div>
   );
 
