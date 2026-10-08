@@ -1,17 +1,90 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 import { queryClient } from '@/app/query-client'
 import { router } from '@/app/router'
 import { env } from '@/lib/env'
 import { AuthDialogProvider } from '@/features/auth/auth-dialog-context'
+import { getSessionToken, sessionQuery } from '@/features/auth/api'
+import { nftQuery } from '@/features/catalog/api'
+import type { Nft, Order, Page } from '@/contracts/marketplace'
+import { isNftUpdatedEvent, isOrderUpdatedEvent, shouldApplyNftEvent, shouldApplyOrderEvent } from '@/features/realtime/domain-event-consumer'
 
 let mockWorkerStart: Promise<void> | undefined
 
 function startMockWorker() {
   mockWorkerStart ??= import('@/mocks/browser').then(({ initializeMocks }) => initializeMocks())
   return mockWorkerStart
+}
+
+function DomainEventConsumer({ children }: { children: ReactNode }) {
+  const session = useQuery(sessionQuery)
+  const queryClient = useQueryClient()
+  const userId = session.data?.id ?? ''
+
+  useEffect(() => {
+    if (!env.mocksEnabled || session.isPending) return
+
+    let active = true
+    const seenEventIds = new Set<string>()
+    let socket: import('socket.io-client').Socket | undefined
+    let authenticatedSessionId: string | null = null
+    const remember = (eventId: string) => {
+      if (seenEventIds.has(eventId)) return false
+      seenEventIds.add(eventId)
+      if (seenEventIds.size > 500) seenEventIds.delete(seenEventIds.values().next().value!)
+      return true
+    }
+
+    void import('socket.io-client').then(({ io }) => {
+      if (!active) return
+      socket = io(window.location.origin, { path: '/socket.io/', transports: ['websocket'] })
+      socket.on('connect', () => {
+        authenticatedSessionId = null
+        const token = userId ? getSessionToken() : null
+        if (token) socket?.emit('session.authenticate', { token })
+      })
+      socket.on('session.authenticated', (payload: unknown) => {
+        if (payload && typeof payload === 'object' && 'sessionId' in payload && typeof payload.sessionId === 'string')
+          authenticatedSessionId = payload.sessionId
+      })
+      socket.on('session.authenticationFailed', () => {
+        authenticatedSessionId = null
+        void queryClient.invalidateQueries({ queryKey: ['session'] })
+      })
+      socket.on('nft.updated', (payload: unknown) => {
+        if (!isNftUpdatedEvent(payload) || !remember(payload.eventId)) return
+        const detail = queryClient.getQueryData<Nft>(nftQuery(payload.resourceId).queryKey)
+        const cachedLists = queryClient.getQueriesData<Page<Nft>>({ queryKey: ['nfts', 'list'] })
+        const latestVersion = Math.max(
+          detail?.version ?? 0,
+          ...cachedLists.flatMap(([, page]) => page?.items.filter(item => item.id === payload.resourceId).map(item => item.version) ?? []),
+        )
+        if (!shouldApplyNftEvent(payload, latestVersion)) return
+        queryClient.setQueryData(nftQuery(payload.resourceId).queryKey, payload.data.nft)
+        void queryClient.invalidateQueries({ queryKey: ['nfts', 'list'] })
+        void queryClient.invalidateQueries({ queryKey: ['nfts', 'facets'] })
+        void queryClient.invalidateQueries({ queryKey: ['cart'] })
+        queryClient.setQueryData(['domain-events', 'nft', payload.resourceId], payload)
+      })
+      socket.on('order.updated', (payload: unknown) => {
+        if (!isOrderUpdatedEvent(payload) || !remember(payload.eventId)) return
+        if (!userId || !authenticatedSessionId || !shouldApplyOrderEvent(payload, queryClient.getQueryData<Order>(['orders', payload.resourceId]), userId, authenticatedSessionId)) return
+        queryClient.setQueryData(['orders', payload.resourceId], payload.data.order)
+        queryClient.setQueryData(['domain-events', 'order', payload.resourceId], payload)
+        if (payload.data.order.status === 'confirmed')
+          void queryClient.invalidateQueries({ queryKey: ['cart', `user:${userId}`] })
+      })
+    }).catch(() => undefined)
+
+    return () => {
+      active = false
+      socket?.disconnect()
+    }
+  }, [queryClient, session.isPending, userId])
+
+  return children
 }
 
 function MockBootstrap({ children }: { children: ReactNode }) {
@@ -33,7 +106,7 @@ function MockBootstrap({ children }: { children: ReactNode }) {
 
   if (error) return <main role="alert" className="grid min-h-screen place-items-center text-sm text-muted-foreground">Não foi possível iniciar a simulação de rede.</main>
   if (!ready) return <main className="grid min-h-screen place-items-center text-sm text-muted-foreground">Iniciando simulação de rede…</main>
-  return children
+  return <DomainEventConsumer>{children}</DomainEventConsumer>
 }
 
 export function AppProviders() {

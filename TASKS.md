@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08 e TASK-09A/B/C/D concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10A em andamento; TASK-10B a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10C a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -37,8 +37,8 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-09C | 2 / 7 | Implementar alteração de senha com senha atual/nova; atualizar verificador com salt, sem persistir texto em claro; confirmar que senha antiga falha e nova autentica | TASK-09A | REQ-024 | TEST-08C, TEST-03 | Concluída |
 | TASK-09D | 2 / 7 | Implementar cadastro e edição das carteiras principal/secundária; validar endereço/rede/slot, persistir e refletir alterações no checkout | TASK-08 | REQ-014, REQ-024 | TEST-08D, TEST-06 | Concluída |
 | TASK-10 (épico) | 2 / 8 | Implementar eventos de domínio versionados, isolamento de sessão, reconciliação REST após reconexão e recuperação idempotente de pedidos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | Em andamento |
-| TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Em andamento |
-| TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | A fazer |
+| TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Concluída |
+| TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | Concluída |
 | TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | A fazer |
 | TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | A fazer |
 | TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | A fazer |
@@ -287,15 +287,21 @@ Quebrada em cinco entregas por camada: TASK-10A (emissão após persistência), 
 
 ### TASK-10A — Emissão de eventos de domínio
 
-- [ ] Emitir EVT-01 quando preço ou disponibilidade do NFT mudar e EVT-02 quando o status do pedido mudar, apenas depois da gravação atômica no IndexedDB.
-- [ ] Montar envelopes com `eventId`, `resourceId`, versão monotônica, horário e snapshot correspondente; eventos de pedido incluem `userId` e `sessionId`.
-- [ ] Cobrir versão e payload dos dois eventos em testes de domínio/integração.
+- [x] Emitir EVT-01 quando preço ou disponibilidade do NFT mudar e EVT-02 quando o status do pedido mudar, apenas depois da gravação atômica no IndexedDB.
+- [x] Montar envelopes com `eventId`, `resourceId`, versão monotônica, horário e snapshot correspondente; eventos de pedido incluem `userId` e `sessionId`.
+- [x] Cobrir versão e payload dos dois eventos em testes de domínio/integração; o usuário confirmou que os testes passaram em 08/10/2026 e autorizou o commit da etapa.
+
+TASK-10A concluída e commitada após aprovação explícita do usuário. O reteste confirmou o handshake Socket.IO autenticado e os eventos de domínio em desktop/mobile. A emissão ocorre depois da transação IndexedDB e o teste compara o snapshot publicado com a leitura REST persistida.
 
 ### TASK-10B — Consumo seguro de eventos
 
-- [ ] Registrar listeners de catálogo/pedido e comparar identidade e versão antes de alterar caches.
-- [ ] Ignorar duplicatas e eventos antigos sem regredir NFT, pedido terminal, carrinho ou disponibilidade.
-- [ ] Invalidar consultas derivadas de alteração relevante e comunicar mudanças que exigem revisão, sem repetir efeitos financeiros localmente.
+- [x] Registrar listener Socket.IO após a inicialização do worker MSW; validar estrutura/coerência do evento e comparar versões antes de atualizar o cache de NFT ou pedido.
+- [x] Deduplicar por `eventId` com conjunto limitado; rejeitar evento de pedido com usuário/sessão divergentes, payload/envelope incoerentes ou estado terminal regressivo.
+- [x] Atualizar cache de detalhe/pedido e invalidar listas, facetas e carrinhos afetados; confirmação do pedido invalida o carrinho da identidade autenticada, sem aplicar efeitos financeiros locais.
+- [x] Cobrir validação estrutural, identidade, versões e terminalidade em `tests/unit/domain-events.spec.ts` (25 testes unitários passaram).
+- [x] Executar `tests/e2e/domain-events.spec.ts` em Chromium desktop/mobile; o usuário confirmou que passou em 08/10/2026.
+
+Durante a verificação, foi corrigida uma comparação de identidade: `sessionId` do evento não é o token de autenticação. O consumidor agora usa o `sessionId` devolvido por `session.authenticated`. Também foi corrigida a captura do ID do pedido no teste de integração, que estava navegando para `/orders/undefined`. `npm run typecheck`, `npm run lint`, `npm run test:unit` (25 testes) e build passaram; o usuário confirmou a execução E2E em desktop/mobile.
 
 ### TASK-10C — Isolamento de recursos privados entre sessões
 
