@@ -1,6 +1,6 @@
 # Contratos REST e eventos
 
-Status: **DTOs v1, catálogo, autenticação, favoritos, carrinho e checkout básico implementados nas TASK-04 a TASK-08; perfil, avatar e alteração de senha implementados nas TASK-09A/B/C; carteiras editáveis e eventos de domínio seguem pendentes**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
+Status: **DTOs v1, catálogo, autenticação, favoritos, carrinho, checkout básico, perfil, avatar, alteração de senha e gestão de carteiras implementados nas TASK-04 a TASK-09D; eventos de domínio seguem pendentes**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
 
 ## Campos identificados nas screenshots — DEC-19
 
@@ -13,7 +13,7 @@ Modelos v1 em `src/contracts/marketplace.ts` cobrem rede, abas Novos/Em alta, or
 - API-01/API-02/API-04: cadastro, sessão e favoritos estão ligados aos handlers MSW; verificar a cobertura E2E antes de considerar TEST-03/TEST-04 aprovados.
 - API-05/API-06/API-07: carrinho e cupons estão ligados aos handlers MSW/IndexedDB; visitante é identificado por `X-Guest-Id`, autenticado pelo bearer token. Merge consome a versão de origem uma vez e devolve avisos para estoque/cupom não transferidos.
 - API-08/API-09/API-12: cotação, conexão simulada, pedido idempotente, recuperação e telas de checkout/recibo implementados na TASK-08.
-- API-10 GET/PATCH, avatar e alteração de senha implementados nas TASK-09A/B/C. API-11 GET/POST/PATCH de carteiras e integração ao checkout implementados na TASK-09D; aceite E2E ainda pendente.
+- API-10 GET/PATCH, avatar e alteração de senha implementados nas TASK-09A/B/C. API-11 GET/POST/PATCH de carteiras e integração ao checkout implementados e aprovados na TASK-09D.
 - Eventos de domínio seguem pendentes na TASK-10.
 
 ## Convenções
