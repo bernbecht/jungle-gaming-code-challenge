@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C/D/E concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-11A em andamento; TASK-11B/C concluídas; TASK-11D a fazer; TASK-12 e suas subtarefas adiadas até nova análise; TASK-13 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D, TASK-10A/B/C/D/E e TASK-11 concluídas; TASK-06 em andamento (resposta privada antiga após troca/reset ainda sem E2E dedicado); TASK-12 e suas subtarefas adiadas até nova análise; TASK-13 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -44,11 +44,11 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | Concluída |
 | TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | Concluída |
 | TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | Concluída |
-| TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | Em andamento |
-| TASK-11A | 2 / 8 | Controlar e verificar expiração de sessão com o relógio simulado; preservar returnTo e permitir autenticação e retomada após 401 | TASK-06, TASK-10 | REQ-022, REQ-031, REQ-044 | TEST-03 | Em andamento |
+| TASK-11 | 2 / 8 | Completar controles determinísticos para os cenários cobertos; reset reproduzível e registro da disponibilidade/limites dos casos de SCENARIOS | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | Concluída |
+| TASK-11A | 2 / 8 | Controlar e verificar expiração de sessão com o relógio simulado; preservar returnTo e permitir autenticação e retomada após 401 | TASK-06, TASK-10 | REQ-022, REQ-031, REQ-044 | TEST-03 | Concluída |
 | TASK-11B | 2 / 8 | Completar controles determinísticos de latência, erro de rede e respostas 4xx/5xx para os recursos cobertos por TEST-07/08/12 | TASK-11A | REQ-030, REQ-031, REQ-044 | TEST-07, TEST-08, TEST-12 | Concluída |
-| TASK-11C | 2 / 8 | Tornar reset e seleção/preparação de cenários reproduzíveis, incluindo limpeza coerente do estado de navegador e simulação | TASK-11A, TASK-11B | REQ-030, REQ-031, REQ-044 | TEST-16 | Concluída |
-| TASK-11D | 2 / 8 | Fechar cobertura dos cenários publicados, documentar limites reais e validar execuções E2E desktop/mobile dos grupos afetados | TASK-11A, TASK-11B, TASK-11C | REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
+| TASK-11C | 2 / 8 | Tornar o reset/preparação de SCN-01 reproduzível, limpando de forma coerente o estado do navegador e da simulação; documentar a ausência de seleção dos demais cenários | TASK-11A, TASK-11B | REQ-030, REQ-031, REQ-044 | TEST-16 | Concluída |
+| TASK-11D | 2 / 8 | Fechar cobertura dos cenários publicados, documentar limites reais e validar execuções E2E desktop/mobile dos grupos afetados | TASK-11A, TASK-11B, TASK-11C | REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | Concluída |
 | TASK-12 (épico) | 2 / 9 | Concluir revisão visual, responsiva e de acessibilidade de todas as telas; aceite quando TASK-12A a TASK-12F estiverem concluídas com evidências | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | Adiada — aguarda nova análise |
 | TASK-12A | 2 / 9 | Revisar fidelidade visual das nove telas contra os PNGs disponíveis, incluindo a home completa da TASK-05A; ajustar composição, tokens, tipografia e imagens locais e documentar substituições DEC-16/DEC-17 | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-037, REQ-040 | TEST-14 | Adiada — aguarda nova análise |
 | TASK-12B | 2 / 9 | Ajustar todas as telas em 390/768/1440, adaptações DEC-18 e favoritos; resolver o follow-up de navegação global mobile, barras fixas/safe-area e zoom 200%, sem conteúdo coberto ou overflow indevido | TASK-12A | REQ-004, REQ-037, REQ-039 | TEST-14 | Adiada — aguarda nova análise |
@@ -143,7 +143,7 @@ Tipo, lint e build passaram depois da integração. O matcher do MSW foi validad
 - [x] Fixtures determinísticas: 36 NFTs, três redes/categorias/coleções, dois usuários com recursos privados diferentes, carteiras, cupons e placeholders locais (REQ-030; DEC-17).
 - [x] Banco IndexedDB com schema 1; reset de formato incompatível e transações atômicas. Verificadores PBKDF2 com salt, sem persistir senhas em claro (DEC-05).
 - [x] API-03 de listagem/detalhe: filtros combinados, rede/abas, ordenação/paginação, vazio, 404 e parâmetros inválidos 422 (REQ-006).
-- [x] API-13: status, reset integral e relógio. SCN-01/seed 1 implementados; demais controles/cenários continuam na TASK-11.
+- [x] API-13: status, reset integral e relógio. SCN-01/seed 1 implementados; controles determinísticos adicionais e limites dos cenários foram tratados na TASK-11.
 - [x] Núcleo de cotação/pedidos: revalidação, reserva, fingerprint/chave por usuário, recuperação de resultado, confirmado/recusado terminal e snapshot imutável. Baixa captura lotes para preservar adições posteriores (REQ-016; DEC-08 a DEC-10).
 - [x] 12 testes unitários passaram via `npm run test:unit`; typecheck, lint e build passaram. Testes não abrem browser.
 - [x] Executar `npm run test:e2e`: o usuário confirmou em 07/10/2026 que a suíte passou localmente, incluindo os novos testes de catálogo, persistência e reset em desktop/mobile (`tests/e2e/mock-foundation.spec.ts`) e as provas anteriores. Evidência registrada em TEST-MATRIX; relatório/trace não anexado.
@@ -180,7 +180,8 @@ Na entrega da TASK-05A, compra e favorito ainda estavam indisponíveis; favorito
 - [x] Conectar favorito do catálogo e detalhe; atualizar otimisticamente e reverter em erro; separar a consulta pelo `userId` autenticado.
 - [x] Preparar `tests/e2e/auth.spec.ts` para cadastro/conflito, guard/retorno/refresh, rollback e isolamento entre usuários.
 - [x] Executar TEST-03/TEST-04 em Chromium desktop/mobile; o usuário confirmou que os E2E passaram em 08/10/2026. A tentativa do agente nesta sandbox continua bloqueada antes da inicialização por `listen EPERM` em `127.0.0.1:4173`.
-- [ ] Cobrir cenários de sessão expirada e resposta antiga após troca/reset quando os controles determinísticos da TASK-11 estiverem disponíveis.
+- [x] Cobrir expiração de sessão, 401, retorno interno e retomada após novo login por meio da TASK-11A; E2E confirmado em Chromium desktop/mobile pelo usuário.
+- [ ] Adicionar E2E para uma resposta REST privada antiga que chegue após troca de usuário/reset; a proteção de eventos atrasados está coberta, mas esta variante REST continua sem controle/assertion dedicado (SCN-15).
 
 Typecheck, lint e build passaram; o usuário confirmou os E2E anteriores de autenticação/favoritos em desktop/mobile. A modal desktop segue `Sign In Modal.png` e as medidas confirmadas pelo usuário: 500 × 600 px, abas 20 px/medium, subtítulo 13 px/regular, inputs 40 px, CTA 45 px, link de recuperação 14 px e borda inferior 10 px. Inclui mostrar senha e ações Google/Facebook; recuperação e OAuth exibem avisos de indisponibilidade, sem simular sucesso. `/login` e `/register` seguem acessíveis diretamente, e mobile mantém navegação de página. E2Es cobrem a modal e seus controles, mas a reexecução pelo agente ficou bloqueada anteriormente por `listen EPERM` em `127.0.0.1:4173`; validar localmente antes de encerrar a TASK-06. Perfil e carteiras continuam com páginas protegidas de indisponibilidade e serão implementados na TASK-09.
 
@@ -257,7 +258,7 @@ DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do c
 - [x] Executar TEST-06/parte de TEST-07 em Chromium desktop/mobile; execução confirmada pelo usuário.
 - [x] Executar a cobertura multirrede (SCN-18) em Chromium desktop/mobile junto com a suíte de checkout; execução confirmada pelo usuário.
 
-`npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. O usuário confirmou a execução da suíte de checkout em Chromium desktop/mobile e da cobertura multirrede; TASK-08 encerrada. TEST-07 ainda requer cenários de timeout, cotação alterada e refresh durante pedido pendente, além dos controles determinísticos da TASK-10/11, previstos nas TASK-10/11.
+`npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. O usuário confirmou a execução da suíte de checkout em Chromium desktop/mobile e da cobertura multirrede; TASK-08 encerrada. TEST-07 recebeu cobertura de resposta ambígua e recuperação após refresh na TASK-10E. Um timeout HTTP real por resposta atrasada e outras variantes continuam limitados conforme SCN-11.
 
 ### TASK-09 — gestão de perfil e carteiras (épico)
 
@@ -295,7 +296,7 @@ Decisão de implementação: as imagens da demo ficam em uma URL `data:` dentro 
 
 ### TASK-10 — Eventos, reconexão e recuperação (épico)
 
-Quebrada em cinco entregas por camada: TASK-10A (emissão após persistência), TASK-10B (consumo versionado), TASK-10C (isolamento de sessão), TASK-10D (reconciliação após reconexão) e TASK-10E (recuperação idempotente de pedidos). A expiração de sessão e os controles determinísticos de falha permanecem na TASK-11; a TASK-10C cobre logout e troca de usuário.
+Quebrada em cinco entregas por camada: TASK-10A (emissão após persistência), TASK-10B (consumo versionado), TASK-10C (isolamento de sessão), TASK-10D (reconciliação após reconexão) e TASK-10E (recuperação idempotente de pedidos). Expiração de sessão, controles determinísticos e auditoria de cenários foram concluídos na TASK-11; a TASK-10C cobre logout e troca de usuário.
 
 ### TASK-10A — Emissão de eventos de domínio
 
@@ -344,7 +345,15 @@ TASK-10C concluída. Typecheck, lint, build e 27 testes unitários passaram; o u
 
 ### TASK-11B/C — Controles de rede e reset de avaliação
 
-O usuário confirmou que os E2E desktop/mobile de detalhe/carrinho com falhas de rede e recuperação, e o reset de avaliação com limpeza de storage, passaram. TASK-11B/C concluídas; a TASK-11A (expiração de sessão e retorno) ainda aguarda confirmação de execução E2E.
+O usuário confirmou que os E2E desktop/mobile de detalhe/carrinho com falhas de rede e recuperação, e o reset de avaliação com limpeza de storage, passaram. TASK-11B/C concluídas.
+
+### TASK-11A — Expiração e retomada da sessão
+
+Adicionado E2E que avança o relógio simulado além das 24 horas, verifica o `401` de `/api/auth/session`, a remoção do token expirado, a preservação de `returnTo` e o retorno ao perfil após novo login. Adicionado teste unitário da fronteira exata de expiração, incluindo remoção da sessão expirada. Typecheck, lint e 29 testes unitários passaram. O usuário confirmou a conclusão da TASK-11A.
+
+### TASK-11D — Auditoria de cenários e evidências
+
+Corrigidas as descrições de SCN-07 e SCN-11 após a conclusão das TASK-11A e TASK-10E; atualizados contratos, fluxos e guia de mocks para refletir o comportamento implementado. Registrados os limites reais: sem seletor para os 18 cenários, sem resposta HTTP atrasada além do timeout real, e variantes específicas de pedido pending/evento ou resposta privada antiga ainda não cobertas. A matriz registra as confirmações do usuário para E2E desktop/mobile dos grupos TEST-03, TEST-07, TEST-08, TEST-12 e TEST-16, sem afirmar que relatórios/traces foram anexados. Typecheck, lint, build, 29 testes unitários e diff check passaram; o runner Playwright deste ambiente continua bloqueado por `listen EPERM` antes de iniciar servidor local.
 
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026
 
@@ -388,6 +397,7 @@ Planejamento dividido em TASK-12A a TASK-12F, todas **adiadas até nova análise
 - [ ] **TASK-12F — Aceite e evidências:** executar TEST-11/12 em desktop/mobile e TEST-14 em 390/768/1440; revisar capturas das nove telas e favoritos; preparar/revisar snapshots de início/detalhe/carrinho/checkout para TEST-13 com cenário, relógio, fontes e imagens estáveis; registrar viewport, referência, resultados e desvios em TEST-MATRIX/UI-SPEC. Baselines devem ser revisadas contra as referências, não apenas aprovadas por coincidirem com a aplicação. TASK-13 permanece responsável pela consolidação da suíte e entrega das baselines, HTML e traces.
 
 Verificação desta decomposição: revisão documental do escopo, requisitos, grupos de teste e dependências, além de `git diff --check`. Nenhum teste da aplicação executado ou critério de implementação marcado como concluído. Próximo passo: analisar as evidências e a situação atual da aplicação para definir o escopo e as prioridades; a execução da TASK-12 permanece adiada até essa análise e a confirmação do usuário. Sem commit nesta etapa.
+
 
 ### Destinos auxiliares em construção — 08/10/2026 — Concluído
 
