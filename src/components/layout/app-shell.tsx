@@ -13,7 +13,6 @@ import {
   Home,
   LogIn,
   ScanLine,
-  ShoppingBag,
   ShoppingCart,
   UserRound,
 } from "lucide-react";
@@ -169,7 +168,7 @@ export function AppShell() {
             activeProps={{ className: "text-primary" }}
             aria-label="Carrinho"
           >
-            <ShoppingBag aria-hidden="true" size={20} />
+            <ShoppingCart aria-hidden="true" size={20} />
           </Link>
           <Link
             to="/profile"
