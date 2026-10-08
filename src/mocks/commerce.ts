@@ -82,6 +82,126 @@ export function addCartItem(
   return cart;
 }
 
+export function setCartQuantity(
+  state: DatabaseState,
+  owner: string,
+  lineId: string,
+  quantity: number,
+  expectedVersion: number,
+): StoredCart {
+  try { assertQuantity(quantity) } catch { invalid("Quantidade inválida.") }
+  const cart = getStoredCart(state, owner)
+  assertCartVersion(cart, expectedVersion)
+  const line = cart.items.find((item) => item.id === lineId)
+  if (!line) throw new MockError(404, "NOT_FOUND", "Item não encontrado no carrinho.")
+  const nft = readNft(state, line.nftId)
+  const edition = nft.editions.find((item) => item.id === line.editionId)
+  if (!edition) throw new MockError(404, "NOT_FOUND", "Edição não encontrada.")
+  if (quantity > edition.available)
+    throw new MockError(409, "STOCK_CONFLICT", "Quantidade indisponível.")
+  const current = line.lots.reduce((sum, lot) => sum + lot.quantity, 0)
+  if (quantity < current) {
+    let toRemove = current - quantity
+    for (let index = line.lots.length - 1; index >= 0 && toRemove > 0; index--) {
+      const lot = line.lots[index]!
+      const removed = Math.min(lot.quantity, toRemove)
+      lot.quantity -= removed
+      toRemove -= removed
+    }
+    line.lots = line.lots.filter((lot) => lot.quantity > 0)
+  } else if (quantity > current) {
+    line.lots.push({ id: nextId(state, "lot"), quantity: quantity - current })
+  }
+  cart.version += 1
+  return cart
+}
+
+export function removeCartItem(state: DatabaseState, owner: string, lineId: string, expectedVersion: number): StoredCart {
+  const cart = getStoredCart(state, owner)
+  assertCartVersion(cart, expectedVersion)
+  const index = cart.items.findIndex((item) => item.id === lineId)
+  if (index < 0) throw new MockError(404, "NOT_FOUND", "Item não encontrado no carrinho.")
+  cart.items.splice(index, 1)
+  cart.version += 1
+  return cart
+}
+
+export function setCartCoupon(state: DatabaseState, owner: string, code: string | null, expectedVersion: number): StoredCart {
+  const cart = getStoredCart(state, owner)
+  assertCartVersion(cart, expectedVersion)
+  if (code) discountBps(state, code)
+  if (cart.couponCode !== code) {
+    cart.couponCode = code
+    cart.version += 1
+  }
+  return cart
+}
+
+export function mergeGuestCart(state: DatabaseState, userId: string, guestId: string, guestVersion: number): Cart {
+  requireUser(state, userId)
+  if (!/^[a-z0-9-]{8,80}$/i.test(guestId)) invalid("Identificador de visitante inválido.")
+  const owner = `guest:${guestId}`
+  const guest = getStoredCart(state, owner)
+  const previousMerge = state.mergedGuestCarts[guestId]
+  if (previousMerge && previousMerge.guestVersion === guestVersion) {
+    return { ...readCart(state, `user:${userId}`), notices: [{ code: "GUEST_CART_ALREADY_MERGED", message: "O carrinho de visitante já foi combinado." }] }
+  }
+  assertCartVersion(guest, guestVersion)
+  const userCart = getStoredCart(state, `user:${userId}`)
+  const notices: Cart["notices"] = []
+  let changed = false
+  for (const guestLine of guest.items) {
+    const nft = state.nfts.find((item) => item.id === guestLine.nftId)
+    const edition = nft?.editions.find((item) => item.id === guestLine.editionId)
+    if (!nft || !edition) {
+      notices.push({ code: "ITEM_UNAVAILABLE", message: "Um item indisponível não foi transferido." })
+      continue
+    }
+    const currentEdition = readNft(state, nft.id).editions.find((item) => item.id === edition.id)
+    if (!currentEdition) {
+      notices.push({ code: "ITEM_UNAVAILABLE", message: `A edição de ${nft.name} não está mais disponível.` })
+      continue
+    }
+    const quantity = guestLine.lots.reduce((sum, lot) => sum + lot.quantity, 0)
+    const currentLine = userCart.items.find((item) => item.nftId === nft.id && item.editionId === edition.id)
+    const current = currentLine?.lots.reduce((sum, lot) => sum + lot.quantity, 0) ?? 0
+    const transferable = Math.max(0, Math.min(quantity, currentEdition.available - current))
+    if (transferable > 0) {
+      const target = currentLine ?? { id: nextId(state, "line"), nftId: nft.id, editionId: edition.id, lots: [] }
+      if (!currentLine) userCart.items.push(target)
+      let remaining = transferable
+      for (const lot of guestLine.lots) {
+        if (remaining === 0) break
+        const moved = Math.min(lot.quantity, remaining)
+        if (moved > 0) target.lots.push({ id: nextId(state, "lot"), quantity: moved })
+        remaining -= moved
+      }
+      changed = true
+    }
+    if (transferable < quantity) notices.push({ code: "STOCK_CONFLICT", message: `A quantidade de ${nft.name} foi limitada ao estoque disponível.` })
+  }
+  if (guest.couponCode) {
+    if (!userCart.couponCode) {
+      try {
+        discountBps(state, guest.couponCode)
+        userCart.couponCode = guest.couponCode
+        changed = true
+      } catch (error) {
+        notices.push({ code: error instanceof MockError ? error.body.error.code : "COUPON_INVALID", message: "O cupom do carrinho de visitante não foi transferido." })
+      }
+    } else if (guest.couponCode !== userCart.couponCode) {
+      notices.push({ code: "COUPON_CONFLICT", message: "O cupom do carrinho de visitante não foi aplicado porque já existe outro cupom." })
+    }
+  }
+  if (changed) userCart.version += 1
+  const originalVersion = guest.version
+  guest.items = []
+  guest.couponCode = null
+  guest.version += 1
+  state.mergedGuestCarts[guestId] = { guestVersion: originalVersion, mergedAtVersion: userCart.version }
+  return { ...readCart(state, `user:${userId}`), notices }
+}
+
 function discountBps(state: DatabaseState, code: string | null): number {
   if (!code) return 0;
   const coupon = Object.hasOwn(state.coupons, code)
@@ -109,6 +229,8 @@ export function readCart(
       id: line.id,
       nftId: nft.id,
       editionId: edition.id,
+      editionLabel: edition.label,
+      tokenId: nft.tokenId,
       quantity,
       name: nft.name,
       imageUrl: nft.images[0]!.url,

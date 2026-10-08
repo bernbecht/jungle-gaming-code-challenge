@@ -1,7 +1,7 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
 import { delay, http, HttpResponse, ws } from 'msw'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
-import { advanceClock } from './commerce'
+import { addCartItem, advanceClock, mergeGuestCart, readCart, removeCartItem, setCartCoupon, setCartQuantity } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
 import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite } from './auth'
@@ -37,7 +37,76 @@ function stringField(body: Record<string, unknown>, name: string) {
   return body[name] as string
 }
 
+function numberField(body: Record<string, unknown>, name: string) {
+  if (typeof body[name] !== 'number' || !Number.isSafeInteger(body[name])) invalid(`Campo ${name} inválido.`)
+  return body[name] as number
+}
+
+function guestOwner(request: Request) {
+  const guestId = request.headers.get('X-Guest-Id')
+  if (!guestId || !/^[a-z0-9-]{8,80}$/i.test(guestId)) throw new MockError(400, 'GUEST_ID_REQUIRED', 'Identificador do visitante ausente ou inválido.')
+  return `guest:${guestId}`
+}
+
+function versionHeader(request: Request) {
+  const value = request.headers.get('If-Match')?.replace(/^W\//, '').replace(/^"|"$/g, '')
+  const version = Number(value)
+  if (!Number.isSafeInteger(version) || version < 1) throw new MockError(400, 'VERSION_REQUIRED', 'Informe a versão atual do carrinho em If-Match.')
+  return version
+}
+
 export const handlers = [
+  http.get('/api/cart', ({ request }) => respond(() => transact(state => {
+    const token = readToken(request)
+    const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+    return readCart(state, owner)
+  }))),
+  http.post('/api/cart/items', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const input = { nftId: stringField(body, 'nftId'), editionId: stringField(body, 'editionId'), quantity: numberField(body, 'quantity'), expectedVersion: numberField(body, 'expectedVersion') }
+    return transact(state => {
+      const token = readToken(request)
+      const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+      addCartItem(state, owner, input)
+      return readCart(state, owner)
+    })
+  })),
+  http.patch('/api/cart/items/:id', async ({ request, params }) => respond(async () => {
+    const body = await readBody(request)
+    return transact(state => {
+      const token = readToken(request)
+      const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+      setCartQuantity(state, owner, String(params.id), numberField(body, 'quantity'), numberField(body, 'expectedVersion'))
+      return readCart(state, owner)
+    })
+  })),
+  http.delete('/api/cart/items/:id', ({ request, params }) => respond(() => transact(state => {
+    const token = readToken(request)
+    const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+    removeCartItem(state, owner, String(params.id), versionHeader(request))
+    return readCart(state, owner)
+  }))),
+  http.put('/api/cart/coupon', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    return transact(state => {
+      const token = readToken(request)
+      const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+      setCartCoupon(state, owner, stringField(body, 'code').trim().toUpperCase(), numberField(body, 'expectedVersion'))
+      return readCart(state, owner)
+    })
+  })),
+  http.delete('/api/cart/coupon', ({ request }) => respond(() => transact(state => {
+    const token = readToken(request)
+    const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+    setCartCoupon(state, owner, null, versionHeader(request))
+    return readCart(state, owner)
+  }))),
+  http.post('/api/cart/merge', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const guestId = stringField(body, 'guestId')
+    const guestVersion = numberField(body, 'guestVersion')
+    return transact(state => mergeGuestCart(state, requireSession(state, readToken(request)).userId, guestId, guestVersion))
+  })),
   http.post('/api/auth/login', async ({ request }) => respond(async () => {
     const body = await readBody(request)
     const input = { email: stringField(body, 'email'), password: stringField(body, 'password') }

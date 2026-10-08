@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { env } from '@/lib/env'
+import { getGuestId } from '@/lib/guest-id'
 
 // Os serviços de cada recurso usarão esta instância e receberão AbortSignal.
 // Sessão/interceptors e contratos de negócio serão adicionados nas TASK-04/06.
@@ -13,6 +14,7 @@ http.interceptors.request.use(config => {
   const token = typeof sessionStorage === 'undefined' ? null : sessionStorage.getItem('kurio-session-token')
   if (token) config.headers.set('Authorization', `Bearer ${token}`)
   else config.headers.delete('Authorization')
+  if (typeof localStorage !== 'undefined') config.headers.set('X-Guest-Id', getGuestId())
   return config
 })
 

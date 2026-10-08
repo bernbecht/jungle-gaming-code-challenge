@@ -11,8 +11,9 @@ Modelos v1 em `src/contracts/marketplace.ts` cobrem rede, abas Novos/Em alta, or
 - API-03: `GET /api/nfts` e `GET /api/nfts/:id` implementados via MSW e IndexedDB.
 - API-13: `GET /api/__mock/status`, `POST /api/__mock/reset` e `POST /api/__mock/clock` implementados. Somente SCN-01 e seed 1 são aceitos nesta etapa.
 - API-01/API-02/API-04: cadastro, sessão e favoritos estão ligados aos handlers MSW; verificar a cobertura E2E antes de considerar TEST-03/TEST-04 aprovados.
-- API-08/API-09: funções de cotação, reserva, idempotência e resolução existem em `src/mocks/commerce.ts`. Seus endpoints privados serão conectados nas tarefas de carrinho/checkout; não há compra exposta pela API nesta etapa.
-- API-05/API-06/API-07/API-10/API-11/API-12 e eventos de domínio: contratos preparados; handlers/fluxos ainda pendentes.
+- API-05/API-06/API-07: carrinho e cupons estão ligados aos handlers MSW/IndexedDB; visitante é identificado por `X-Guest-Id`, autenticado pelo bearer token. Merge consome a versão de origem uma vez e devolve avisos para estoque/cupom não transferidos.
+- API-08/API-09: funções de cotação, reserva, idempotência e resolução existem em `src/mocks/commerce.ts`. Endpoints privados e telas de checkout continuam pendentes na TASK-08.
+- API-10/API-11/API-12 e eventos de domínio: contratos preparados; handlers/fluxos ainda pendentes.
 
 ## Convenções
 

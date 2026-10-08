@@ -12,6 +12,8 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { signIn, signUp } from "./api";
 import type { AuthDialogMode } from "./auth-dialog-types";
+import { cartQuery, getGuestId, mergeGuestCart } from "@/features/cart/api";
+import type { Cart } from "@/contracts/marketplace";
 
 export function AuthForm({
   mode,
@@ -40,10 +42,28 @@ export function AuthForm({
   const mutation = useMutation({
     mutationFn: (input: LoginInput | RegisterInput) =>
       isRegister ? signUp(input as RegisterInput) : signIn(input as LoginInput),
-    onSuccess: async (user) => {
+    onMutate: async () => {
+      try {
+        const guestId = getGuestId();
+        const guestCart = await queryClient.ensureQueryData(cartQuery(`guest:${guestId}`));
+        return { guestId, guestCart };
+      } catch {
+        return undefined;
+      }
+    },
+    onSuccess: async (user, _input, context) => {
+      let mergedCart: Cart | undefined;
+      if (context?.guestCart) {
+        try {
+          mergedCart = await mergeGuestCart(context.guestId, context.guestCart.version);
+        } catch {
+          setNotice("Você entrou, mas não foi possível sincronizar o carrinho. Atualize a página para tentar novamente.");
+        }
+      }
       await queryClient.cancelQueries({ queryKey: ["session"] });
       queryClient.clear();
       queryClient.setQueryData(["session"], user);
+      if (mergedCart) queryClient.setQueryData(["cart", `user:${user.id}`], mergedCart);
       onAuthenticated(user);
     },
     onError: (cause: unknown) => {

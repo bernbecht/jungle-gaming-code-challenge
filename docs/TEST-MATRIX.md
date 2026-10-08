@@ -1,6 +1,6 @@
 # Matriz de testes e evidências
 
-Status: **smoke do shell, E2E anteriores de catálogo/detalhe (TEST-01/02 e parte de TEST-12), revisão responsiva da TASK-05 em 390/768/1440, REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 15 testes unitários aprovados pelo agente. TEST-03/04 de autenticação/favoritos estão preparados, aguardando execução local; checkout e demais fluxos ainda serão implementados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
+Status: **smoke do shell, E2E anteriores de catálogo/detalhe, revisão responsiva da TASK-05 em 390/768/1440, REST/Socket.IO, fundação MSW/IndexedDB e TEST-03/04 de autenticação/favoritos aprovados pelo usuário; 17 testes unitários passaram nesta árvore. E2E de carrinho foram preparados e aguardam execução local; checkout e demais fluxos ainda serão implementados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
 
 Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENARIOS.md). Contratos: [CONTRACTS](CONTRACTS.md). Execução: TASK-13 a TASK-15 em [TASKS](../TASKS.md).
 
@@ -58,6 +58,7 @@ Preencher uma linha por grupo/projeto executado. `Não executado` é diferente d
 | TEST-17 — núcleo financeiro/idempotência (parcial) | Árvore de trabalho TASK-04 | 12 testes unitários passaram, executados pelo agente | `npm run test:unit`; `tests/unit/marketplace.spec.ts` | Precisão wei, filtros/paginação, fixtures, fingerprint, cotação alterada, reserva, recusa, snapshot e remoção de lotes. Não comprova checkout na interface. Typecheck, lint e build também passaram. |
 | Fundação MSW/IndexedDB — catálogo, refresh e reset | Árvore de trabalho TASK-04 | Passou, conforme confirmação do usuário em 07/10/2026 | `npm run test:e2e`; `tests/e2e/mock-foundation.spec.ts`; terminal local do usuário | Suíte desktop/mobile, incluindo shell e provas REST/Socket.IO. Relatório/trace não anexado. Tentativa do agente bloqueada antes dos testes por `listen EPERM` em `127.0.0.1:4173`. Não comprova fluxos de catálogo/compra na interface. |
 | TEST-03/TEST-04 — autenticação e favoritos | Árvore de trabalho TASK-06 | Passou, conforme confirmação do usuário em 08/10/2026 | `npx playwright test tests/e2e/auth.spec.ts`; terminal local do usuário | Execução em Chromium desktop/mobile confirmada pelo usuário, sem relatório/trace anexado. A execução do agente segue bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`. |
+| TEST-05 — carrinho e cupom | Árvore de trabalho TASK-07 | E2E preparado; não executado | `tests/e2e/cart.spec.ts` | A tentativa do agente foi bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`. Typecheck, lint, build e 17 testes unitários passaram. |
 
 ## Evidência de referência visual (não é execução de teste)
 

@@ -15,6 +15,7 @@ Os fluxos abaixo são a especificação do comportamento esperado. A existência
 | FLOW-03 | Criar conta, autenticar, recuperar sessão e sair | REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | API-01, API-02 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-08; TEST-03 |
 | FLOW-04 | Consultar e alternar favoritos com autenticação | REQ-008, REQ-021, REQ-023, REQ-027 | API-02, API-04 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-15; TEST-03, TEST-04 |
 | FLOW-05 | Filtrar e explorar o catálogo | REQ-005, REQ-006, REQ-026 | API-03 | TASK-05, TASK-12 | TEST-01, TEST-12, TEST-14 |
+| FLOW-06 | Manter e revisar o carrinho de visitante ou usuário | REQ-009, REQ-010, REQ-011, REQ-012 | API-05, API-06, API-07 | TASK-07, TASK-11 | SCN-01, SCN-09; TEST-05, TEST-17 |
 
 ## FLOW-01: Compra
 
@@ -269,3 +270,20 @@ flowchart TD
 ## Como manter este documento
 
 Ao mudar um comportamento, atualize o fluxo e confira seus vínculos com requisitos, contratos, tarefas e testes. Novos fluxos recebem novos IDs; os existentes não são renumerados. Tempos específicos, bibliotecas, funções e armazenamento pertencem à arquitetura/guia técnico, enquanto este documento descreve o que o usuário deve observar.
+
+## FLOW-06: Carrinho e cupom
+
+**Objetivo:** permitir montar e revisar o carrinho antes de autenticar, sem perder itens ao atualizar a página ou entrar na conta.
+
+**Identidade:** visitante usa um `guestId` estável guardado no navegador e enviado em `X-Guest-Id`; depois do login/cadastro, o bearer token identifica o carrinho da conta. A UI nunca escolhe o `userId` da operação.
+
+### Caminho principal
+
+1. O detalhe envia NFT, edição, quantidade e versão do carrinho à API. A API valida edição, inteiro positivo, versão e estoque.
+2. Carrinho e cupom ficam no IndexedDB do mock. A página consulta a API ao abrir/atualizar, e subtotais, descontos, taxa estimada e total são calculados no servidor usando wei inteiro.
+3. Alterar/remover quantidade envia a versão lida. Conflito de versão ou estoque mantém o estado do servidor e pede nova consulta; não aplica uma alteração local silenciosa.
+4. Aplicar cupom válido atualiza a versão e o resumo. Código inválido/expirado retorna erro sem alterar o carrinho; remover cupom é uma operação explícita.
+5. No login/cadastro, o cliente captura a versão do carrinho visitante antes de autenticar e chama o merge privado. Merge repetido para a mesma versão não duplica linhas. Estoque insuficiente e conflito entre cupons aparecem como avisos, sem ocultar itens sem explicação.
+6. O carrinho da conta passa a ser a origem após autenticar. Checkout continua uma etapa protegida e separada (FLOW-01/TASK-08).
+
+**Resultado:** carrinho permanece disponível em refresh, visitante pode começar sem conta, e totais exibidos refletem a resposta da API. Preço/estoque podem mudar e serão revalidados na cotação de checkout.

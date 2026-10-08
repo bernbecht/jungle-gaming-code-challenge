@@ -57,6 +57,7 @@ export async function createFixtures(now = BASE_TIME): Promise<DatabaseState> {
       'user:user-a': { id: 'cart-user-a', version: 1, items: [], couponCode: null },
       'user:user-b': { id: 'cart-user-b', version: 1, items: [], couponCode: null },
     },
+    mergedGuestCarts: {},
     sessions: {}, connections: {}, quotes: {}, orders: {}, attempts: {}, reservations: {},
     coupons: { NFT10: { discountBps: 1000, expiresAt: now + 365 * 86_400_000 }, EXPIRED: { discountBps: 1000, expiresAt: now - 1 } },
     networkFees: { ethereum: '0.001', polygon: '0.0001', solana: '0.00001' },

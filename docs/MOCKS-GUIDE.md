@@ -17,18 +17,24 @@ Rastreabilidade: REQ-029, REQ-030; DEC-03, DEC-05; API-03, API-13.
 | Arquivo | Responsabilidade | Relações principais |
 | --- | --- | --- |
 | [contracts/marketplace.ts](../src/contracts/marketplace.ts) | Define os formatos públicos: NFT, perfil, carteira, carrinho, cotação, pedido e eventos | Tipos compartilhados por mocks e futuros serviços/telas; REQ-025, DEC-19 |
-| [mocks/state.ts](../src/mocks/state.ts) | Define a organização interna do banco, sua versão, relógio, reservas, tentativas e lotes de quantidade | Usado por fixtures, database, catálogo e comércio; DEC-05, DEC-10 |
+| [mocks/state.ts](../src/mocks/state.ts) | Define a organização interna do banco, sua versão, relógio, reservas, tentativas, carrinhos de visitante e lotes de quantidade | Usado por fixtures, database, catálogo e comércio; DEC-05, DEC-10 |
 | [mocks/fixtures.ts](../src/mocks/fixtures.ts) | Cria os dados iniciais e verificadores das senhas fictícias | Usa contratos/state; database usa as fixtures na inicialização e no reset; REQ-030, DEC-17 |
 | [mocks/database.ts](../src/mocks/database.ts) | Abre IndexedDB, carrega/salva o estado e executa operações em uma transação | Recebe uma função que consulta/altera o estado; usa fixtures e a versão de state; DEC-05 |
 | [lib/money.ts](../src/lib/money.ts) | Converte ETH para wei e calcula subtotal, desconto, taxa e total com precisão | Usado pelo catálogo para comparar preços e por commerce para calcular totais; REQ-012, DEC-06 |
 | [mocks/catalog.ts](../src/mocks/catalog.ts) | Valida parâmetros, consulta NFTs e aplica filtros, ordenação e paginação | Recebe o estado do banco; considera reservas para mostrar disponibilidade; REQ-006, API-03 |
-| [mocks/commerce.ts](../src/mocks/commerce.ts) | Aplica regras de carrinho, cotação, reserva, idempotência e resolução de pedidos | Recebe o estado; usa catálogo, dinheiro e erros; REQ-012, REQ-016, DEC-08 a DEC-10 |
+| [mocks/commerce.ts](../src/mocks/commerce.ts) | Aplica regras de carrinho, merge de visitante, cupom, cotação, reserva, idempotência e resolução de pedidos | Recebe o estado; usa catálogo, dinheiro e erros; REQ-009 a REQ-012, REQ-016, DEC-08 a DEC-10 |
 | [mocks/errors.ts](../src/mocks/errors.ts) | Representa erros com status HTTP, código e mensagem | Regras lançam MockError; handlers transformam o erro em resposta; API-03, API-08, API-09 |
 | [mocks/handlers.ts](../src/mocks/handlers.ts) | Liga endereços HTTP e conexões Socket.IO ao comportamento simulado | Aciona database e regras; devolve JSON ou erro; REQ-029 |
 | [mocks/browser.ts](../src/mocks/browser.ts) | Inicializa o banco e inicia o worker MSW | Configura os handlers e verifica o cenário disponível; DEC-04 |
 | [app/providers.tsx](../src/app/providers.tsx) | Aguarda a inicialização dos mocks antes de montar as rotas | Chama initializeMocks de browser.ts quando mocks estão habilitados |
 
 `marketplace.ts` descreve o que pode trafegar pela API. `state.ts` inclui detalhes internos que não precisam chegar à tela: verificadores de senha, reservas, fingerprint de tentativas e lotes do carrinho. Essa separação evita devolver o banco inteiro em uma resposta.
+
+## Carrinho visitante e merge após autenticação
+
+O fluxo funcional está em [FLOW-06](FLOWS.md#flow-06-carrinho-e-cupom). `lib/guest-id.ts` cria e persiste um identificador anônimo no `localStorage`; o interceptor Axios envia `X-Guest-Id`. Sem bearer token, os handlers gravam em `guest:<id>`; com token, usam `user:<id>`. O identificador de visitante nunca concede acesso ao carrinho de uma conta.
+
+Ao entrar/criar conta, o formulário lê a versão do carrinho visitante antes de gravar a sessão e chama `POST /api/cart/merge`. O reducer move as quantidades para o carrinho autenticado, respeita estoque, comunica conflitos como avisos e marca a versão de origem consumida. Repetir a mesma versão retorna o resultado sem duplicar itens. A versão do schema do IndexedDB mudou para 2; o banco antigo é semeado novamente para manter o estado compatível.
 
 ## Exemplo: consultar o catálogo
 

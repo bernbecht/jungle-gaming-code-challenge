@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import type { OrderInput, Quote } from '../../src/contracts/marketplace'
 import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
-import { addCartItem, advanceClock, createQuote, getStoredCart, readCart, readOrder, settleOrder, submitOrder } from '../../src/mocks/commerce'
+import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
 import { BASE_TIME } from '../../src/mocks/state'
 import type { DatabaseState } from '../../src/mocks/state'
@@ -176,6 +176,40 @@ test('expired or unknown coupon is rejected by quote creation without changing t
     expect(readCart(state, 'user:user-a').totals.discount).toBe('0')
   }
   expect(state.now).toBe(BASE_TIME)
+})
+
+test('cart quantity changes respect stock, exact coupons, removal and optimistic versions', async () => {
+  const state = await createFixtures()
+  addCartItem(state, 'guest:guest-test-0001', { nftId: 'nft-001', editionId: 'nft-001-limited', quantity: 2, expectedVersion: 1 })
+  const cart = readCart(state, 'guest:guest-test-0001')
+  expect(cart.items[0]!.quantity).toBe(2)
+  const updated = setCartQuantity(state, 'guest:guest-test-0001', cart.items[0]!.id, 4, cart.version)
+  const staleVersion = updated.version
+  expect(readCart(state, 'guest:guest-test-0001').items[0]!.quantity).toBe(4)
+  expect(() => setCartQuantity(state, 'guest:guest-test-0001', cart.items[0]!.id, 11, updated.version)).toThrow(/Quantidade indisponível/)
+  const discounted = setCartCoupon(state, 'guest:guest-test-0001', 'NFT10', updated.version)
+  expect(readCart(state, 'guest:guest-test-0001').totals.discount).toBe('0.004')
+  expect(() => setCartCoupon(state, 'guest:guest-test-0001', 'EXPIRED', discounted.version)).toThrow(/Cupom expirado/)
+  expect(() => removeCartItem(state, 'guest:guest-test-0001', cart.items[0]!.id, staleVersion)).toThrow(/atualizado/)
+  const discountedVersion = discounted.version
+  const removed = removeCartItem(state, 'guest:guest-test-0001', cart.items[0]!.id, discounted.version)
+  expect(readCart(state, 'guest:guest-test-0001').items).toEqual([])
+  expect(removed.version).toBe(discountedVersion + 1)
+})
+
+test('guest cart merge is idempotent and reports inventory limits', async () => {
+  const state = await createFixtures()
+  const guestId = 'guest-test-0001'
+  addCartItem(state, `guest:${guestId}`, { nftId: 'nft-001', editionId: 'nft-001-unique', quantity: 1, expectedVersion: 1 })
+  addCartItem(state, `guest:${guestId}`, { nftId: 'nft-001', editionId: 'nft-001-limited', quantity: 8, expectedVersion: 2 })
+  addCartItem(state, 'user:user-a', { nftId: 'nft-001', editionId: 'nft-001-limited', quantity: 4, expectedVersion: 1 })
+  const merged = mergeGuestCart(state, 'user-a', guestId, 3)
+  expect(merged.items.find((item) => item.editionId.endsWith('limited'))?.quantity).toBe(10)
+  expect(merged.notices.some((notice) => notice.code === 'STOCK_CONFLICT')).toBe(true)
+  const repeated = mergeGuestCart(state, 'user-a', guestId, 3)
+  expect(repeated.items.find((item) => item.editionId.endsWith('limited'))?.quantity).toBe(10)
+  expect(repeated.notices[0]?.code).toBe('GUEST_CART_ALREADY_MERGED')
+  expect(readCart(state, `guest:${guestId}`).items).toEqual([])
 })
 
 test('facet counts represent NFTs once and follow changes to catalog categories and networks', async () => {

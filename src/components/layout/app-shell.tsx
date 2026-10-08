@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sessionQuery, signOut } from "@/features/auth/api";
 import { useAuthDialog } from "@/features/auth/use-auth-dialog";
 import { AuthDialog } from "@/features/auth/auth-dialog";
+import { cartQuery, getGuestId } from "@/features/cart/api";
 import {
   Heart,
   Home,
@@ -19,6 +20,8 @@ import {
 
 export function AppShell() {
   const session = useQuery(sessionQuery);
+  const cartIdentity = session.data ? `user:${session.data.id}` : `guest:${getGuestId()}`;
+  const cart = useQuery({ ...cartQuery(cartIdentity), enabled: !session.isPending });
   const queryClient = useQueryClient();
   const router = useRouter();
   const authDialog = useAuthDialog();
@@ -34,7 +37,7 @@ export function AppShell() {
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
   const isNftDetail = pathname.startsWith("/nfts/");
-  const isMarketActive = isNftDetail || (isHome && hash === "colecoes");
+  const isMarketActive = isNftDetail || pathname === "/cart" || pathname === "/checkout" || (isHome && hash === "colecoes");
   const isHomeActive = isHome && !isMarketActive;
   return (
     <div className="min-h-dvh">
@@ -94,7 +97,10 @@ export function AppShell() {
           <HeaderSearch />
           <Button variant="ghost" size="icon" asChild>
             <Link to="/cart" aria-label="Carrinho de NFTs">
-              <ShoppingCart aria-hidden="true" />
+              <span className="relative inline-flex">
+                <ShoppingCart aria-hidden="true" />
+                {!!cart.data?.items.length && <span aria-hidden="true" className="absolute -right-2 -top-2 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-4 text-primary-foreground">{cart.data.items.reduce((total, item) => total + item.quantity, 0)}</span>}
+              </span>
             </Link>
           </Button>
           {session.data ? <>

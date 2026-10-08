@@ -12,6 +12,7 @@ import { ErrorPage } from '@/routes/error-page'
 import { IntegrationProofPage } from '@/routes/integration-proof-page'
 import { AuthPage } from '@/routes/auth-page'
 import { sessionQuery } from '@/features/auth/api'
+import { CartPage } from '@/routes/cart-page'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: AppShell,
@@ -32,7 +33,7 @@ async function requireUser({ context, location }: { context: { queryClient: Quer
 const cartRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/cart',
-  component: () => createElement(UnavailablePage, { title: 'Carrinho de NFTs' }),
+  component: CartPage,
 })
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,

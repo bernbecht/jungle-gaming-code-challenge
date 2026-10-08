@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 em andamento; TASK-07 a TASK-15 a fazer. Cadastro, login/logout, guards e favoritos começaram na TASK-06. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-07 em andamento; TASK-08 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -29,7 +29,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-05 | 1 / 3 | Base da home (hero/catálogo) e detalhe; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Concluída |
 | TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: destaque sob os filtros, banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | TEST-19; comparação com UI-01 em TEST-14 (TASK-12) | Concluída |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback (FLOW-03, FLOW-04) | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | Em andamento |
-| TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | A fazer |
+| TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | Em andamento |
 | TASK-08 | 1 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | A fazer |
 | TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
 | TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
@@ -200,3 +200,18 @@ Refino da imagem principal: cantos arredondados e recorte de overflow aplicados 
 Revisão UI-01 — header desktop: removido o border-bottom global; links Início/Mercado usam estado ativo de aba (texto cobre, borda inferior com respiro) conforme home/detalhe/catálogo.
 
 Revisão UI-01 — navegação desktop: adicionados Criadores (leva ao catálogo, pois páginas editoriais de criadores estão fora do escopo) e Aprenda (leva à seção explicativa existente); ícone do carrinho do header trocado de sacola para carrinho.
+
+### TASK-07 — carrinho (em andamento)
+
+- [x] Expor API-05/06/07 para visitante e usuário autenticado: consulta, adição, quantidade, remoção, cupom e merge.
+- [x] Persistir identidade de visitante em `localStorage` e carrinho no IndexedDB; manter carrinhos separados por usuário.
+- [x] Limitar quantidades ao estoque e usar versão esperada para rejeitar atualizações concorrentes; calcular totais e desconto no mock com precisão wei.
+- [x] Fazer merge idempotente ao autenticar/cadastrar; reportar itens limitados por estoque e conflitos de cupom.
+- [x] Substituir `/cart` indisponível por tela responsiva com estados vazio/loading/erro, quantidades, remoção, cupom e resumo da API.
+- [x] Habilitar adicionar NFT/edição/quantidade pelo detalhe e mostrar contagem no carrinho do header.
+- [x] Preparar cobertura unitária para estoque, versão, cupom e merge; preparar E2E `tests/e2e/cart.spec.ts` para visitante, refresh, cupom e autenticação.
+- [ ] Executar TEST-05 em Chromium desktop/mobile após revisão local do usuário; completar correções de UI/fluxo que os E2E apontarem.
+
+Execução desta etapa: typecheck, lint, build e 17 testes unitários passaram. E2E `tests/e2e/cart.spec.ts` preparado; execução pelo agente bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`.
+
+Refino visual após comparar UI-03: breadcrumb e navegação Mercado ativa; colunas NFTs/Preço/Edições/Total, token ID, linhas compactas e steppers preenchidos; resumo alinhado e sem card destacado, com rótulos do mockup, CTA/link agrupados; recomendações com cinco cards e paginação antes do footer. Revisão visual final e E2E local permanecem pendentes.

@@ -9,7 +9,7 @@ import {
 } from "@/features/catalog/components";
 import { lowestEdition } from "@/features/catalog/price";
 import { defaultCatalog } from "@/features/catalog/search";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import axios from "axios";
 import {
@@ -21,6 +21,8 @@ import {
   Twitter,
 } from "lucide-react";
 import { FavoriteButton } from "@/features/favorites/favorite-button";
+import { addCartItem, cartQuery, getGuestId } from "@/features/cart/api";
+import { sessionQuery } from "@/features/auth/api";
 import { useRef, useState } from "react";
 
 function CollectorRating({ rating, count }: { rating: number; count: number }) {
@@ -52,6 +54,37 @@ function CollectorRating({ rating, count }: { rating: number; count: number }) {
       <span className="text-sm">{count} avaliações de colecionadores</span>
     </span>
   );
+}
+
+function AddToCartButton({ nft, editionId, quantity, disabled, iconOnly = false }: { nft: Nft; editionId: string; quantity: number; disabled: boolean; iconOnly?: boolean }) {
+  const session = useQuery(sessionQuery)
+  const identity = session.data ? `user:${session.data.id}` : `guest:${getGuestId()}`
+  const key = ['cart', identity]
+  const queryClient = useQueryClient()
+  const cart = useQuery({ ...cartQuery(identity), enabled: !session.isPending })
+  const mutation = useMutation({
+    mutationFn: () => addCartItem({ nftId: nft.id, editionId, quantity, expectedVersion: cart.data!.version }),
+    onSuccess: (updated) => queryClient.setQueryData(key, updated),
+    onError: () => void queryClient.invalidateQueries({ queryKey: key }),
+  })
+  const isDisabled = disabled || session.isPending || cart.isPending || cart.isError || mutation.isPending
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button
+        type="button"
+        variant={iconOnly ? "outline" : "default"}
+        size={iconOnly ? "icon" : "default"}
+        className={iconOnly ? "size-14 rounded-full" : "min-h-11"}
+        disabled={isDisabled}
+        aria-label={iconOnly ? `Adicionar ${nft.name} ao carrinho` : undefined}
+        onClick={() => mutation.mutate()}
+      >
+        {iconOnly ? <ShoppingCart aria-hidden="true" /> : <><ShoppingCart aria-hidden="true" />Adicionar ao carrinho</>}
+      </Button>
+      {mutation.isSuccess && <span role="status" className="text-sm text-primary">Adicionado ao carrinho.</span>}
+      {mutation.isError && <span role="alert" className="text-sm text-destructive">Não foi possível adicionar. Atualize o carrinho e tente novamente.</span>}
+    </div>
+  )
 }
 
 export function NftDetailPage() {
@@ -265,6 +298,7 @@ function NftDetail({ nft }: { nft: Nft }) {
               <Button className="uppercase" disabled>
                 Comprar
               </Button>
+              <AddToCartButton nft={nft} editionId={edition.id} quantity={quantity} disabled={edition.available === 0} />
               <FavoriteButton nftId={nft.id} name={nft.name} showLabel className="min-h-11 gap-2 rounded-md border border-border px-4 text-sm font-semibold hover:bg-muted" />
             </div>
           </div>
@@ -469,15 +503,7 @@ function NftDetail({ nft }: { nft: Nft }) {
           <Button disabled className="h-14 flex-1 rounded-full">
             Comprar NFT
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-14 rounded-full"
-            disabled
-            aria-label="Adicionar ao carrinho indisponível nesta etapa"
-          >
-            <ShoppingCart aria-hidden="true" />
-          </Button>
+          <AddToCartButton nft={nft} editionId={edition.id} quantity={quantity} disabled={edition.available === 0} iconOnly />
         </div>
       </div>
     </div>

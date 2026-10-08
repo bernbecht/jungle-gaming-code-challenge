@@ -36,7 +36,7 @@ export type Collector = {
   ensName: string | null; referralCode: string | null; note: string
 }
 export type CartLine = {
-  id: string; nftId: string; editionId: string; quantity: number; name: string
+  id: string; nftId: string; editionId: string; editionLabel: string; tokenId: string; quantity: number; name: string
   imageUrl: string; unitPrice: Money; available: number
   availability: 'available' | 'insufficient' | 'unavailable'
 }
