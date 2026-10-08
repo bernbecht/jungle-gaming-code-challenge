@@ -1,6 +1,6 @@
 # Contratos REST e eventos
 
-Status: **DTOs v1 e núcleo de domínio implementados na TASK-04; endpoints de catálogo, autenticação e favoritos estão em implementação na TASK-06; demais fluxos ainda planejados**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
+Status: **DTOs v1, catálogo, autenticação, favoritos, carrinho e checkout básico implementados nas TASK-04 a TASK-08; perfil/carteiras editáveis e eventos de domínio continuam planejados**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
 
 ## Campos identificados nas screenshots — DEC-19
 
@@ -9,11 +9,12 @@ Modelos v1 em `src/contracts/marketplace.ts` cobrem rede, abas Novos/Em alta, or
 ## Implementação da TASK-04
 
 - API-03: `GET /api/nfts` e `GET /api/nfts/:id` implementados via MSW e IndexedDB.
-- API-13: `GET /api/__mock/status`, `POST /api/__mock/reset` e `POST /api/__mock/clock` implementados. Somente SCN-01 e seed 1 são aceitos nesta etapa.
+- API-13: `GET /api/__mock/status`, `POST /api/__mock/reset` e `POST /api/__mock/clock` implementados. Controles adicionais de catálogo/favoritos/pagamento estão em API-13/API-14 conforme descrito abaixo. Somente SCN-01 e seed 1 são aceitos nesta etapa.
 - API-01/API-02/API-04: cadastro, sessão e favoritos estão ligados aos handlers MSW; verificar a cobertura E2E antes de considerar TEST-03/TEST-04 aprovados.
 - API-05/API-06/API-07: carrinho e cupons estão ligados aos handlers MSW/IndexedDB; visitante é identificado por `X-Guest-Id`, autenticado pelo bearer token. Merge consome a versão de origem uma vez e devolve avisos para estoque/cupom não transferidos.
-- API-08/API-09: funções de cotação, reserva, idempotência e resolução existem em `src/mocks/commerce.ts`. Endpoints privados e telas de checkout continuam pendentes na TASK-08.
-- API-10/API-11/API-12 e eventos de domínio: contratos preparados; handlers/fluxos ainda pendentes.
+- API-08/API-09/API-12: cotação, conexão simulada, pedido idempotente, recuperação e telas de checkout/recibo implementados na TASK-08.
+- API-10 e mutações API-11: contratos preparados; perfil e edição de carteiras entram na TASK-09. API-11 GET de carteiras já atende o checkout.
+- Eventos de domínio seguem pendentes na TASK-10.
 
 ## Convenções
 
@@ -37,15 +38,16 @@ Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/m
 | API-02 | `POST /auth/login`, `GET /auth/session`, `POST /auth/logout` | Login → `{token,session:Session}`; consulta → `{user:Profile}`; logout → `{loggedOut:true}` | 401 credenciais/sessão expirada | REQ-021, REQ-022, REQ-023 |
 | API-03 | `GET /nfts`, `GET /nfts/:id` | Lista parametrizada → 200 página de Nft; detalhe → 200 Nft | 422 parâmetros, 404 detalhe | REQ-005, REQ-006, REQ-007 |
 | API-04 | `GET /me/favorites`, `PUT /me/favorites/:nftId` (privado) | Consulta → `{userId,nftIds:string[]}`; PUT `{favorite:boolean}` → mesmo formato; seleção explícita idempotente | 401, 404, 503 transitório | REQ-008 |
-| API-05 | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:id`, `DELETE /cart/items/:id` | Consulta → Cart; adição `{nftId,editionId,quantity,expectedVersion}`; edição `{quantity,expectedVersion}`; remoção com `If-Match` da versão → 200 Cart | 404, 409 estoque/versão, 422 quantidade | REQ-009, REQ-010, REQ-011, REQ-013 |
+| API-05 | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:id`, `DELETE /cart/items/:id` | Consulta → Cart; cada `CartLine` informa sua `network`; Cart traz `networkTotals` e `totals` agregados por rede presente; adição `{nftId,editionId,quantity,expectedVersion}`; edição `{quantity,expectedVersion}`; remoção com `If-Match` da versão → 200 Cart | 404, 409 estoque/versão, 422 quantidade | REQ-009, REQ-010, REQ-011, REQ-013 |
 | API-06 | `POST /cart/merge` (privado) | `{guestId,guestVersion}` → 200 Cart com notices; repetir origem consumida não duplica | 409 revisão divergente, 401 | REQ-010, REQ-023 |
 | API-07 | `PUT /cart/coupon`, `DELETE /cart/coupon` | PUT `{code,expectedVersion}`; DELETE com `If-Match` → 200 Cart | 422 `COUPON_INVALID`/`COUPON_EXPIRED`, 409 versão | REQ-011 |
-| API-08 | `POST /quotes` (privado) | `{cartVersion,network}` → 201 Quote; valida carrinho, cupom, estoque e taxas | 409 `CART_CHANGED`/`STOCK_CONFLICT`, 422 cupom/rede | REQ-012, REQ-014, REQ-015 |
+| API-08 | `POST /quotes` (privado) | `{cartVersion,network}` → 200 Quote com apenas os itens do carrinho naquela rede; valida versão global, cupom, estoque e taxa da rede selecionada. Se não houver itens na rede, retorna 422 | 409 `CART_CHANGED`/`STOCK_CONFLICT`, 422 cupom/rede/itens ausentes | REQ-012, REQ-014, REQ-015 |
 | API-09 | `POST /orders`, `GET /orders/:id`, `GET /order-attempts/:key` (privado) | POST OrderInput + `Idempotency-Key` → 201 Order na criação / 200 Order em replay; GET pedido → 200 Order; tentativa → 200 `{order:Order}` ou resultado de conflito previamente registrado | 401, 403, 404 tentativa/pedido, 409 cotação/idempotência/estoque | REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 |
 | API-10 | `GET /profile`, `PATCH /profile`, `PUT/DELETE /profile/avatar`, `PUT /profile/password` (privado) | GET/PATCH → `Profile`; PATCH `{username,displayName,email,ensName,expectedVersion}`; avatar multipart `file,expectedVersion` → perfil; DELETE avatar com `If-Match` → perfil; senha `{currentPassword,newPassword}` → 204 | 422 campos/arquivo/senha, 409 email/versão | REQ-024 |
-| API-11 | `GET /wallets`, `POST /wallets`, `PATCH /wallets/:id` (privado) | GET → `{items:Wallet[]}`; POST `{slot,nickname,profileName,address,network,provider,ensName,referralCode}` → 201 Wallet; PATCH mesmos campos + expectedVersion → 200 Wallet | 422 endereço/rede, 409 slot/endereço/versão, 403 | REQ-014, REQ-024 |
-| API-12 | `POST /wallet-connections`, `DELETE /wallet-connections/:id` (privado) | POST `{walletId,network}` → 201 `{id,status:'connected',walletId,network}`; DELETE → 204 | 409 `CONNECTION_REJECTED`/`NETWORK_MISMATCH`; checkout rejeita conexão encerrada | REQ-014 |
-| API-13 | Controles `/api/__mock/*`, fora da API de produto | Reset e relógio; `POST /favorite-network` define falhas one-shot de favoritos e `POST /catalog-network` controla latência/falhas do catálogo | 422 configuração inválida | REQ-030, REQ-031, REQ-044 |
+| API-11 | `GET /wallets`, `POST /wallets`, `PATCH /wallets/:id` (privado) | GET → `{items:Wallet[]}` está implementado; POST/PATCH pertencem à TASK-09 | 422 endereço/rede, 409 slot/endereço/versão, 403 | REQ-014, REQ-024 |
+| API-12 | `POST /wallet-connections`, `DELETE /wallet-connections/:id` (privado) | POST `{walletId,network,provider}` → 201 `{id,status:'connected',walletId,network,provider}`; DELETE → `{disconnected:true}`. Conexão simulada | 404 conexão/carteira alheia, 409 `NETWORK_MISMATCH`; pedido revalida conexão | REQ-014 |
+| API-13 | Controles `/api/__mock/status`, `/reset`, `/clock`, `/catalog-network`, `/favorite-network`, fora da API de produto | Reset/relógio e parâmetros de latência/falha do catálogo e favoritos | 422 configuração inválida | REQ-030, REQ-031, REQ-044 |
+| API-14 | `POST /api/__mock/payment`, controle fora da API de produto | `{outcome:'confirmed'|'declined',delayMs:0..10000}` configura o resultado e o tempo real do pagamento simulado | 422 configuração inválida | REQ-030, REQ-031 |
 
 ## Parâmetros, validações e erros
 

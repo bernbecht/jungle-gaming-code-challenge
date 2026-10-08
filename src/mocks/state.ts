@@ -1,13 +1,13 @@
 import type { ApiError, Network, Nft, Order, Profile, Quote, Wallet } from '../contracts/marketplace'
 
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 export const BASE_TIME = Date.parse('2026-01-15T12:00:00Z')
 export type QuantityLot = { id: string; quantity: number }
 export type StoredLine = { id: string; nftId: string; editionId: string; lots: QuantityLot[] }
 export type StoredCart = { id: string; version: number; items: StoredLine[]; couponCode: string | null }
 export type MergedGuestCart = { guestVersion: number; mergedAtVersion: number }
 export type StoredUser = { profile: Profile; password: { salt: string; verifier: string; iterations: number } }
-export type Connection = { id: string; userId: string; walletId: string; network: Network; active: boolean }
+export type Connection = { id: string; userId: string; walletId: string; network: Network; provider: Wallet['provider']; active: boolean }
 export type StoredQuote = { userId: string; quote: Quote; lots: Record<string, QuantityLot[]> }
 export type StoredOrder = {
   order: Order; resolveAt: number; outcome: 'confirmed' | 'declined'; cartId: string

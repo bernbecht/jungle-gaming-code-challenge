@@ -13,6 +13,9 @@ import { IntegrationProofPage } from '@/routes/integration-proof-page'
 import { AuthPage } from '@/routes/auth-page'
 import { sessionQuery } from '@/features/auth/api'
 import { CartPage } from '@/routes/cart-page'
+import { CheckoutPage } from '@/routes/checkout-page'
+import { OrderPage } from '@/routes/order-page'
+import type { Network } from '@/contracts/marketplace'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: AppShell,
@@ -23,6 +26,11 @@ const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
 const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', validateSearch: validateCatalogSearch, component: HomePage })
 const integrationProofRoute = createRoute({ getParentRoute: () => rootRoute, path: '/__proof', component: IntegrationProofPage })
 const authSearch = (search: Record<string, unknown>) => ({ returnTo: typeof search.returnTo === 'string' ? search.returnTo : undefined })
+const checkoutSearch = (search: Record<string, unknown>) => ({
+  network: search.network === 'ethereum' || search.network === 'polygon' || search.network === 'solana'
+    ? search.network as Network
+    : undefined,
+})
 async function requireUser({ context, location }: { context: { queryClient: QueryClient }; location: { href: string } }) {
   const user = await context.queryClient.ensureQueryData(sessionQuery)
   if (user) return
@@ -62,8 +70,9 @@ const walletsRoute = createRoute({
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/checkout',
+  validateSearch: checkoutSearch,
   beforeLoad: requireUser,
-  component: () => createElement(UnavailablePage, { title: 'Pagamento com carteira' }),
+  component: CheckoutPage,
 })
 const nftRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -74,7 +83,7 @@ const orderRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/orders/$orderId',
   beforeLoad: requireUser,
-  component: () => createElement(UnavailablePage, { title: 'Seu pedido' }),
+  component: OrderPage,
 })
 
 export const router = createRouter({

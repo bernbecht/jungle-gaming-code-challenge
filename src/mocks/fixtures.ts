@@ -40,7 +40,7 @@ async function seedUser(id: string, username: string, displayName: string, email
 }
 
 function wallet(id: string, slot: Wallet['slot'], suffix: string): Wallet {
-  return { id, version: 1, slot, nickname: slot === 'primary' ? 'Principal' : 'Reserva', profileName: 'Colecionador', address: `0x${suffix.repeat(40)}`, network: 'ethereum', provider: 'metamask', ensName: null, referralCode: null }
+  return { id, version: 1, slot, nickname: slot === 'primary' ? 'Principal' : 'Reserva', profileName: 'Colecionador', address: `0x${suffix.repeat(40)}`, network: slot === 'secondary' ? 'polygon' : 'ethereum', provider: 'metamask', ensName: null, referralCode: null }
 }
 
 export async function createFixtures(now = BASE_TIME): Promise<DatabaseState> {

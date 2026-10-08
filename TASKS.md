@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-07 em andamento; TASK-08 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A e TASK-07 concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-08 implementada, aguardando E2E local por bloqueio de rede do runner; TASK-09 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -29,8 +29,8 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-05 | 1 / 3 | Base da home (hero/catálogo) e detalhe; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Concluída |
 | TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: destaque sob os filtros, banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | TEST-19; comparação com UI-01 em TEST-14 (TASK-12) | Concluída |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback (FLOW-03, FLOW-04) | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | Em andamento |
-| TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | Em andamento |
-| TASK-08 | 1 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | A fazer |
+| TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | Concluída |
+| TASK-08 | 4 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | Implementada; E2E local pendente |
 | TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
 | TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
@@ -201,7 +201,7 @@ Revisão UI-01 — header desktop: removido o border-bottom global; links Iníci
 
 Revisão UI-01 — navegação desktop: adicionados Criadores (leva ao catálogo, pois páginas editoriais de criadores estão fora do escopo) e Aprenda (leva à seção explicativa existente); ícone do carrinho do header trocado de sacola para carrinho.
 
-### TASK-07 — carrinho (em andamento)
+### TASK-07 — carrinho (concluída)
 
 - [x] Expor API-05/06/07 para visitante e usuário autenticado: consulta, adição, quantidade, remoção, cupom e merge.
 - [x] Persistir identidade de visitante em `localStorage` e carrinho no IndexedDB; manter carrinhos separados por usuário.
@@ -210,12 +210,30 @@ Revisão UI-01 — navegação desktop: adicionados Criadores (leva ao catálogo
 - [x] Substituir `/cart` indisponível por tela responsiva com estados vazio/loading/erro, quantidades, remoção, cupom e resumo da API.
 - [x] Habilitar adicionar NFT/edição/quantidade pelo detalhe e mostrar contagem no carrinho do header.
 - [x] Preparar cobertura unitária para estoque, versão, cupom e merge; preparar E2E `tests/e2e/cart.spec.ts` para visitante, refresh, cupom e autenticação.
-- [ ] Executar TEST-05 em Chromium desktop/mobile após revisão local do usuário; completar correções de UI/fluxo que os E2E apontarem.
+- [x] Executar TEST-05 em Chromium desktop/mobile; corrigir os problemas apontados nos E2E e confirmar a aprovação da suíte.
 
-Execução desta etapa: typecheck, lint, build e 17 testes unitários passaram. E2E `tests/e2e/cart.spec.ts` preparado; execução pelo agente bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`.
+Execução desta etapa: typecheck, lint, build e 17 testes unitários passaram. O agente não conseguiu iniciar o preview E2E por `listen EPERM` em `127.0.0.1:4173`; o usuário executou os E2E em Chromium desktop/mobile e confirmou que passaram.
 
-Refino visual após comparar UI-03: breadcrumb e navegação Mercado ativa; colunas NFTs/Preço/Edições/Total, token ID, linhas compactas e steppers preenchidos; resumo alinhado e sem card destacado, com rótulos do mockup, CTA/link agrupados; recomendações com cinco cards e paginação antes do footer. Revisão visual final e E2E local permanecem pendentes.
+Refino visual após comparar UI-03: breadcrumb e navegação Mercado ativa; colunas NFTs/Preço/Edições/Total, token ID, linhas compactas e steppers preenchidos; resumo alinhado e sem card destacado, com rótulos do mockup, CTA/link agrupados; recomendações com cinco cards e paginação antes do footer. Revisão visual final permanece na TASK-12.
 
-Adaptação mobile de UI-03: header geral substituído por voltar/título; cartões com imagem 100 × 100, edição, preço e steppers; resumo, cupom e CTA fixos no rodapé com safe area; recomendações e footer ocultos nesta rota mobile. Typecheck, lint e build passaram; E2E mobile bloqueado pelo ambiente ao iniciar preview (`listen EPERM` em `127.0.0.1:4173`).
+Adaptação mobile de UI-03: header geral substituído por voltar/título; cartões com imagem 100 × 100, edição, preço e steppers; resumo, cupom e CTA fixos no rodapé com safe area; recomendações e footer ocultos nesta rota mobile. Typecheck, lint e build passaram; E2E desktop/mobile confirmados pelo usuário.
 
 DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do cartão e foi agrupada ao stepper numa linha abaixo dos dados do NFT, com ícone e rótulo para melhorar localização e clareza. Após revisão, a imagem passou a acompanhar verticalmente as linhas de detalhes e ações para não ficar isolada no topo. Desktop mantém a lixeira compacta. O mockup mobile não especifica esse controle; verificar toque, disposição e remoção em TEST-05/TEST-14.
+
+### TASK-08 — checkout e pedido (implementada; validação E2E local pendente)
+
+- [x] Conectar checkout à sessão, ao carrinho de conta e às carteiras seed; exibir dados do colecionador, edição, quantidades e totais.
+- [x] Implementar adaptação mobile em etapas Dados → Carteira/rede → Revisão e resumo responsivo no desktop.
+- [x] Expor cotação, conexão/desconexão simulada, envio idempotente e leitura/recuperação de tentativa pelos handlers MSW.
+- [x] Exigir cotação atual e conexão válida antes do pedido; tratar cotação alterada com revisão explícita.
+- [x] Separar os rótulos das etapas: “Revisar compra” inicia conexão/cotação; “Confirmar compra” envia somente após revisão.
+- [x] Agrupar carrinho e totais por rede; permitir pedidos separados por grupo e preservar os outros grupos após uma confirmação (DEC-24).
+- [x] Derivar a rede do grupo de NFTs no checkout e selecionar uma carteira compatível; orientar cadastro quando não houver carteira naquela rede.
+- [x] Documentar a regra em DEC-24, FLOW-01/FLOW-06, API-05/API-08, UI-SPEC e TEST-06/SCN-18.
+- [x] Implementar estados pendente, confirmado e recusado; recibo só após confirmação e sempre identificado como simulação.
+- [x] Persistir chave e conteúdo da tentativa no navegador antes do envio; recuperar pedido pela mesma chave ou reenviar o mesmo conteúdo sem duplicar.
+- [x] Preparar testes E2E de compra confirmada e recusa com carrinho preservado em [checkout.spec.ts](tests/e2e/checkout.spec.ts).
+- [ ] Executar TEST-06/parte de TEST-07 em Chromium desktop/mobile; o runner do agente foi bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`.
+- [ ] Executar a nova cobertura multirrede (SCN-18) em Chromium desktop/mobile junto com a suíte de checkout.
+
+`npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. Executar `npx playwright test tests/e2e/checkout.spec.ts` no terminal local antes de encerrar a tarefa; o runner do agente foi bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. TEST-07 ainda requer cenários de timeout, cotação alterada e refresh durante pedido pendente, além dos controles determinísticos da TASK-10/11.

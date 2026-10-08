@@ -1,0 +1,110 @@
+import { expect, test, type Page } from '@playwright/test'
+
+async function reset(page: Page) {
+  await page.goto('/__proof')
+  await expect(page.getByRole('button', { name: 'Executar prova REST' })).toBeVisible()
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    if (!response.ok) throw new Error('Reset failed')
+  })
+}
+
+async function loginAndAddItem(page: Page) {
+  await page.goto('/login')
+  await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
+  await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
+  await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/$|\/\?.*/) // AuthForm redirects to the market after the login and cart merge finish.
+  await page.goto('/nfts/nft-001')
+  await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
+  await page.goto('/cart')
+  await page.getByRole('link', { name: /^Finalizar Ethereum/ }).click()
+  await expect(page.getByRole('heading', { name: 'Pagamento', exact: true }).or(page.getByRole('heading', { name: 'Pagamento com carteira' }))).toBeVisible()
+}
+
+test.beforeEach(async ({ page }) => reset(page))
+
+test('checkout connects a saved wallet and shows a confirmed order receipt', async ({ page, isMobile }) => {
+  await loginAndAddItem(page)
+  const reviewPurchase = page.getByRole('button', { name: 'Revisar compra' })
+
+  if (isMobile) {
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Carteiras cadastradas' })).toBeVisible()
+  } else {
+    await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+    await expect(reviewPurchase).toBeVisible()
+    await expect(reviewPurchase).toBeEnabled()
+  }
+  await reviewPurchase.click()
+  await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: isMobile ? 'Revisão da compra' : 'Seus NFTs' })).toBeVisible()
+  const confirmPurchase = page.getByRole('button', { name: 'Confirmar compra' })
+  await expect(confirmPurchase).toBeEnabled()
+  const orderResponse = page.waitForResponse(response => response.url().endsWith('/api/orders') && response.request().method() === 'POST')
+  await confirmPurchase.click()
+  const response = await orderResponse
+  expect(response.status()).toBe(201)
+  const order = await response.json()
+  expect(order.id).toEqual(expect.any(String))
+  expect(order.id).not.toBe('')
+  await expect(page).toHaveURL(new RegExp(`/orders/${order.id}$`))
+  await expect(page.getByRole('heading', { name: 'Aguardando confirmação do pagamento' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Compra simulada confirmada' })).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByText('não corresponde a uma transação em blockchain')).toBeVisible()
+})
+
+test('declined payment keeps the items in the cart and does not show a receipt', async ({ page }) => {
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/payment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ outcome: 'declined', delayMs: 0 }) })
+    if (!response.ok) throw new Error('Payment scenario setup failed')
+  })
+  await loginAndAddItem(page)
+  const reviewPurchase = page.getByRole('button', { name: 'Revisar compra' })
+  if (await page.getByRole('button', { name: 'Continuar', exact: true }).isVisible().catch(() => false))
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click()
+  await reviewPurchase.click()
+  await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
+  const confirmPurchase = page.getByRole('button', { name: 'Confirmar compra' })
+  await confirmPurchase.click()
+  await expect(page.getByRole('heading', { name: 'Pagamento não confirmado' })).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByRole('link', { name: 'Voltar ao carrinho' })).toBeVisible()
+  await page.getByRole('link', { name: 'Voltar ao carrinho' }).click()
+  await expect(page.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
+})
+
+test('mixed-network cart finalizes one network and preserves the other group', async ({ page, isMobile }) => {
+  await page.goto('/login')
+  await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
+  await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
+  await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/$|\/\?.*/)
+
+  for (const nftId of ['nft-001', 'nft-002']) {
+    await page.goto(`/nfts/${nftId}`)
+    await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
+    await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
+  }
+
+  await page.goto('/cart')
+  await expect(page.getByRole('heading', { name: 'NFTs na rede Ethereum (1)' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'NFTs na rede Polygon (1)' })).toBeVisible()
+  await page.getByRole('link', { name: 'Finalizar Polygon (1)' }).click()
+  await expect(page).toHaveURL(/\/checkout\?network=polygon$/)
+  if (isMobile) await page.getByRole('button', { name: 'Continuar', exact: true }).click()
+
+  const reviewPurchase = page.getByRole('button', { name: 'Revisar compra' })
+  await reviewPurchase.click()
+  await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
+  const confirmPurchase = page.getByRole('button', { name: 'Confirmar compra' })
+  const checkout = page.getByRole('main')
+  await expect(checkout).toContainText('Ivory Baron')
+  await expect(checkout).not.toContainText('Violet Nomad')
+  await confirmPurchase.click()
+  await expect(page.getByRole('heading', { name: 'Compra simulada confirmada' })).toBeVisible({ timeout: 10_000 })
+
+  await page.goto('/cart')
+  await expect(page.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ver Ivory Baron', exact: true })).toHaveCount(0)
+})

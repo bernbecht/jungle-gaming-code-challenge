@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Cart } from "@/contracts/marketplace";
+import type { Cart, Network } from "@/contracts/marketplace";
 import { sessionQuery } from "@/features/auth/api";
 import {
   applyCartCoupon,
@@ -35,6 +35,11 @@ function formatEth(value: string) {
 function lineTotal(unitPrice: string, quantity: number) {
   return fromWei(toWei(unitPrice) * BigInt(quantity));
 }
+const networkLabels: Record<Network, string> = {
+  ethereum: "Ethereum",
+  polygon: "Polygon",
+  solana: "Solana",
+};
 
 export function CartPage() {
   const session = useQuery(sessionQuery);
@@ -127,9 +132,16 @@ export function CartPage() {
 
   const data = cart.data;
   const busy = mutation.isPending;
+  const itemGroups = (Object.keys(networkLabels) as Network[])
+    .map((network) => ({
+      network,
+      items: data.items.filter((item) => item.network === network),
+      totals: data.networkTotals[network],
+    }))
+    .filter((group) => group.items.length > 0);
   return (
     <section
-      className={`cart-page py-6 md:py-6 ${data.items.length ? "pb-[390px] md:pb-6" : ""}`}
+      className={`cart-page py-6 md:py-6 ${data.items.length ? "pb-[65dvh] md:pb-6" : ""}`}
       aria-label="Carrinho de NFTs"
     >
       <div className="mb-5 grid grid-cols-[40px_1fr_40px] items-center md:hidden">
@@ -204,6 +216,7 @@ export function CartPage() {
       ) : (
         <div className="grid items-start gap-10 xl:grid-cols-[minmax(0,782px)_332px] xl:justify-between">
           <div className="min-w-0">
+            {itemGroups.length > 1 && <p className="mb-4 rounded-lg border border-primary/30 p-3 text-sm text-secondary">Seu carrinho tem NFTs em redes diferentes. Finalize cada rede separadamente; os outros grupos permanecem no carrinho.</p>}
             <div className="hidden grid-cols-[minmax(0,1fr)_100px_120px_100px_32px] gap-4 border-b border-border pb-2 text-sm font-semibold md:grid">
               <span>NFTs</span>
               <span className="text-right">Preço</span>
@@ -211,8 +224,17 @@ export function CartPage() {
               <span className="text-right">Total</span>
               <span />
             </div>
-            <ul className="mt-3 space-y-5 md:space-y-2">
-              {data.items.map((item) => (
+            <div className="mt-3 space-y-7">
+              {itemGroups.map(({ network, items, totals }) => (
+                <section key={network} aria-labelledby={`cart-network-${network}`}>
+                  <div className="mb-2 flex items-center justify-between gap-3 border-b border-border pb-2">
+                    <h2 id={`cart-network-${network}`} className="text-sm font-semibold text-primary">
+                      NFTs na rede {networkLabels[network]} <span className="font-normal text-secondary">({items.length})</span>
+                    </h2>
+                    <span className="shrink-0 text-sm font-semibold">{formatEth(totals?.total ?? "0")}</span>
+                  </div>
+                  <ul className="space-y-5 md:space-y-2">
+              {items.map((item) => (
                 <li
                   key={item.id}
                   className="relative grid min-h-[100px] grid-cols-[100px_minmax(0,1fr)] items-center gap-2 overflow-hidden rounded-2xl bg-card pr-3 md:min-h-0 md:grid-cols-[minmax(0,1fr)_100px_120px_100px_32px] md:gap-4 md:overflow-visible md:rounded-none md:pr-0 md:py-1.5"
@@ -338,11 +360,14 @@ export function CartPage() {
                   </Button>
                 </li>
               ))}
-            </ul>
+                  </ul>
+                </section>
+              ))}
+            </div>
           </div>
           <aside
             aria-labelledby="summary-title"
-            className="fixed inset-x-0 bottom-0 z-30 rounded-t-[2rem] border-t border-border bg-card px-6 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:static md:z-auto md:rounded-none md:border-0 md:bg-transparent md:p-0"
+            className="fixed inset-x-0 bottom-0 z-30 max-h-[65dvh] overflow-y-auto rounded-t-[2rem] border-t border-border bg-card px-6 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:static md:z-auto md:max-h-none md:overflow-visible md:rounded-none md:border-0 md:bg-transparent md:p-0"
           >
             <h2
               id="summary-title"
@@ -414,21 +439,21 @@ export function CartPage() {
                 <dd className="text-primary">{formatEth(data.totals.total)}</dd>
               </div>
             </dl>
-            {data.items.some((item) => item.availability !== "available") ? (
-              <Button
-                className="mt-5 min-h-[60px] w-full rounded-full text-base md:min-h-10 md:rounded-md md:text-sm"
-                disabled
-              >
-                Corrija o estoque para continuar
-              </Button>
-            ) : (
-              <Button
-                asChild
-                className="mt-5 min-h-[60px] w-full rounded-full text-base md:min-h-10 md:rounded-md md:text-sm"
-              >
-                <Link to="/checkout">Conectar e finalizar</Link>
-              </Button>
-            )}
+            <div className="mt-5 space-y-2" aria-label="Finalização por rede">
+              {itemGroups.map(({ network, items }) => (
+                items.some((item) => item.availability !== "available") ? (
+                  <Button key={network} className="min-h-11 w-full rounded-full text-sm md:rounded-md" disabled>
+                    Estoque indisponível · {networkLabels[network]}
+                  </Button>
+                ) : (
+                  <Button key={network} asChild className="min-h-11 w-full rounded-full text-sm md:rounded-md">
+                    <Link to="/checkout" search={{ network }}>
+                      Finalizar {networkLabels[network]} ({items.length})
+                    </Link>
+                  </Button>
+                )
+              ))}
+            </div>
             <Link
               to="/"
               search={defaultCatalog}

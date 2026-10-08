@@ -11,7 +11,7 @@ const collector = { displayName: 'Collector A', username: 'collector-a', email: 
 
 function connect(state: DatabaseState, userId = 'user-a') {
   const walletId = userId === 'user-a' ? 'wallet-a-main' : 'wallet-b-main'
-  state.connections[`connection-${userId}`] = { id: `connection-${userId}`, userId, walletId, network: 'ethereum', active: true }
+  state.connections[`connection-${userId}`] = { id: `connection-${userId}`, userId, walletId, network: 'ethereum', provider: 'metamask', active: true }
   return { walletId, connectionId: `connection-${userId}` }
 }
 
@@ -65,6 +65,7 @@ test('order replay ignores its own reservation and canonicalizes object field or
   const first = submitOrder(state, 'user-a', '__proto__', input)
   const again = submitOrder(state, 'user-a', '__proto__', { ...input, collector: { note: '', referralCode: null, ensName: null, profileName: 'Principal', email: collector.email, username: collector.username, displayName: collector.displayName } })
   expect('order' in first && 'order' in again && first.order.id === again.order.id).toBe(true)
+  if ('order' in first) expect(first.order.snapshot.walletProvider).toBe('metamask')
   expect('replayed' in again && again.replayed).toBe(true)
   expect(Object.keys(state.orders)).toHaveLength(1)
   expect(readNft(state, 'nft-001').editions[1]!.available).toBe(8)
@@ -195,6 +196,27 @@ test('cart quantity changes respect stock, exact coupons, removal and optimistic
   const removed = removeCartItem(state, 'guest:guest-test-0001', cart.items[0]!.id, discounted.version)
   expect(readCart(state, 'guest:guest-test-0001').items).toEqual([])
   expect(removed.version).toBe(discountedVersion + 1)
+})
+
+test('mixed-network cart quotes and settles only the selected network group', async () => {
+  const state = await createFixtures()
+  addCartItem(state, 'user:user-a', { nftId: 'nft-001', editionId: 'nft-001-limited', quantity: 1, expectedVersion: 1 })
+  addCartItem(state, 'user:user-a', { nftId: 'nft-002', editionId: 'nft-002-limited', quantity: 1, expectedVersion: 2 })
+  const cart = readCart(state, 'user:user-a')
+  expect(cart.items.map((item) => item.network)).toEqual(['ethereum', 'polygon'])
+  expect(cart.networkTotals.ethereum?.networkFee).toBe('0.001')
+  expect(cart.networkTotals.polygon?.networkFee).toBe('0.0001')
+  expect(cart.totals.networkFee).toBe('0.0011')
+
+  state.connections['connection-polygon'] = { id: 'connection-polygon', userId: 'user-a', walletId: 'wallet-a-reserve', network: 'polygon', provider: 'metamask', active: true }
+  const quote = createQuote(state, 'user-a', { cartVersion: cart.version, network: 'polygon' })
+  expect(quote.items.map((item) => item.nftId)).toEqual(['nft-002'])
+  const input: OrderInput = { quoteId: quote.id, quoteVersion: quote.version, walletId: 'wallet-a-reserve', connectionId: 'connection-polygon', network: 'polygon', collector }
+  const result = submitOrder(state, 'user-a', 'polygon-only', input)
+  if (!('order' in result)) throw new Error('Expected polygon order')
+  expect(result.order.snapshot.items.map((item) => item.nftId)).toEqual(['nft-002'])
+  advanceClock(state, 2_000)
+  expect(readCart(state, 'user:user-a').items.map((item) => item.nftId)).toEqual(['nft-001'])
 })
 
 test('guest cart merge is idempotent and reports inventory limits', async () => {

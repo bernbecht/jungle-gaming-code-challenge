@@ -4,47 +4,51 @@ Este documento descreve as ações do usuário, estados, alternativas e resultad
 
 Fonte normativa: [desafio](../challenge-description.md) e [REQUIREMENTS](../REQUIREMENTS.md). Detalhes da API: [CONTRACTS](CONTRACTS.md). Decisões técnicas: [ARCHITECTURE](../ARCHITECTURE.md). Implementação simulada: [MOCKS-GUIDE](MOCKS-GUIDE.md). Progresso e evidências: [TASKS](../TASKS.md) e [TEST-MATRIX](TEST-MATRIX.md).
 
-Os fluxos abaixo são a especificação do comportamento esperado. A existência deste documento não significa que as telas e integrações já estão entregues; consulte TASKS para o estado de execução.
+Os fluxos abaixo são a especificação do comportamento esperado. A implementação de cada fluxo está indicada em TASKS e na matriz de evidências.
 
 ## Índice e rastreabilidade
 
 | Fluxo | Objetivo | Requisitos | Contratos | Tarefas | Cenários e testes |
 | --- | --- | --- | --- | --- | --- |
-| FLOW-01 | Revisar a compra e acompanhar confirmação ou recusa | REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | API-08, API-09, API-12, EVT-01, EVT-02 | TASK-04 (núcleo), TASK-07, TASK-08, TASK-10 | SCN-01, SCN-09, SCN-10, SCN-12, SCN-16, SCN-17; TEST-06, TEST-07, TEST-09, TEST-17 |
+| FLOW-01 | Revisar a compra e acompanhar confirmação ou recusa, uma rede por pedido | REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | API-08, API-09, API-12, EVT-01, EVT-02 | TASK-04 (núcleo), TASK-07, TASK-08, TASK-10 | SCN-01, SCN-09, SCN-10, SCN-12, SCN-16, SCN-17; TEST-06, TEST-07, TEST-09, TEST-17 |
 | FLOW-02 | Recuperar uma tentativa após timeout, refresh ou reconexão | REQ-016, REQ-017, REQ-019, REQ-022, REQ-023, REQ-036 | API-02, API-09, EVT-02 | TASK-04 (núcleo), TASK-08, TASK-10 | SCN-07, SCN-11, SCN-14, SCN-15; TEST-03, TEST-07, TEST-10 |
 | FLOW-03 | Criar conta, autenticar, recuperar sessão e sair | REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | API-01, API-02 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-08; TEST-03 |
 | FLOW-04 | Consultar e alternar favoritos com autenticação | REQ-008, REQ-021, REQ-023, REQ-027 | API-02, API-04 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-15; TEST-03, TEST-04 |
 | FLOW-05 | Filtrar e explorar o catálogo | REQ-005, REQ-006, REQ-026 | API-03 | TASK-05, TASK-12 | TEST-01, TEST-12, TEST-14 |
-| FLOW-06 | Manter e revisar o carrinho de visitante ou usuário | REQ-009, REQ-010, REQ-011, REQ-012 | API-05, API-06, API-07 | TASK-07, TASK-11 | SCN-01, SCN-09; TEST-05, TEST-17 |
+| FLOW-06 | Manter, revisar e agrupar o carrinho de visitante ou usuário por rede | REQ-009, REQ-010, REQ-011, REQ-012 | API-05, API-06, API-07, API-08 | TASK-07, TASK-08, TASK-11 | SCN-01, SCN-09; TEST-05, TEST-06, TEST-17 |
 
 ## FLOW-01: Compra
 
 **Objetivo:** comprar as quantidades revisadas e mostrar o resultado real da simulação, preservando o carrinho em caso de falha.
 
-**Pré-condições:** usuário autenticado, carrinho com itens, dados do colecionador válidos e carteira cadastrada conectada à rede selecionada. A revisão usa uma cotação da API, com preços, disponibilidade, cupom, taxas e total.
+**Pré-condições:** usuário autenticado, carrinho com itens, dados do colecionador válidos e carteira cadastrada na rede do grupo selecionado. O carrinho pode conter NFTs de redes diferentes; a pessoa escolhe um grupo no carrinho e cada pedido/cotação inclui somente os NFTs dessa rede (DEC-24). As demais redes permanecem no carrinho para finalizações independentes. A revisão usa uma cotação da API, com preços, disponibilidade, cupom, taxa e total daquele grupo.
+
+No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobile, a compra avança em três passos — dados, carteira/rede e revisão — e mantém a ação de confirmar acessível na parte inferior. Em ambos os tamanhos, conexão e pagamento são simulações locais; não há chamada a uma carteira real. A cotação exibida expira após cinco minutos.
 
 **Gatilho:** o usuário confirma a compra após revisar os dados e os valores.
 
 ### Caminho principal
 
-1. O usuário revisa itens, quantidades, dados, carteira, rede e valores.
-2. Confirma o envio. A interface impede cliques concorrentes enquanto resolve essa tentativa.
-3. A API revalida a tentativa: sessão, cotação, estoque, cupom, taxas, carteira e conexão.
-4. Se estiver tudo válido, cria um pedido **pendente** e reserva as quantidades compradas. Os itens continuam no carrinho enquanto o resultado é aguardado.
-5. O pagamento simulado termina em confirmação ou recusa.
-6. Se confirmado, o pedido passa a **confirmado**, o estoque reservado é consumido e somente as quantidades compradas são removidas do carrinho. A interface mostra o recibo com os dados registrados na compra.
+1. No carrinho, o usuário escolhe “Finalizar [rede]” em um grupo. O checkout mostra somente os NFTs daquele grupo; a rede fica determinada pelos próprios NFTs e a carteira compatível é selecionada automaticamente.
+2. O usuário preenche/revisa os dados e aciona **“Revisar compra”**. A interface simula a conexão da carteira e busca uma cotação atualizada para aquele grupo.
+3. A interface mostra os itens, valores, taxa e total cotados; o usuário confere a revisão e aciona **“Confirmar compra”** para enviar o pedido. A interface impede cliques concorrentes enquanto resolve essa tentativa.
+4. A API revalida a tentativa: sessão, cotação, estoque, cupom, taxas, carteira e conexão.
+5. Se estiver tudo válido, cria um pedido **pendente** e reserva as quantidades compradas. A resposta do POST já contém esse pedido; o cliente usa-a para mostrar o estado pendente imediatamente e depois consulta o pedido para acompanhar a confirmação. Os itens do grupo continuam no carrinho enquanto o resultado é aguardado.
+6. O pagamento simulado termina em confirmação ou recusa.
+7. Se confirmado, o pedido passa a **confirmado**, o estoque reservado é consumido e somente as quantidades capturadas desse grupo são removidas do carrinho. Outros grupos de rede permanecem intactos. A interface mostra o recibo com os dados registrados na compra.
 
 O pedido fica pendente **depois de ser criado pela API e antes de haver resultado do pagamento**. Estar na revisão, clicar no botão ou aguardar a resposta de uma chamada não comprova, por si só, que o pedido existe. Quando o resultado do envio é desconhecido, seguir FLOW-02.
 
 ```mermaid
 flowchart TD
-    A[Revisar itens, carteira e valores] --> B[Confirmar envio]
-    B --> C[API revalida a tentativa]
-    C -->|Dados válidos| D[Pedido PENDENTE e estoque reservado]
-    C -->|Validação ou cotação alterada| E[Corrigir ou revisar; nenhum pedido criado]
-    D --> F[Resultado do pagamento simulado]
-    F --> G[CONFIRMADO: consome estoque e remove quantidades compradas]
-    F --> H[RECUSADO: libera reserva e preserva carrinho]
+    A[Escolher grupo de rede no carrinho] --> B[Revisar apenas os itens dessa rede]
+    B --> C[Confirmar envio]
+    C --> D[API revalida a tentativa]
+    D -->|Dados válidos| E[Pedido PENDENTE e estoque reservado]
+    D -->|Validação ou cotação alterada| F[Corrigir ou revisar; nenhum pedido criado]
+    E --> G[Resultado do pagamento simulado]
+    G --> H[CONFIRMADO: remove só este grupo]
+    G --> I[RECUSADO: libera reserva e preserva este grupo]
 ```
 
 ### Estados e efeitos
@@ -72,7 +76,7 @@ Confirmado e recusado são estados terminais: não voltam para pendente. Repetir
 
 Se o usuário adicionar itens enquanto um pedido está pendente, essas novas inclusões devem sobreviver à confirmação. Exemplo: compra de duas unidades, seguida de adição de mais uma; após confirmar, uma permanece no carrinho. Se as inclusões antigas forem removidas e outras forem adicionadas, as novas também devem permanecer. A estratégia técnica de identificar essas quantidades por lotes está no guia de mocks e em DEC-10.
 
-**Resultado:** pedido confirmado com recibo coerente ou pedido recusado com carrinho preservado. Falha anterior à criação não produz pedido.
+**Resultado:** pedido confirmado com recibo coerente ou pedido recusado com o grupo preservado. Falha anterior à criação não produz pedido. Cada rede exige sua própria confirmação; o projeto não simula atomicidade entre blockchains. Grupos restantes podem ser finalizados depois, com novas cotações e novos pedidos.
 
 ## FLOW-02: Recuperação de tentativa
 

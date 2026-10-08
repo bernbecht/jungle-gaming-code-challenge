@@ -31,19 +31,22 @@ export type Wallet = {
   profileName: string; address: string; network: Network
   provider: 'metamask' | 'walletconnect' | 'coinbase'; ensName: string | null; referralCode: string | null
 }
+export type WalletConnection = {
+  id: string; status: 'connected'; walletId: string; network: Network; provider: Wallet['provider']
+}
 export type Collector = {
   displayName: string; username: string; email: string; profileName: string
   ensName: string | null; referralCode: string | null; note: string
 }
 export type CartLine = {
   id: string; nftId: string; editionId: string; editionLabel: string; tokenId: string; quantity: number; name: string
-  imageUrl: string; unitPrice: Money; available: number
+  imageUrl: string; unitPrice: Money; available: number; network: Network
   availability: 'available' | 'insufficient' | 'unavailable'
 }
 export type Totals = { subtotal: Money; discount: Money; networkFee: Money; total: Money }
 export type Cart = {
   id: string; version: number; items: CartLine[]; couponCode: string | null
-  totals: Totals; notices: { code: string; message: string }[]
+  totals: Totals; networkTotals: Partial<Record<Network, Totals>>; notices: { code: string; message: string }[]
 }
 export type Quote = {
   id: string; version: number; cartId: string; cartVersion: number; network: Network
@@ -56,7 +59,7 @@ export type OrderInput = {
 export type Order = {
   id: string; userId: string; version: number; status: 'pending' | 'confirmed' | 'declined'
   createdAt: string; updatedAt: string; declineReason: string | null
-  snapshot: { items: CartLine[]; totals: Totals; collector: Collector; walletAddress: string; network: Network; couponCode: string | null }
+  snapshot: { items: CartLine[]; totals: Totals; collector: Collector; walletAddress: string; walletProvider: Wallet['provider']; network: Network; couponCode: string | null }
   transaction: { reference: string; simulated: true; explorerUrl: string | null } | null
 }
 export type ResourceEvent<T> = {

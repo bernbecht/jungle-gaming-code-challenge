@@ -6,7 +6,7 @@ import type {
   OrderInput,
   Quote,
 } from "../contracts/marketplace";
-import { assertQuantity, calculateTotals } from "../lib/money";
+import { assertQuantity, calculateTotals, fromWei, toWei } from "../lib/money";
 import { readNft } from "./catalog";
 import { invalid, MockError } from "./errors";
 import type { DatabaseState, StoredCart, StoredQuote } from "./state";
@@ -236,6 +236,7 @@ export function readCart(
       imageUrl: nft.images[0]!.url,
       unitPrice: edition.unitPrice,
       available: edition.available,
+      network: nft.network,
       availability:
         edition.available === 0
           ? "unavailable"
@@ -252,15 +253,34 @@ export function readCart(
     if (!(error instanceof MockError)) throw error;
     notices.push({ code: error.body.error.code, message: error.message });
   }
-  const fee = state.networkFees[network];
-  if (fee === undefined) invalid("Rede inválida.");
+  const networks = [...new Set(items.map((item) => item.network))];
+  const networkTotals: Cart["networkTotals"] = {};
+  for (const itemNetwork of networks) {
+    const fee = state.networkFees[itemNetwork];
+    if (fee === undefined) invalid("Rede inválida.");
+    networkTotals[itemNetwork] = calculateTotals(
+      items.filter((item) => item.network === itemNetwork),
+      fee,
+      discount,
+    );
+  }
+  const requestedFee = state.networkFees[network];
+  if (requestedFee === undefined) invalid("Rede inválida.");
+  const networkTotalValues = Object.values(networkTotals);
+  const totals = {
+    subtotal: fromWei(networkTotalValues.reduce((total, value) => total + toWei(value!.subtotal), 0n)),
+    discount: fromWei(networkTotalValues.reduce((total, value) => total + toWei(value!.discount), 0n)),
+    networkFee: fromWei(networkTotalValues.reduce((total, value) => total + toWei(value!.networkFee), 0n)),
+    total: fromWei(networkTotalValues.reduce((total, value) => total + toWei(value!.total), 0n)),
+  };
   return {
     id: cart.id,
     version: cart.version,
     items,
     couponCode: cart.couponCode,
     notices,
-    totals: calculateTotals(items, fee, discount),
+    totals,
+    networkTotals,
   };
 }
 
@@ -274,16 +294,13 @@ export function createQuote(
   if (storedCart.version !== input.cartVersion)
     throw new MockError(409, "CART_CHANGED", "O carrinho foi atualizado.");
   const cart = readCart(state, `user:${userId}`, input.network);
-  if (!cart.items.length) invalid("O carrinho está vazio.");
+  const items = cart.items.filter((item) => item.network === input.network);
+  if (!items.length) invalid("Não há NFTs do carrinho nesta rede.");
   discountBps(state, cart.couponCode);
-  if (cart.items.some((line) => line.availability !== "available"))
+  if (items.some((line) => line.availability !== "available"))
     throw new MockError(409, "STOCK_CONFLICT", "Estoque insuficiente.");
-  if (
-    cart.items.some(
-      (line) => readNft(state, line.nftId).network !== input.network,
-    )
-  )
-    invalid("Todos os itens devem pertencer à rede selecionada.");
+  const totals = cart.networkTotals[input.network];
+  if (!totals) invalid("Não há NFTs do carrinho nesta rede.");
   const quote: Quote = {
     id: nextId(state, "quote"),
     version: 1,
@@ -292,14 +309,16 @@ export function createQuote(
     network: input.network,
     couponCode: cart.couponCode,
     expiresAt: new Date(state.now + QUOTE_VALIDITY_MS).toISOString(),
-    items: cart.items,
-    totals: cart.totals,
+    items,
+    totals,
   };
   state.quotes[quote.id] = {
     userId,
     quote,
     lots: Object.fromEntries(
-      storedCart.items.map((line) => [line.id, structuredClone(line.lots)]),
+      storedCart.items
+        .filter((line) => items.some((item) => item.id === line.id))
+        .map((line) => [line.id, structuredClone(line.lots)]),
     ),
   };
   return structuredClone(quote);
@@ -352,23 +371,25 @@ function validatePurchase(
     collector.note.length > 2000
   )
     invalid("Dados do colecionador inválidos.");
-  const cart = readCart(state, `user:${userId}`, input.network);
-  discountBps(state, cart.couponCode);
-  if (cart.items.some((item) => item.availability !== "available"))
+  const fullCart = readCart(state, `user:${userId}`, input.network);
+  const cartItems = fullCart.items.filter((item) => item.network === input.network);
+  const cartTotals = fullCart.networkTotals[input.network];
+  discountBps(state, fullCart.couponCode);
+  if (cartItems.some((item) => item.availability !== "available"))
     throw new MockError(409, "STOCK_CONFLICT", "Estoque insuficiente.");
   const quote = stored.quote;
   if (
     input.quoteVersion !== quote.version ||
     quote.network !== input.network ||
     Date.parse(quote.expiresAt) <= state.now ||
-    cart.id !== quote.cartId ||
-    cart.version !== quote.cartVersion ||
-    cart.couponCode !== quote.couponCode ||
-    fingerprint(cart.items) !== fingerprint(quote.items) ||
-    fingerprint(cart.totals) !== fingerprint(quote.totals)
+    fullCart.id !== quote.cartId ||
+    fullCart.version !== quote.cartVersion ||
+    fullCart.couponCode !== quote.couponCode ||
+    fingerprint(cartItems) !== fingerprint(quote.items) ||
+    fingerprint(cartTotals) !== fingerprint(quote.totals)
   ) {
     const replacement = createQuote(state, userId, {
-      cartVersion: cart.version,
+      cartVersion: fullCart.version,
       network: input.network,
     });
     throw new MockError(
@@ -430,6 +451,7 @@ export function submitOrder(
   const wallet = state.wallets[userId]!.find(
     (item) => item.id === input.walletId,
   )!;
+  const connection = state.connections[input.connectionId]!;
   const now = new Date(state.now).toISOString();
   const order: Order = {
     id: nextId(state, "order"),
@@ -444,6 +466,7 @@ export function submitOrder(
       totals: quote.totals,
       collector: input.collector,
       walletAddress: wallet.address,
+      walletProvider: connection.provider,
       network: input.network,
       couponCode: quote.couponCode,
     }),

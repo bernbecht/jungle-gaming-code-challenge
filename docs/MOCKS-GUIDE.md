@@ -23,6 +23,8 @@ Rastreabilidade: REQ-029, REQ-030; DEC-03, DEC-05; API-03, API-13.
 | [lib/money.ts](../src/lib/money.ts) | Converte ETH para wei e calcula subtotal, desconto, taxa e total com precisão | Usado pelo catálogo para comparar preços e por commerce para calcular totais; REQ-012, DEC-06 |
 | [mocks/catalog.ts](../src/mocks/catalog.ts) | Valida parâmetros, consulta NFTs e aplica filtros, ordenação e paginação | Recebe o estado do banco; considera reservas para mostrar disponibilidade; REQ-006, API-03 |
 | [mocks/commerce.ts](../src/mocks/commerce.ts) | Aplica regras de carrinho, merge de visitante, cupom, cotação, reserva, idempotência e resolução de pedidos | Recebe o estado; usa catálogo, dinheiro e erros; REQ-009 a REQ-012, REQ-016, DEC-08 a DEC-10 |
+| [features/checkout/api.ts](../src/features/checkout/api.ts) | Serviços Axios e queries para carteira, conexão, cotação, pedido e recuperação | Checkout fala com a API e não acessa fixtures/banco diretamente; API-08/API-09/API-11/API-12 |
+| [routes/checkout-page.tsx](../src/routes/checkout-page.tsx) e [routes/order-page.tsx](../src/routes/order-page.tsx) | Formulário/resumo responsivo, passos mobile, revisão, recuperação e estados do pedido/recibo | Consomem os serviços do checkout; só mostram recibo no estado confirmado; FLOW-01/FLOW-02 |
 | [mocks/errors.ts](../src/mocks/errors.ts) | Representa erros com status HTTP, código e mensagem | Regras lançam MockError; handlers transformam o erro em resposta; API-03, API-08, API-09 |
 | [mocks/handlers.ts](../src/mocks/handlers.ts) | Liga endereços HTTP e conexões Socket.IO ao comportamento simulado | Aciona database e regras; devolve JSON ou erro; REQ-029 |
 | [mocks/browser.ts](../src/mocks/browser.ts) | Inicializa o banco e inicia o worker MSW | Configura os handlers e verifica o cenário disponível; DEC-04 |
@@ -62,13 +64,13 @@ Uma busca sem correspondência devolve uma página vazia. Parâmetros inválidos
 
 ## Implementação dos fluxos de compra
 
-O comportamento da compra e de sua recuperação está em [FLOW-01](FLOWS.md#flow-01-compra) e [FLOW-02](FLOWS.md#flow-02-recuperação-de-tentativa). O núcleo dessas regras existe em `commerce.ts`. Os endpoints privados e a interface serão conectados nas tarefas de sessão, carrinho e checkout.
+O comportamento da compra e de sua recuperação está em [FLOW-01](FLOWS.md#flow-01-compra) e [FLOW-02](FLOWS.md#flow-02-recuperação-de-tentativa). O domínio em `commerce.ts`, handlers privados e telas foram conectados na TASK-08. Os eventos em tempo real e os cenários completos de falha continuam na TASK-10/11.
 
 1. O carrinho guarda NFT, edição e quantidades. `readCart` consulta preços e disponibilidade atuais e calcula o resumo.
-2. `createQuote` valida carrinho, cupom, estoque e rede. Guarda uma cópia dos itens/totais para revisão, com validade de cinco minutos do relógio simulado.
+2. `readCart` inclui a rede em cada linha e calcula `networkTotals` para cada rede presente. `createQuote` recebe a rede do grupo escolhido, valida a versão global do carrinho e guarda apenas os itens/totais dessa rede para revisão, com validade de cinco minutos do relógio simulado.
 3. `submitOrder` verifica se a chave de tentativa já existe para aquele usuário. Mesmo conteúdo recupera o resultado; conteúdo diferente gera conflito. Só uma tentativa nova revalida a cotação e a conexão da carteira.
 4. Uma cotação alterada exige nova revisão. Uma cotação válida cria o pedido pendente e reserva estoque. Pedido, reserva e registro da tentativa devem ser salvos na mesma transação.
-5. `advanceClock` resolve pedidos vencidos. Na confirmação, baixa estoque e remove do carrinho as quantidades capturadas. Na recusa, libera a reserva e preserva o carrinho.
+5. `advanceClock` resolve pedidos vencidos. Na confirmação, baixa estoque e remove do carrinho somente as quantidades capturadas daquele grupo de rede. Na recusa, libera a reserva e preserva o grupo. Outros grupos permanecem no carrinho e exigem suas próprias cotações e pedidos; não há atomicidade multichain (DEC-24).
 
 O recibo usa o **snapshot**, uma cópia dos dados da compra. Se o preço do NFT mudar depois, o total do pedido confirmado continua igual. Resolver um pedido terminal novamente não reaplica seus efeitos.
 
@@ -96,7 +98,7 @@ Em database.ts, a função recebida por `transact` deve ser síncrona: não colo
 
 ETH trafega como texto, por exemplo, `"0.1"`. Para calcular, money.ts converte para wei usando BigInt: um ETH corresponde a 10¹⁸ wei. Depois, converte o resultado novamente para texto. Isso evita imprecisões de ponto flutuante. Desconto usa basis points: 1.000 representa 10%; frações menores que um wei são arredondadas para baixo. REQ-012; DEC-06.
 
-O relógio da simulação começa em `2026-01-15T12:00:00Z` e avança por comando. Nesta etapa, esperar dois segundos reais não resolve um pedido: é necessário avançar o relógio do domínio. Scheduler e eventos de domínio entram nas TASK-10/TASK-11.
+O relógio da simulação começa em `2026-01-15T12:00:00Z` e avança por comando; ele resolve pedidos cuja data de resolução venceu e controla expiração da cotação. No fluxo normal da TASK-08, o handler também agenda uma resolução após o tempo real configurado em `POST /api/__mock/payment` (dois segundos por padrão), para que a interface possa acompanhar pending e o resultado terminal sem painel de cenário. Esse temporizador é apenas conveniência do mock; eventos de domínio e controle determinístico completo entram nas TASK-10/11.
 
 Controles disponíveis quando os mocks estão habilitados:
 
@@ -105,6 +107,7 @@ Controles disponíveis quando os mocks estão habilitados:
 | GET `/api/__mock/status` | Consulta schema, cenário, relógio e contagens de NFTs/usuários |
 | POST `/api/__mock/reset` com `{"scenarioId":"SCN-01"}` | Restaura todo o banco e fecha os sockets desta aba |
 | POST `/api/__mock/clock` com `{"advanceMs":2000}` | Avança o relógio e resolve pedidos vencidos no núcleo |
+| POST `/api/__mock/payment` com `{"outcome":"declined","delayMs":0}` | Programa resultado recusado e latência da simulação de pagamento |
 
 Reset não limpa automaticamente o estado de formulário/cache da interface; o painel da TASK-11 deverá cuidar desse ciclo. Outros cenários, controle de falhas e emissão de eventos continuam planejados em [SCENARIOS](SCENARIOS.md).
 

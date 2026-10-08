@@ -1,10 +1,54 @@
 import { toSocketIo } from '@mswjs/socket.io-binding'
 import { delay, http, HttpResponse, ws } from 'msw'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
-import { addCartItem, advanceClock, mergeGuestCart, readCart, removeCartItem, setCartCoupon, setCartQuantity } from './commerce'
+import { addCartItem, advanceClock, createQuote, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder, PAYMENT_DELAY_MS } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
 import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite } from './auth'
+import type { Network, OrderInput } from '../contracts/marketplace'
+
+let paymentSimulation = { delayMs: PAYMENT_DELAY_MS, outcome: 'confirmed' as 'confirmed' | 'declined' }
+const scheduledOrders = new Set<string>()
+
+function scheduleOrderResolution(orderId: string) {
+  if (scheduledOrders.has(orderId)) return
+  scheduledOrders.add(orderId)
+  setTimeout(() => {
+    void transact(state => settleOrder(state, orderId)).catch(() => undefined).finally(() => scheduledOrders.delete(orderId))
+  }, paymentSimulation.delayMs)
+}
+
+function validNetwork(value: unknown): value is Network {
+  return value === 'ethereum' || value === 'polygon' || value === 'solana'
+}
+
+function parseOrderInput(body: Record<string, unknown>): OrderInput {
+  const collector = body.collector
+  if (!collector || typeof collector !== 'object' || Array.isArray(collector)) invalid('Dados do colecionador inválidos.')
+  const data = collector as Record<string, unknown>
+  const optionalText = (value: unknown, field: string) => {
+    if (value === null || value === undefined) return null
+    if (typeof value !== 'string') invalid(`Campo ${field} inválido.`)
+    return value
+  }
+  if (!validNetwork(body.network)) invalid('Rede inválida.')
+  return {
+    quoteId: stringField(body, 'quoteId'),
+    quoteVersion: numberField(body, 'quoteVersion'),
+    walletId: stringField(body, 'walletId'),
+    network: body.network,
+    connectionId: stringField(body, 'connectionId'),
+    collector: {
+      displayName: stringField(data, 'displayName'),
+      username: stringField(data, 'username'),
+      email: stringField(data, 'email'),
+      profileName: stringField(data, 'profileName'),
+      ensName: optionalText(data.ensName, 'ensName'),
+      referralCode: optionalText(data.referralCode, 'referralCode'),
+      note: typeof data.note === 'string' ? data.note : '',
+    },
+  }
+}
 
 // MSW normalizes Socket.IO's default `/socket.io/` path to `/` before matching ws.link.
 const socket = ws.link(window.location.origin.replace(/^http/, 'ws'))
@@ -12,8 +56,11 @@ let catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
 let favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
 const closeSockets = new Set<() => void>()
 
-async function respond<T extends object>(operation: () => Promise<T>) {
-  try { return HttpResponse.json(await operation()) } catch (error) {
+async function respond<T extends object>(operation: () => Promise<T | Response>) {
+  try {
+    const result = await operation()
+    return result instanceof Response ? result : HttpResponse.json(result)
+  } catch (error) {
     if (error instanceof MockError) return HttpResponse.json(error.body, { status: error.status })
     console.error('Falha no mock de rede:', error)
     return HttpResponse.json({ error: { code: 'MOCK_FAILURE', message: 'Não foi possível executar a operação simulada.' } }, { status: 500 })
@@ -107,6 +154,69 @@ export const handlers = [
     const guestVersion = numberField(body, 'guestVersion')
     return transact(state => mergeGuestCart(state, requireSession(state, readToken(request)).userId, guestId, guestVersion))
   })),
+  http.get('/api/wallets', ({ request }) => respond(() => transact(state => {
+    const { userId } = requireSession(state, readToken(request))
+    return { items: state.wallets[userId] ?? [] }
+  }))),
+  http.post('/api/wallet-connections', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const walletId = stringField(body, 'walletId')
+    const networkValue = body.network
+    if (!validNetwork(networkValue)) invalid('Rede inválida.')
+    const provider = body.provider ?? 'metamask'
+    if (provider !== 'metamask' && provider !== 'walletconnect' && provider !== 'coinbase') invalid('Provedor de carteira inválido.')
+    return transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      const wallet = state.wallets[userId]?.find(item => item.id === walletId)
+      if (!wallet) throw new MockError(403, 'FORBIDDEN', 'Carteira não pertence ao usuário.')
+      if (wallet.network !== networkValue) throw new MockError(409, 'NETWORK_MISMATCH', 'A carteira não está cadastrada nesta rede.')
+      const id = `connection-${crypto.randomUUID()}`
+      state.connections[id] = { id, userId, walletId, network: networkValue, provider, active: true }
+      return { id, status: 'connected' as const, walletId, network: networkValue, provider }
+    })
+  })),
+  http.delete('/api/wallet-connections/:id', ({ request, params }) => respond(() => transact(state => {
+    const { userId } = requireSession(state, readToken(request))
+    const connection = state.connections[String(params.id)]
+    if (!connection || connection.userId !== userId) throw new MockError(404, 'NOT_FOUND', 'Conexão não encontrada.')
+    connection.active = false
+    return { disconnected: true }
+  }))),
+  http.post('/api/quotes', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const cartVersion = numberField(body, 'cartVersion')
+    if (!validNetwork(body.network)) invalid('Rede inválida.')
+    return transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      return createQuote(state, userId, { cartVersion, network: body.network as Network })
+    })
+  })),
+  http.post('/api/orders', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const input = parseOrderInput(body)
+    const key = request.headers.get('Idempotency-Key') ?? ''
+    const { userId } = await transact(state => ({ userId: requireSession(state, readToken(request)).userId }))
+    const result = await transact(state => submitOrder(state, userId, key, input, paymentSimulation.outcome))
+    if ('status' in result) throw new MockError(result.status, result.body.error.code, result.body.error.message, result.body.error.details)
+    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id)
+    return HttpResponse.json(result.order, { status: result.replayed ? 200 : 201 })
+  })),
+  http.get('/api/orders/:id', ({ request, params }) => respond(async () => {
+    const order = await transact(state => readOrder(state, requireSession(state, readToken(request)).userId, String(params.id)))
+    if (order.status === 'pending') scheduleOrderResolution(order.id)
+    return order
+  })),
+  http.get('/api/order-attempts/:key', ({ request, params }) => respond(async () => {
+    const { userId } = await transact(state => ({ userId: requireSession(state, readToken(request)).userId }))
+    const result = await transact(state => {
+      const attempt = state.attempts[userId]?.[String(params.key)]
+      if (!attempt) throw new MockError(404, 'NOT_FOUND', 'Tentativa não encontrada.')
+      if ('orderId' in attempt.result) return { order: readOrder(state, userId, attempt.result.orderId) }
+      throw new MockError(attempt.result.status, attempt.result.body.error.code, attempt.result.body.error.message, attempt.result.body.error.details)
+    })
+    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id)
+    return result
+  })),
   http.post('/api/auth/login', async ({ request }) => respond(async () => {
     const body = await readBody(request)
     const input = { email: stringField(body, 'email'), password: stringField(body, 'password') }
@@ -183,6 +293,8 @@ export const handlers = [
     await resetDatabase(now)
     catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
     favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
+    paymentSimulation = { delayMs: PAYMENT_DELAY_MS, outcome: 'confirmed' }
+    scheduledOrders.clear()
     for (const close of closeSockets) close()
     closeSockets.clear()
     return { scenarioId: 'SCN-01', reset: true }
@@ -192,6 +304,15 @@ export const handlers = [
     const advanceMs = body.advanceMs
     if (typeof advanceMs !== 'number') invalid('Avanço de relógio inválido.')
     return transact(state => { const orders = advanceClock(state, advanceMs); return { now: new Date(state.now).toISOString(), resolvedOrderIds: orders.map(order => order.id) } })
+  })),
+  http.post('/api/__mock/payment', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const outcome = body.outcome ?? 'confirmed'
+    const delayMs = body.delayMs ?? PAYMENT_DELAY_MS
+    if (outcome !== 'confirmed' && outcome !== 'declined') invalid('Resultado de pagamento inválido.')
+    if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10_000) invalid('Latência de pagamento inválida.')
+    paymentSimulation = { outcome, delayMs }
+    return paymentSimulation
   })),
   http.get('/api/__proof', () => HttpResponse.json({
     source: 'msw',
