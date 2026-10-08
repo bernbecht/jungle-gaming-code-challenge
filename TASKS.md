@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C/D concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10E em andamento; TASK-11 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C/D/E concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-11A em andamento; TASK-11B/C concluídas; TASK-11D e TASK-12 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -36,13 +36,17 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-09B | 2 / 7 | Implementar envio, validação e remoção do avatar; validar arquivo/tamanho, persistir a escolha e mostrar erros sem salvar parcialmente | TASK-09A | REQ-003, REQ-024 | TEST-08B | Concluída |
 | TASK-09C | 2 / 7 | Implementar alteração de senha com senha atual/nova; atualizar verificador com salt, sem persistir texto em claro; confirmar que senha antiga falha e nova autentica | TASK-09A | REQ-024 | TEST-08C, TEST-03 | Concluída |
 | TASK-09D | 2 / 7 | Implementar cadastro e edição das carteiras principal/secundária; validar endereço/rede/slot, persistir e refletir alterações no checkout | TASK-08 | REQ-014, REQ-024 | TEST-08D, TEST-06 | Concluída |
-| TASK-10 (épico) | 2 / 8 | Implementar eventos de domínio versionados, isolamento de sessão, reconciliação REST após reconexão e recuperação idempotente de pedidos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | Em andamento |
+| TASK-10 (épico) | 2 / 8 | Implementar eventos de domínio versionados, isolamento de sessão, reconciliação REST após reconexão e recuperação idempotente de pedidos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | Concluído |
 | TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Concluída |
 | TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | Concluída |
 | TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | Concluída |
 | TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | Concluída |
-| TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | Em andamento |
-| TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
+| TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | Concluída |
+| TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | Em andamento |
+| TASK-11A | 2 / 8 | Controlar e verificar expiração de sessão com o relógio simulado; preservar returnTo e permitir autenticação e retomada após 401 | TASK-06, TASK-10 | REQ-022, REQ-031, REQ-044 | TEST-03 | Em andamento |
+| TASK-11B | 2 / 8 | Completar controles determinísticos de latência, erro de rede e respostas 4xx/5xx para os recursos cobertos por TEST-07/08/12 | TASK-11A | REQ-030, REQ-031, REQ-044 | TEST-07, TEST-08, TEST-12 | Concluída |
+| TASK-11C | 2 / 8 | Tornar reset e seleção/preparação de cenários reproduzíveis, incluindo limpeza coerente do estado de navegador e simulação | TASK-11A, TASK-11B | REQ-030, REQ-031, REQ-044 | TEST-16 | Concluída |
+| TASK-11D | 2 / 8 | Fechar cobertura dos cenários publicados, documentar limites reais e validar execuções E2E desktop/mobile dos grupos afetados | TASK-11A, TASK-11B, TASK-11C | REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
 | TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
 | TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
 | TASK-14 | 2 / 11 | Auditar cedo; concluir 12 medições no build final, medianas/métricas, HTML/JSON e análise de desvios | TASK-12 | REQ-001, REQ-045, REQ-046 | TEST-15 | A fazer |
@@ -329,6 +333,10 @@ TASK-10C concluída. Typecheck, lint, build e 27 testes unitários passaram; o u
 - [x] Adicionar controle determinístico de resposta 504 após persistência e E2E para refresh, acompanhamento pending→confirmed, um único POST e carrinho removido após confirmação.
 - [x] Executar o novo E2E em Chromium desktop/mobile; o usuário confirmou que os testes passaram.
 
+
+### TASK-11B/C — Controles de rede e reset de avaliação
+
+O usuário confirmou que os E2E desktop/mobile de detalhe/carrinho com falhas de rede e recuperação, e o reset de avaliação com limpeza de storage, passaram. TASK-11B/C concluídas; a TASK-11A (expiração de sessão e retorno) ainda aguarda confirmação de execução E2E.
 
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026
 

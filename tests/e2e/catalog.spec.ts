@@ -236,6 +236,33 @@ test("invalid URL values use safe defaults and mobile drawer restores focus", as
   ).toBe(true);
 });
 
+test("detail request supports a deterministic network failure and explicit recovery", async ({ page }) => {
+  await page.evaluate(async () => {
+    const response = await fetch("/api/__mock/detail-network", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ failuresRemaining: 5, failureMode: "network" }),
+    })
+    if (!response.ok) throw new Error("Could not configure the detail network failure")
+  })
+  await page.getByRole("link", { name: "Ir à página inicial" }).click()
+  await expect.poll(() => new URL(page.url()).pathname).toBe("/")
+  await page.getByRole("link", { name: /Ver Violet Nomad/ }).first().click()
+  await expect(page).toHaveURL(/\/nfts\/nft-001$/)
+  await expect(page.getByRole("alert")).toContainText("Não foi possível carregar o detalhe.")
+
+  await page.evaluate(async () => {
+    const response = await fetch("/api/__mock/detail-network", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    })
+    if (!response.ok) throw new Error("Could not clear the detail network failure")
+  })
+  await page.getByRole("button", { name: "Tentar novamente", exact: true }).click()
+  await expect(page.getByRole("heading", { name: "Violet Nomad", exact: true })).toBeVisible()
+})
+
 test("slow catalog shows skeleton and obsolete response cannot replace a newer search", async ({
   page,
 }) => {

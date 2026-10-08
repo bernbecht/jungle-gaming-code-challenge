@@ -10,6 +10,24 @@ export function IntegrationProofPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [socketResult, setSocketResult] = useState<string | null>(null)
+  const [resetting, setResetting] = useState(false)
+
+  async function resetEvaluation() {
+    setResetting(true)
+    setError(null)
+    try {
+      await http.post('/__mock/reset', { scenarioId: 'SCN-01', seed: 1 })
+      sessionStorage.removeItem('kurio-session-token')
+      localStorage.removeItem('kurio-guest-id')
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith('kurio-order-attempt:')) localStorage.removeItem(key)
+      }
+      window.location.assign('/')
+    } catch {
+      setResetting(false)
+      setError('Não foi possível restaurar a simulação. Tente novamente.')
+    }
+  }
 
   async function verifyRest() {
     setLoading(true)
@@ -68,6 +86,13 @@ export function IntegrationProofPage() {
       <p className="text-xs font-medium tracking-widest text-muted-foreground">DIAGNÓSTICO INTERNO · TASK-03</p>
       <h1 className="text-2xl font-semibold">Prova de integração de rede</h1>
       <p className="text-sm leading-6 text-muted-foreground">Esta rota de diagnóstico valida requisições Axios e eventos Socket.IO recebidos do MSW no navegador.</p>
+      <section aria-labelledby="evaluation-controls-title" className="space-y-3 rounded-md border p-5">
+        <h2 id="evaluation-controls-title" className="text-lg font-semibold">Preparar demonstração</h2>
+        <p className="text-sm leading-6 text-muted-foreground">O reset restaura o cenário SCN-01, remove sessão e tentativas de compra salvas e recarrega a aplicação. Os outros cenários ainda não estão disponíveis para seleção.</p>
+        <button className="rounded-md border px-4 py-2 text-sm focus-visible:outline-2" onClick={() => void resetEvaluation()} disabled={resetting || loading}>
+          {resetting ? 'Restaurando…' : 'Resetar demonstração'}
+        </button>
+      </section>
       <button className="rounded-md border px-4 py-2 text-sm focus-visible:outline-2" onClick={() => void verifyRest()} disabled={loading}>
         {loading ? 'Verificando…' : 'Executar prova REST'}
       </button>

@@ -61,6 +61,48 @@ test('visitor cart persists, updates quantity and calculates valid coupon totals
   await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
 })
 
+test('cart query exposes its skeleton during a deterministic delay', async ({ page }) => {
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/cart-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ delayMs: 700 }),
+    })
+    if (!response.ok) throw new Error('Could not configure the cart delay')
+    localStorage.removeItem('kurio-guest-id')
+  })
+  await page.getByRole('link', { name: 'Ir à página inicial' }).click()
+  await page.getByRole('link', { name: /Carrinho de NFTs/ }).click()
+  await expect(page.getByRole('status', { name: 'Carregando carrinho' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
+})
+
+test('cart query recovers from a deterministic network failure after retry', async ({ page }) => {
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/cart-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ failuresRemaining: 5, failureMode: 'network' }),
+    })
+    if (!response.ok) throw new Error('Could not configure the cart network failure')
+    localStorage.removeItem('kurio-guest-id')
+  })
+  await page.getByRole('link', { name: 'Ir à página inicial' }).click()
+  await page.getByRole('link', { name: /Carrinho de NFTs/ }).click()
+  await expect(page.getByRole('alert')).toContainText('Não foi possível carregar o carrinho.')
+
+  await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/cart-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    })
+    if (!response.ok) throw new Error('Could not clear the cart network failure')
+  })
+  await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
+})
+
 test('login merges visitor items once and keeps them in the account cart', async ({ page }) => {
   await page.goto('/nfts/nft-001')
   await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()

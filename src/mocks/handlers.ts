@@ -93,9 +93,34 @@ function parseOrderInput(body: Record<string, unknown>): OrderInput {
 
 // MSW normalizes Socket.IO's default `/socket.io/` path to `/` before matching ws.link.
 const socket = ws.link(window.location.origin.replace(/^http/, 'ws'))
-let catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
-let favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
+type NetworkSimulation = { delayMs: number; failuresRemaining: number; failureMode: 'http' | 'network'; statusCode: number }
+const defaultNetworkSimulation = (): NetworkSimulation => ({ delayMs: 0, failuresRemaining: 0, failureMode: 'http', statusCode: 503 })
+let catalogNetwork = defaultNetworkSimulation()
+let detailNetwork = defaultNetworkSimulation()
+let cartNetwork = defaultNetworkSimulation()
+let favoriteNetwork = defaultNetworkSimulation()
 const closeSockets = new Set<() => void>()
+
+function parseNetworkSimulation(body: Record<string, unknown>): NetworkSimulation {
+  const delayMs = body.delayMs ?? 0
+  const failuresRemaining = body.failuresRemaining ?? 0
+  const failureMode = body.failureMode ?? 'http'
+  const statusCode = body.statusCode ?? 503
+  if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10000) invalid('Latência inválida (0–10000 ms).')
+  if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
+  if (failureMode !== 'http' && failureMode !== 'network') invalid('Tipo de falha inválido.')
+  if (typeof statusCode !== 'number' || !Number.isSafeInteger(statusCode) || statusCode < 400 || statusCode > 599) invalid('Status HTTP inválido (400–599).')
+  return { delayMs, failuresRemaining, failureMode, statusCode }
+}
+
+async function applyNetworkSimulation(simulation: NetworkSimulation, resource: string): Promise<Response | null> {
+  const fail = simulation.failuresRemaining > 0
+  if (fail) simulation.failuresRemaining--
+  if (simulation.delayMs) await delay(simulation.delayMs)
+  if (!fail) return null
+  if (simulation.failureMode === 'network') return HttpResponse.error()
+  return HttpResponse.json({ error: { code: 'TEMPORARY_FAILURE', message: `Falha temporária em ${resource}.` } }, { status: simulation.statusCode })
+}
 
 async function respond<T extends object>(operation: () => Promise<T | Response>) {
   try {
@@ -151,11 +176,15 @@ function versionHeader(request: Request) {
 }
 
 export const handlers = [
-  http.get('/api/cart', ({ request }) => respond(() => transact(state => {
-    const token = readToken(request)
-    const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
-    return readCart(state, owner)
-  }))),
+  http.get('/api/cart', async ({ request }) => {
+    const failure = await applyNetworkSimulation(cartNetwork, 'carrinho')
+    if (failure) return failure
+    return respond(() => transact(state => {
+      const token = readToken(request)
+      const owner = token ? `user:${requireSession(state, token).userId}` : guestOwner(request)
+      return readCart(state, owner)
+    }))
+  }),
   http.post('/api/cart/items', async ({ request }) => respond(async () => {
     const body = await readBody(request)
     const input = { nftId: stringField(body, 'nftId'), editionId: stringField(body, 'editionId'), quantity: numberField(body, 'quantity'), expectedVersion: numberField(body, 'expectedVersion') }
@@ -407,52 +436,50 @@ export const handlers = [
     const { userId } = requireSession(state, readToken(request))
     return readFavorites(state, userId)
   }))),
-  http.put('/api/me/favorites/:nftId', async ({ request, params }) => respond(async () => {
-    const body = await readBody(request)
-    if (typeof body.favorite !== 'boolean') invalid('Favorito inválido.')
-    const token = readToken(request)
-    const { userId } = await transact(state => requireSession(state, token))
-    const fail = favoriteNetwork.failuresRemaining > 0
-    if (fail) favoriteNetwork.failuresRemaining--
-    if (favoriteNetwork.delayMs) await delay(favoriteNetwork.delayMs)
-    if (fail) {
-      throw new MockError(503, 'TRANSIENT_FAILURE', 'Falha temporária ao atualizar favoritos.')
-    }
-    return transact(state => {
-      requireSession(state, token)
-      return setFavorite(state, userId, String(params.nftId), body.favorite as boolean)
+  http.put('/api/me/favorites/:nftId', async ({ request, params }) => {
+    const failure = await applyNetworkSimulation(favoriteNetwork, 'favoritos')
+    if (failure) return failure
+    return respond(async () => {
+      const body = await readBody(request)
+      if (typeof body.favorite !== 'boolean') invalid('Favorito inválido.')
+      const token = readToken(request)
+      const { userId } = await transact(state => requireSession(state, token))
+      return transact(state => {
+        requireSession(state, token)
+        return setFavorite(state, userId, String(params.nftId), body.favorite as boolean)
+      })
     })
-  })),
+  }),
   http.post('/api/__mock/catalog-network', ({ request }) => respond(async () => {
-    const body = await readBody(request)
-    const delayMs = body.delayMs ?? 0, failuresRemaining = body.failuresRemaining ?? 0
-    if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10000) invalid('Latência inválida (0–10000 ms).')
-    if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
-    catalogNetwork = { delayMs, failuresRemaining }
+    catalogNetwork = parseNetworkSimulation(await readBody(request))
     return { ...catalogNetwork }
   })),
+  http.post('/api/__mock/detail-network', ({ request }) => respond(async () => {
+    detailNetwork = parseNetworkSimulation(await readBody(request))
+    return { ...detailNetwork }
+  })),
+  http.post('/api/__mock/cart-network', ({ request }) => respond(async () => {
+    cartNetwork = parseNetworkSimulation(await readBody(request))
+    return { ...cartNetwork }
+  })),
   http.post('/api/__mock/favorite-network', ({ request }) => respond(async () => {
-    const body = await readBody(request)
-    const delayMs = body.delayMs ?? 0
-    const failuresRemaining = body.failuresRemaining ?? 0
-    if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10000) invalid('Latência inválida (0–10000 ms).')
-    if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
-    favoriteNetwork = { delayMs, failuresRemaining }
+    favoriteNetwork = parseNetworkSimulation(await readBody(request))
     return { ...favoriteNetwork }
   })),
   http.get('/api/nfts', async ({ request }) => {
-    const delayMs = catalogNetwork.delayMs
-    const fail = catalogNetwork.failuresRemaining > 0
-    if (fail) catalogNetwork.failuresRemaining--
-    if (delayMs) await delay(delayMs)
-    if (fail) return HttpResponse.json({ error: { code: 'TEMPORARY_FAILURE', message: 'Falha temporária do catálogo.' } }, { status: 503 })
+    const failure = await applyNetworkSimulation(catalogNetwork, 'catálogo')
+    if (failure) return failure
     return respond(() => {
       const params = parseCatalogParams(new URL(request.url).searchParams)
       return transact(state => listNfts(state, params))
     })
   }),
   http.get('/api/nfts/facets', () => respond(() => transact(catalogFacets))),
-  http.get('/api/nfts/:id', ({ params }) => respond(() => transact(state => readNft(state, String(params.id))))),
+  http.get('/api/nfts/:id', async ({ params }) => {
+    const failure = await applyNetworkSimulation(detailNetwork, 'detalhe do NFT')
+    if (failure) return failure
+    return respond(() => transact(state => readNft(state, String(params.id))))
+  }),
   http.get('/api/__mock/status', () => respond(() => transact(state => ({ schemaVersion: state.schemaVersion, scenarioId: state.scenarioId, now: new Date(state.now).toISOString(), nftCount: state.nfts.length, userCount: state.users.length })))),
   http.post('/api/__mock/reset', ({ request }) => respond(async () => {
     const body = await readBody(request)
@@ -461,8 +488,10 @@ export const handlers = [
     const now = body.now === undefined ? undefined : typeof body.now === 'string' ? Date.parse(body.now) : NaN
     if (now !== undefined && (!Number.isFinite(now) || !Number.isSafeInteger(now))) invalid('Data de reset inválida.')
     await resetDatabase(now)
-    catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
-    favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
+    catalogNetwork = defaultNetworkSimulation()
+    detailNetwork = defaultNetworkSimulation()
+    cartNetwork = defaultNetworkSimulation()
+    favoriteNetwork = defaultNetworkSimulation()
     scheduledOrders.clear()
     for (const close of closeSockets) close()
     closeSockets.clear()
