@@ -15,6 +15,7 @@ TASK-04 concluída na árvore de trabalho: contratos v1, 36 NFTs/dois usuários 
 | [ROTEIRO.md](ROTEIRO.md) | Cronograma de dois dias e prioridades |
 | [TASKS.md](TASKS.md) | Backlog com dependências, aceite, status e IDs TASK |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Decisões DEC sobre estado, sessão, dinheiro, pedidos e eventos |
+| [Decisões para avaliação](docs/DECISOES-PARA-AVALIACAO.md) | Motivações, evidências e consequências das adaptações do protótipo e das regras de produto |
 | [docs/FLOWS.md](docs/FLOWS.md) | Fluxos FLOW: ações do usuário, estados, alternativas e resultados esperados |
 | [docs/MOCKS-GUIDE.md](docs/MOCKS-GUIDE.md) | Guia didático dos arquivos, fixtures, banco, MSW e regras da TASK-04 |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Contratos propostos API/EVT, payloads, validações e erros |

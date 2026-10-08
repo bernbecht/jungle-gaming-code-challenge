@@ -4,7 +4,7 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { addCartItem, advanceClock, createQuote, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder, PAYMENT_DELAY_MS } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
-import { AVATAR_MAX_BYTES, AVATAR_TYPES, login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateAvatar, updateProfile } from './auth'
+import { AVATAR_MAX_BYTES, AVATAR_TYPES, changePassword, login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateAvatar, updateProfile } from './auth'
 import type { Network, OrderInput } from '../contracts/marketplace'
 
 const scheduledOrders = new Set<string>()
@@ -285,6 +285,32 @@ export const handlers = [
     const { userId } = requireSession(state, readToken(request))
     return updateAvatar(state, userId, version, null)
   }))),
+  http.put('/api/profile/password', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const currentPassword = stringField(body, 'currentPassword')
+    const newPassword = stringField(body, 'newPassword')
+    const { userId, storedPassword } = await transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      const user = state.users.find(candidate => candidate.profile.id === userId)!
+      return { userId, storedPassword: user.password }
+    })
+    const fieldErrors: Record<string, string[]> = {}
+    if (newPassword.length < 8) fieldErrors.newPassword = ['Use ao menos 8 caracteres.']
+    if (newPassword === currentPassword) fieldErrors.newPassword = ['Escolha uma senha diferente da atual.']
+    if (Object.keys(fieldErrors).length) {
+      const error = new MockError(422, 'VALIDATION_ERROR', 'Revise os campos destacados.')
+      error.body.error.fieldErrors = fieldErrors
+      throw error
+    }
+    const attemptedCurrentVerifier = await passwordVerifier(currentPassword, storedPassword.salt, storedPassword.iterations)
+    const salt = crypto.randomUUID()
+    const nextPassword = { salt, verifier: await passwordVerifier(newPassword, salt, PASSWORD_ITERATIONS), iterations: PASSWORD_ITERATIONS }
+    await transact(state => {
+      requireSession(state, readToken(request))
+      changePassword(state, userId, storedPassword.verifier, attemptedCurrentVerifier, nextPassword)
+    })
+    return new HttpResponse(null, { status: 204 })
+  })),
   http.get('/api/me/favorites', ({ request }) => respond(() => transact(state => {
     const { userId } = requireSession(state, readToken(request))
     return readFavorites(state, userId)

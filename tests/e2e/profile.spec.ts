@@ -103,3 +103,57 @@ test('avatar upload rejects files larger than 2 MB without changing the profile'
   await expect(page.getByRole('alert')).toContainText('A imagem deve ter até 2 MB.')
   await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveCount(0)
 })
+
+test('password change validates current and matching passwords, then invalidates the old password', async ({ page }) => {
+  await page.goto('/profile')
+  const passwordInputs = [
+    page.getByRole('textbox', { name: 'Senha atual', exact: true }),
+    page.getByRole('textbox', { name: 'Nova senha', exact: true }),
+    page.getByRole('textbox', { name: 'Confirmar nova senha', exact: true }),
+  ]
+  for (const input of passwordInputs) {
+    const passwordToggle = input.locator('..').getByRole('button')
+    await expect(input).toHaveAttribute('type', 'password')
+    await expect(passwordToggle).toHaveAccessibleName('Mostrar senha')
+    await passwordToggle.click()
+    await expect(input).toHaveAttribute('type', 'text')
+    await expect(passwordToggle).toHaveAccessibleName('Ocultar senha')
+    await passwordToggle.click()
+    await expect(input).toHaveAttribute('type', 'password')
+  }
+  await passwordInputs[0]!.fill('senha-incorreta')
+  await passwordInputs[1]!.fill('NovaSenha!2026')
+  await passwordInputs[2]!.fill('NovaSenha!2026')
+  const wrongPasswordResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/profile/password') && response.request().method() === 'PUT')
+  await page.getByRole('button', { name: 'Alterar senha' }).click()
+  const wrongPasswordResponse = await wrongPasswordResponsePromise
+  expect(wrongPasswordResponse.status()).toBe(422)
+  await expect(page.getByText('Confira sua senha atual.')).toBeVisible()
+
+  await passwordInputs[0]!.fill('DemoNft!2026')
+  await passwordInputs[2]!.fill('OutraSenha!2026')
+  await page.getByRole('button', { name: 'Alterar senha' }).click()
+  await expect(page.getByText('As senhas novas não coincidem.')).toBeVisible()
+
+  await passwordInputs[2]!.fill('NovaSenha!2026')
+  const changeResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/profile/password') && response.request().method() === 'PUT')
+  await page.getByRole('button', { name: 'Alterar senha' }).click()
+  expect((await changeResponsePromise).status()).toBe(204)
+  await expect(page.getByRole('status').filter({ hasText: 'Senha atualizada.' })).toBeVisible()
+
+  const credentialResults = await page.evaluate(async () => {
+    async function authenticate(password: string) {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'collector-a@example.test', password }),
+      })
+      return response.status
+    }
+    return {
+      oldPassword: await authenticate('DemoNft!2026'),
+      newPassword: await authenticate('NovaSenha!2026'),
+    }
+  })
+  expect(credentialResults).toEqual({ oldPassword: 401, newPassword: 200 })
+})

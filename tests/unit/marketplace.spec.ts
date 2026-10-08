@@ -4,7 +4,7 @@ import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
-import { updateAvatar, updateProfile } from '../../src/mocks/auth'
+import { changePassword, updateAvatar, updateProfile } from '../../src/mocks/auth'
 import { MockError } from '../../src/mocks/errors'
 import { BASE_TIME } from '../../src/mocks/state'
 import type { DatabaseState } from '../../src/mocks/state'
@@ -72,6 +72,22 @@ test('avatar changes persist as profile versions and reject stale writes without
   expect(state.users[0]?.profile).toEqual(uploaded)
   const removed = updateAvatar(state, 'user-a', 2, null)
   expect(removed).toMatchObject({ avatarUrl: null, version: 3 })
+})
+
+test('password change replaces only the salted verifier and rejects incorrect or stale credentials', async () => {
+  const state = await createFixtures()
+  const stored = state.users[0]!.password
+  const nextPassword = { salt: 'new-random-salt', verifier: 'new-password-verifier', iterations: stored.iterations }
+  expect(() => changePassword(state, 'user-a', stored.verifier, 'incorrect-verifier', nextPassword)).toThrow(MockError)
+  expect(state.users[0]!.password).toEqual(stored)
+
+  changePassword(state, 'user-a', stored.verifier, stored.verifier, nextPassword)
+  expect(state.users[0]!.password).toEqual(nextPassword)
+  expect(JSON.stringify(state.users[0]!.password)).not.toContain('DemoNft!2026')
+  expect(() => changePassword(state, 'user-a', stored.verifier, stored.verifier, {
+    salt: 'another-salt', verifier: 'stale-verifier', iterations: stored.iterations,
+  })).toThrow(MockError)
+  expect(state.users[0]!.password).toEqual(nextPassword)
 })
 
 test('catalog combines dimensions, paginates, sorts and returns an empty result', async () => {

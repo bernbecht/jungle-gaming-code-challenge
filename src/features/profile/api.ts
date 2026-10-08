@@ -21,3 +21,7 @@ export async function uploadAvatar(file: File, expectedVersion: number) {
 export async function removeAvatar(expectedVersion: number) {
   return (await http.delete<Profile>('/profile/avatar', { headers: { 'If-Match': String(expectedVersion) } })).data
 }
+
+export async function updatePassword(input: { currentPassword: string; newPassword: string }) {
+  await http.put<void>('/profile/password', input)
+}

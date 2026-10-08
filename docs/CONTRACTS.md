@@ -1,6 +1,6 @@
 # Contratos REST e eventos
 
-Status: **DTOs v1, catálogo, autenticação, favoritos, carrinho e checkout básico implementados nas TASK-04 a TASK-08; perfil e avatar implementados nas TASK-09A/B; senha, carteiras editáveis e eventos de domínio seguem pendentes**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
+Status: **DTOs v1, catálogo, autenticação, favoritos, carrinho e checkout básico implementados nas TASK-04 a TASK-08; perfil, avatar e alteração de senha implementados nas TASK-09A/B/C; carteiras editáveis e eventos de domínio seguem pendentes**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
 
 ## Campos identificados nas screenshots — DEC-19
 
@@ -13,7 +13,7 @@ Modelos v1 em `src/contracts/marketplace.ts` cobrem rede, abas Novos/Em alta, or
 - API-01/API-02/API-04: cadastro, sessão e favoritos estão ligados aos handlers MSW; verificar a cobertura E2E antes de considerar TEST-03/TEST-04 aprovados.
 - API-05/API-06/API-07: carrinho e cupons estão ligados aos handlers MSW/IndexedDB; visitante é identificado por `X-Guest-Id`, autenticado pelo bearer token. Merge consome a versão de origem uma vez e devolve avisos para estoque/cupom não transferidos.
 - API-08/API-09/API-12: cotação, conexão simulada, pedido idempotente, recuperação e telas de checkout/recibo implementados na TASK-08.
-- API-10 GET/PATCH e avatar implementados nas TASK-09A/B; alteração de senha fica na TASK-09C. API-11 GET de carteiras já atende o checkout; criação/edição fica na TASK-09D.
+- API-10 GET/PATCH, avatar e alteração de senha implementados nas TASK-09A/B/C. API-11 GET de carteiras já atende o checkout; criação/edição fica na TASK-09D.
 - Eventos de domínio seguem pendentes na TASK-10.
 
 ## Convenções
@@ -43,7 +43,7 @@ Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/m
 | API-07 | `PUT /cart/coupon`, `DELETE /cart/coupon` | PUT `{code,expectedVersion}`; DELETE com `If-Match` → 200 Cart | 422 `COUPON_INVALID`/`COUPON_EXPIRED`, 409 versão | REQ-011 |
 | API-08 | `POST /quotes` (privado) | `{cartVersion,network}` → 200 Quote com apenas os itens do carrinho naquela rede; valida versão global, cupom, estoque e taxa da rede selecionada. Se não houver itens na rede, retorna 422 | 409 `CART_CHANGED`/`STOCK_CONFLICT`, 422 cupom/rede/itens ausentes | REQ-012, REQ-014, REQ-015 |
 | API-09 | `POST /orders`, `GET /orders/:id`, `GET /order-attempts/:key` (privado) | POST OrderInput + `Idempotency-Key` → 201 Order na criação / 200 Order em replay; GET pedido → 200 Order; tentativa → 200 `{order:Order}` ou resultado de conflito previamente registrado | 401, 403, 404 tentativa/pedido, 409 cotação/idempotência/estoque | REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 |
-| API-10 | `GET /profile`, `PATCH /profile`, `PUT/DELETE /profile/avatar`, `PUT /profile/password` (privado) | GET/PATCH → `Profile`; PATCH `{username,displayName,email,ensName,expectedVersion}`; avatar multipart `file,expectedVersion` → perfil; DELETE avatar com `If-Match` → perfil; senha `{currentPassword,newPassword}` → 204 | Upload aceita PNG/JPEG/WebP até 2 MiB e verifica assinatura do conteúdo. Só altera `avatarUrl` após validação; ambas operações incrementam `Profile.version` e conflito retorna 409. 422 campos/arquivo/senha | REQ-024 |
+| API-10 | `GET /profile`, `PATCH /profile`, `PUT/DELETE /profile/avatar`, `PUT /profile/password` (privado) | GET/PATCH → `Profile`; PATCH `{username,displayName,email,ensName,expectedVersion}`; avatar multipart `file,expectedVersion` → perfil; DELETE avatar com `If-Match` → perfil; senha `{currentPassword,newPassword}` → 204 | Upload aceita PNG/JPEG/WebP até 2 MiB e verifica assinatura do conteúdo. Senha atual validada; senha nova exige 8+ caracteres e deve ser diferente; troca salt/verificador sem texto claro. 422 campos/arquivo/senha, 409 versão/senha alterada concorrentemente | REQ-024 |
 | API-11 | `GET /wallets`, `POST /wallets`, `PATCH /wallets/:id` (privado) | GET → `{items:Wallet[]}` está implementado; POST/PATCH pertencem à TASK-09 | 422 endereço/rede, 409 slot/endereço/versão, 403 | REQ-014, REQ-024 |
 | API-12 | `POST /wallet-connections`, `DELETE /wallet-connections/:id` (privado) | POST `{walletId,network,provider}` → 201 `{id,status:'connected',walletId,network,provider}`; DELETE → `{disconnected:true}`. Conexão simulada | 404 conexão/carteira alheia, 409 `NETWORK_MISMATCH`; pedido revalida conexão | REQ-014 |
 | API-13 | Controles `/api/__mock/status`, `/reset`, `/clock`, `/catalog-network`, `/favorite-network`, fora da API de produto | Reset/relógio e parâmetros de latência/falha do catálogo e favoritos | 422 configuração inválida | REQ-030, REQ-031, REQ-044 |

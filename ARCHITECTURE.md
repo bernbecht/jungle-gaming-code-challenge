@@ -58,8 +58,15 @@ As decisões abaixo complementam DEC-14 e substituem a espera por informações 
 | DEC-27 | O header global de desktop fica oculto em todas as rotas abaixo do breakpoint `md`; cada fluxo mobile usa sua própria composição, sem reaproveitar o header desktop | UI-SPEC / shell; coberto por verificações de home, login e checkout no E2E | REQ-004, REQ-037, REQ-039 |
 | DEC-28 | Manter a confirmação e o recibo em uma rota própria (`/orders/:orderId`), não em uma modal transitória. A confirmação é assíncrona e depende da resolução do pedido; a URL permite recuperar o estado após refresh, abrir o recibo diretamente e preservar um destino inequívoco para os estados pendente, confirmado e recusado. Manter o painel centralizado do mockup dentro da rota e usar ações explícitas para sair, sem o X de modal | TASK-08; validar navegação, refresh, estados e composição visual em TEST-06, TEST-07 e TEST-14 | REQ-003, REQ-004, REQ-017, REQ-018, REQ-020 |
 | DEC-29 | O perfil recebe o nome ENS completo em um único campo de texto (por exemplo, `ana.eth`). O protótipo só suporta nomes `.eth`, então não há seletor de moeda/rede ou sufixo; a demo não consulta a blockchain nem valida se o nome está registrado. O campo permanece opcional | TASK-09A; cobrir persistência em TEST-08A e revisar composição em TEST-14 | REQ-024, REQ-037 |
+| DEC-30 | Salvar dados do perfil e alterar senha são ações separadas. A senha exige validação da credencial atual, confirmação e mensagens próprias; a API não oferece transação atômica que englobe perfil e senha, então um único botão poderia confirmar apenas parte das alterações quando uma das operações falhasse | TASK-09C; cobrir senha atual incorreta, confirmação, nova autenticação e rejeição da senha antiga em TEST-08C/TEST-03 | REQ-024 |
 
 A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
+
+### DEC-30 — Salvar perfil e alterar senha como ações separadas
+
+O botão **Salvar** grava nome de exibição, nome de usuário, e-mail e ENS pelo `PATCH /profile`. O botão **Alterar senha** envia somente a senha atual e a nova pelo `PUT /profile/password`; a confirmação é validada no cliente e não é enviada à API. As duas ações ficam em formulários independentes porque têm pré-condições e resultados diferentes: uma alteração de senha exige provar conhecimento da credencial atual, e os erros devem permanecer junto ao grupo de senha.
+
+Um único botão para ambos os grupos encadearia duas operações independentes. Se a primeira fosse concluída e a segunda falhasse, ou vice-versa, parte das alterações seria persistida apesar da interface sugerir que o envio era uma unidade. Manter ações distintas evita esse estado de sucesso parcial e deixa explícito o efeito de cada ação. Unificar os botões só deve ser reconsiderado se o produto exigir salvamento conjunto e a API oferecer uma operação transacional que grave ambos os recursos atomicamente.
 
 ## Sessão e isolamento — DEC-04
 

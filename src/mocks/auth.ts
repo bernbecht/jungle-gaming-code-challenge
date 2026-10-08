@@ -99,6 +99,25 @@ export function updateAvatar(state: DatabaseState, userId: string, expectedVersi
   return user.profile
 }
 
+export function changePassword(
+  state: DatabaseState,
+  userId: string,
+  expectedCurrentVerifier: string,
+  attemptedCurrentVerifier: string,
+  nextPassword: StoredUser['password'],
+) {
+  const user = state.users.find(candidate => candidate.profile.id === userId)
+  if (!user) throw new MockError(404, 'NOT_FOUND', 'Conta não encontrada.')
+  if (user.password.verifier !== expectedCurrentVerifier || user.password.salt === nextPassword.salt)
+    throw new MockError(409, 'PASSWORD_CHANGED', 'A senha foi alterada em outra sessão. Atualize a página e tente novamente.')
+  if (attemptedCurrentVerifier !== user.password.verifier) {
+    const error = new MockError(422, 'CURRENT_PASSWORD_INVALID', 'A senha atual está incorreta.')
+    error.body.error.fieldErrors = { currentPassword: ['Confira sua senha atual.'] }
+    throw error
+  }
+  user.password = nextPassword
+}
+
 export function requireSession(state: DatabaseState, token: string | null): { userId: string; session: Session } {
   const record = token ? state.sessions[token] : undefined
   if (!record || record.expiresAt <= state.now) {
