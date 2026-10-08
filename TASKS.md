@@ -358,3 +358,10 @@ Ajuste temporário verificado: seis E2Es de favoritos passaram em desktop/mobile
 - [ ] Definir o comportamento no detalhe do NFT e no checkout, considerando os controles de compra e a concentração no fluxo de pagamento.
 - [ ] Resolver a coexistência com o resumo fixo do carrinho, garantindo que navegação e ações não se sobreponham, inclusive com safe-area.
 - [ ] Validar em mobile navegação por toque/teclado, retorno, foco, rolagem e ausência de conteúdo coberto; atualizar UI-SPEC e os E2Es após a decisão.
+
+
+### Correção — Acesso direto a favoritos com sessão salva — 08/10/2026
+
+Reproduzido `CancelledError` ao abrir ou atualizar `/favorites` no Vite dev com Strict Mode: a desmontagem inicial do observador cancelava a leitura de sessão compartilhada com o guard. O bootstrap agora aguarda a recuperação da sessão antes de montar o roteador; a autenticação das rotas continua usando o guard existente. Adicionada `playwright.dev.config.ts` para executar os E2Es com Strict Mode ativo e artefatos separados da suíte de produção; comando documentado no README.
+
+Verificação: 18 E2Es de favoritos/autenticação/shell passaram em desenvolvimento e outros 18 em produção, nos projetos desktop/mobile, incluindo acesso direto e refresh. Typecheck, build, lint e diff check passaram. Sem commit desta correção.

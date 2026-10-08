@@ -60,6 +60,7 @@ npm run dev
 | `npm run typecheck` | TypeScript dos arquivos da aplicação/configuração/testes |
 | `npm run lint` | ESLint sem warnings permitidos |
 | `npm run test:e2e` | Fluxos de shell, catálogo, homepage, autenticação/favoritos e provas MSW em desktop/mobile; instalar Chromium com `npx playwright install chromium` antes |
+| `npx playwright test tests/e2e/favorites.spec.ts tests/e2e/auth.spec.ts --config=playwright.dev.config.ts` | Verifica acesso direto e refresh das rotas protegidas com Strict Mode ativo no servidor de desenvolvimento; resultados em `artifacts/playwright-development/` |
 | `npm run test:unit` | Testes do domínio: precisão ETH, catálogo, cotação, idempotência, estoque e efeitos de confirmação/recusa; sem browser |
 | `npm run test:visual` | Filtro `@visual`; ainda não há testes visuais, portanto não deve ser considerado aprovado |
 | `npm run test:report` | Abrir relatório HTML após execução Playwright |
