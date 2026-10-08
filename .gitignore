@@ -10,3 +10,6 @@ test-results/
 artifacts/
 *.log
 
+.DS_Store
+design/.DS_Store
+design/screenshots/.DS_Store
