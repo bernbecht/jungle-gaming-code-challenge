@@ -1,4 +1,21 @@
 import type { Nft, NftUpdated, Order, OrderUpdated } from '../../contracts/marketplace'
+import type { Query, QueryClient } from '@tanstack/react-query'
+
+export function isPrivateQueryForUser(queryKey: readonly unknown[], userId: string) {
+  if (!userId) return false
+  const [scope, identity] = queryKey
+  if (scope === 'cart') return identity === `user:${userId}`
+  if (scope === 'favorites' || scope === 'profile' || scope === 'wallets') return identity === userId
+  if (scope === 'orders') return true
+  return scope === 'domain-events' && identity === 'order'
+}
+
+export function clearPrivateQueriesForUser(queryClient: QueryClient, userId: string) {
+  if (!userId) return
+  const predicate = (query: Query) => isPrivateQueryForUser(query.queryKey, userId)
+  void queryClient.cancelQueries({ predicate })
+  queryClient.removeQueries({ predicate })
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value))

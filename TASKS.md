@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10C a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10D a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -39,7 +39,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-10 (épico) | 2 / 8 | Implementar eventos de domínio versionados, isolamento de sessão, reconciliação REST após reconexão e recuperação idempotente de pedidos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | Em andamento |
 | TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Concluída |
 | TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | Concluída |
-| TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | A fazer |
+| TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | Concluída |
 | TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | A fazer |
 | TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
@@ -305,9 +305,13 @@ Durante a verificação, foi corrigida uma comparação de identidade: `sessionI
 
 ### TASK-10C — Isolamento de recursos privados entre sessões
 
-- [ ] No logout e na troca de conta, cancelar requests, remover queries privadas e limpar listeners/conexões associados à identidade anterior.
-- [ ] Descartar resultados tardios e eventos privados iniciados na sessão anterior, mesmo quando o cancelamento não interromper a resposta.
-- [ ] Verificar que trocar de usuário não revela pedido, tentativa, dados do checkout nem eventos da conta anterior. Expiração/401 fica na TASK-11.
+- [x] Na limpeza do consumidor Socket.IO, desconectar o socket, invalidar seus handlers e cancelar/remover o cache privado do usuário anterior.
+- [x] Remover somente os dados privados da identidade anterior; preservar catálogo público, carrinho visitante e cache de outra identidade.
+- [x] Ignorar callbacks de evento que cheguem após a limpeza do listener.
+- [x] Cobrir troca de usuário/logout e eventos atrasados em E2E desktop/mobile; o usuário confirmou que toda a suíte rodou em 08/10/2026.
+- [x] Verificar que trocar de usuário não revela pedido, tentativa, dados do checkout nem eventos da conta anterior. Expiração/401 fica na TASK-11.
+
+TASK-10C concluída. Typecheck, lint, build e 27 testes unitários passaram; o usuário confirmou a execução E2E desktop/mobile. A cobertura de expiração/401 continua na TASK-11.
 
 ### TASK-10D — Reconciliação REST depois de reconectar
 

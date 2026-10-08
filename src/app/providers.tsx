@@ -9,7 +9,7 @@ import { AuthDialogProvider } from '@/features/auth/auth-dialog-context'
 import { getSessionToken, sessionQuery } from '@/features/auth/api'
 import { nftQuery } from '@/features/catalog/api'
 import type { Nft, Order, Page } from '@/contracts/marketplace'
-import { isNftUpdatedEvent, isOrderUpdatedEvent, shouldApplyNftEvent, shouldApplyOrderEvent } from '@/features/realtime/domain-event-consumer'
+import { clearPrivateQueriesForUser, isNftUpdatedEvent, isOrderUpdatedEvent, shouldApplyNftEvent, shouldApplyOrderEvent } from '@/features/realtime/domain-event-consumer'
 
 let mockWorkerStart: Promise<void> | undefined
 
@@ -41,19 +41,23 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
       if (!active) return
       socket = io(window.location.origin, { path: '/socket.io/', transports: ['websocket'] })
       socket.on('connect', () => {
+        if (!active) return
         authenticatedSessionId = null
         const token = userId ? getSessionToken() : null
         if (token) socket?.emit('session.authenticate', { token })
       })
       socket.on('session.authenticated', (payload: unknown) => {
+        if (!active) return
         if (payload && typeof payload === 'object' && 'sessionId' in payload && typeof payload.sessionId === 'string')
           authenticatedSessionId = payload.sessionId
       })
       socket.on('session.authenticationFailed', () => {
+        if (!active) return
         authenticatedSessionId = null
         void queryClient.invalidateQueries({ queryKey: ['session'] })
       })
       socket.on('nft.updated', (payload: unknown) => {
+        if (!active) return
         if (!isNftUpdatedEvent(payload) || !remember(payload.eventId)) return
         const detail = queryClient.getQueryData<Nft>(nftQuery(payload.resourceId).queryKey)
         const cachedLists = queryClient.getQueriesData<Page<Nft>>({ queryKey: ['nfts', 'list'] })
@@ -69,6 +73,7 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
         queryClient.setQueryData(['domain-events', 'nft', payload.resourceId], payload)
       })
       socket.on('order.updated', (payload: unknown) => {
+        if (!active) return
         if (!isOrderUpdatedEvent(payload) || !remember(payload.eventId)) return
         if (!userId || !authenticatedSessionId || !shouldApplyOrderEvent(payload, queryClient.getQueryData<Order>(['orders', payload.resourceId]), userId, authenticatedSessionId)) return
         queryClient.setQueryData(['orders', payload.resourceId], payload.data.order)
@@ -81,6 +86,7 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
     return () => {
       active = false
       socket?.disconnect()
+      clearPrivateQueriesForUser(queryClient, userId)
     }
   }, [queryClient, session.isPending, userId])
 
