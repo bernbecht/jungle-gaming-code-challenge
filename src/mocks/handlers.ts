@@ -508,7 +508,7 @@ export const handlers = [
     const { client } = toSocketIo(connection)
     domainClients.set(client, null)
     connection.client.addEventListener('close', () => domainClients.delete(client))
-    client.on('session.authenticate', (payload: unknown) => {
+    client.on('session.authenticate', (_messageEvent: MessageEvent, payload: unknown) => {
       domainClients.set(client, null)
       const token = payload && typeof payload === 'object' && 'token' in payload && typeof payload.token === 'string'
         ? payload.token

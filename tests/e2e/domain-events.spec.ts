@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { readFile } from 'node:fs/promises'
 
 type ObservedEvent = {
   name: string
@@ -8,18 +9,24 @@ type ObservedEvent = {
 
 test('NFT and private order events are emitted after their IndexedDB changes commit', async ({ page }) => {
   await page.goto('/__proof')
+  await expect(page.getByRole('button', { name: 'Executar prova REST' })).toBeVisible()
+  const socketClientScript = await readFile(new URL('../../node_modules/socket.io-client/dist/socket.io.js', import.meta.url), 'utf8')
+  await page.addScriptTag({ content: socketClientScript })
   await page.evaluate(async () => {
-    const reset = await fetch('/api/__mock/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenarioId: 'SCN-01', seed: 1 }) })
-    if (!reset.ok) throw new Error('Could not reset the domain-event scenario')
+    const reset = await fetch('/api/__mock/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    if (!reset.ok) throw new Error(`Could not reset the domain-event scenario (${reset.status}): ${await reset.text()}`)
     const login = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'collector-a@example.test', password: 'DemoNft!2026' }) })
     if (!login.ok) throw new Error('Could not authenticate the domain-event scenario')
     const { token } = await login.json() as { token: string }
+    const sessionCheck = await fetch('/api/auth/session', { headers: { Authorization: `Bearer ${token}` } })
+    if (!sessionCheck.ok) throw new Error(`The HTTP session is invalid (${sessionCheck.status})`)
     sessionStorage.setItem('kurio-session-token', token)
 
     type EventWindow = Window & { __domainEvents?: ObservedEvent[]; __domainSocket?: import('socket.io-client').Socket }
     const target = window as EventWindow
     target.__domainEvents = []
-    const { io } = await import('socket.io-client')
+    const io = (window as Window & { io?: typeof import('socket.io-client').io }).io
+    if (!io) throw new Error('Socket.IO browser bundle was not loaded')
     const socket = io(window.location.origin, { path: '/socket.io/', transports: ['websocket'] })
     target.__domainSocket = socket
     const observe = (name: string) => (payload: ObservedEvent['payload']) => {
@@ -30,10 +37,22 @@ test('NFT and private order events are emitted after their IndexedDB changes com
     socket.on('nft.updated', observe('nft.updated'))
     socket.on('order.updated', observe('order.updated'))
     await new Promise<void>((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error('Socket did not authenticate')), 5000)
+      let stage = 'connect'
+      const timeout = window.setTimeout(() => reject(new Error(`Socket timed out during ${stage}`)), 5000)
       socket.once('session.authenticated', () => { window.clearTimeout(timeout); resolve() })
-      socket.once('connect_error', () => { window.clearTimeout(timeout); reject(new Error('Socket connection failed')) })
-      socket.once('connect', () => socket.emit('session.authenticate', { token }))
+      socket.once('session.authenticationFailed', (payload: { code?: string }) => {
+        window.clearTimeout(timeout)
+        reject(new Error(`Socket authentication rejected (${payload.code ?? 'unknown'})`))
+      })
+      socket.once('connect_error', error => { window.clearTimeout(timeout); reject(new Error(`Socket connection failed (${error.message})`)) })
+      socket.once('connect', () => {
+        stage = 'proof response'
+        socket.once('proof.event', () => {
+          stage = 'session authentication'
+          socket.emit('session.authenticate', { token })
+        })
+        socket.emit('proof.request')
+      })
     })
   })
 
