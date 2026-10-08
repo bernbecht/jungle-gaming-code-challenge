@@ -146,18 +146,17 @@ export function HomePage() {
         className="md:scroll-mt-6 md:py-8"
       >
         <div className="mt-6 grid gap-12 lg:grid-cols-[310px_1fr]">
-          <aside
-            aria-label="Filtros do catálogo"
-            className="hidden self-start bg-card p-5 lg:block"
-          >
-            <CatalogFilters
-              key={filterKey}
-              params={params}
-              update={update}
-              clear={clear}
-            />
+          <div className="hidden self-start space-y-8 lg:block">
+            <aside aria-label="Filtros do catálogo" className="bg-card p-5">
+              <CatalogFilters
+                key={filterKey}
+                params={params}
+                update={update}
+                clear={clear}
+              />
+            </aside>
             <NftSpotlight />
-          </aside>
+          </div>
           <div className="min-w-0">
             <div className="flex w-full flex-wrap items-center justify-between gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] mb-9">
               <div

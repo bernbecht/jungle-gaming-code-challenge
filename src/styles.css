@@ -285,7 +285,7 @@
   @apply inline-flex items-center gap-1 pt-1 text-xs font-semibold text-primary;
 }
 .home-nft-spotlight {
-  @apply mt-8 border-t border-border pt-6;
+  @apply bg-card p-5;
 }
 .home-nft-spotlight h2 {
   @apply text-base font-bold uppercase text-primary;
