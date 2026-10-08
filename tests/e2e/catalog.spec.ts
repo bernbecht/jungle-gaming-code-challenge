@@ -46,6 +46,32 @@ test.beforeEach(async ({ page }) => {
     if (!response.ok) throw new Error("Reset failed");
   });
 });
+
+test("tablet keeps catalog filters available in a dialog", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "This viewport is covered by the mobile catalog project.");
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.goto("/");
+
+  const openFilters = page.getByRole("button", {
+    name: "Abrir filtros do catálogo",
+    exact: true,
+  });
+  await expect(openFilters).toBeVisible();
+  await openFilters.click();
+
+  const filters = page.getByRole("dialog", {
+    name: "Filtros do catálogo",
+    exact: true,
+  });
+  await expect(filters).toBeVisible();
+  await expect(
+    filters.getByRole("button", { name: "Ethereum", exact: true }),
+  ).toBeVisible();
+});
+
 test("catalog combines filters, sorts, paginates and restores URL history", async ({
   page,
   isMobile,

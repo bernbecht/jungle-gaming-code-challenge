@@ -45,7 +45,7 @@ export function HomePage() {
   };
   return (
     <>
-      <div className="flex items-center gap-2 pt-5 md:hidden">
+      <div className="flex items-center gap-2 pt-5 lg:hidden">
         <HeaderSearch variant="field" />
         <Button
           ref={filterTrigger}
