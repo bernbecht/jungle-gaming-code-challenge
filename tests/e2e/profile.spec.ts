@@ -63,3 +63,43 @@ test('profile rejects a duplicate email and shows the API field error without sa
   await page.reload()
   await expect(page.getByLabel(/^E-mail/)).toHaveValue('collector-a@example.test')
 })
+
+test('avatar upload validates files, persists after refresh and can be removed', async ({ page }) => {
+  await page.goto('/profile')
+  const fileInput = page.getByLabel('Arquivo do avatar')
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jXioAAAAASUVORK5CYII=', 'base64')
+  const uploadResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/profile/avatar') && response.request().method() === 'PUT')
+  await fileInput.setInputFiles({ name: 'avatar.png', mimeType: 'image/png', buffer: png })
+  const uploadResponse = await uploadResponsePromise
+  expect(uploadResponse.status()).toBe(200)
+  await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveAttribute('src', /^data:image\/png;base64,/)
+  const savedAvatar = await page.getByRole('img', { name: 'Avatar do perfil' }).getAttribute('src')
+
+  const invalidResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/profile/avatar') && response.request().method() === 'PUT')
+  await fileInput.setInputFiles({ name: 'avatar.txt', mimeType: 'text/plain', buffer: Buffer.from('not an image') })
+  const invalidResponse = await invalidResponsePromise
+  expect(invalidResponse.status()).toBe(422)
+  await expect(page.getByRole('alert')).toContainText('Use uma imagem PNG, JPG ou WebP.')
+  await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveAttribute('src', savedAvatar!)
+
+  await page.reload()
+  await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveAttribute('src', savedAvatar!)
+  const removeResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/profile/avatar') && response.request().method() === 'DELETE')
+  await page.getByRole('button', { name: 'Remover', exact: true }).click()
+  expect((await removeResponsePromise).status()).toBe(200)
+  await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveCount(0)
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'Remover', exact: true })).toHaveCount(0)
+})
+
+test('avatar upload rejects files larger than 2 MB without changing the profile', async ({ page }) => {
+  await page.goto('/profile')
+  const responsePromise = page.waitForResponse(item => item.url().endsWith('/api/profile/avatar') && item.request().method() === 'PUT')
+  await page.getByLabel('Arquivo do avatar').setInputFiles({
+    name: 'large.png', mimeType: 'image/png', buffer: Buffer.alloc(2 * 1024 * 1024 + 1),
+  })
+  const response = await responsePromise
+  expect(response.status()).toBe(422)
+  await expect(page.getByRole('alert')).toContainText('A imagem deve ter até 2 MB.')
+  await expect(page.getByRole('img', { name: 'Avatar do perfil' })).toHaveCount(0)
+})

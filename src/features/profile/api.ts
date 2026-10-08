@@ -10,3 +10,14 @@ export const profileQuery = (userId: string) => queryOptions({
 export async function saveProfile(input: UpdateProfileInput) {
   return (await http.patch<Profile>('/profile', input)).data
 }
+
+export async function uploadAvatar(file: File, expectedVersion: number) {
+  const form = new FormData()
+  form.append('file', file)
+  form.append('expectedVersion', String(expectedVersion))
+  return (await http.put<Profile>('/profile/avatar', form)).data
+}
+
+export async function removeAvatar(expectedVersion: number) {
+  return (await http.delete<Profile>('/profile/avatar', { headers: { 'If-Match': String(expectedVersion) } })).data
+}

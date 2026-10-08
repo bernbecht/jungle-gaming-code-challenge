@@ -1,8 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import axios from 'axios'
 import { Link, useRouter } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Check, CircleUserRound, LogOut, WalletCards } from 'lucide-react'
+import { ArrowLeft, Check, CircleUserRound, ImageUp, LogOut, Trash2, WalletCards } from 'lucide-react'
 import type { ApiError, Profile, UpdateProfileInput } from '@/contracts/marketplace'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +10,7 @@ import { FormField } from '@/components/ui/form-field'
 import { formFieldMessageId } from '@/lib/form-field'
 import { defaultCatalog } from '@/features/catalog/search'
 import { clearSessionToken, sessionQuery, signOut } from '@/features/auth/api'
-import { profileQuery, saveProfile } from '@/features/profile/api'
+import { profileQuery, removeAvatar, saveProfile, uploadAvatar } from '@/features/profile/api'
 import { USERNAME_PATTERN } from '@/lib/validation'
 
 type ProfileFields = Omit<UpdateProfileInput, 'ensName' | 'expectedVersion'> & { ensName: string }
@@ -61,6 +61,28 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const avatarInput = useRef<HTMLInputElement>(null)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
+
+  function acceptAvatar(updated: Profile) {
+    queryClient.setQueryData(profileQuery(updated.id).queryKey, updated)
+    queryClient.setQueryData(sessionQuery.queryKey, updated)
+    setExpectedVersion(updated.version)
+    setAvatarError(null)
+  }
+  const avatarMutation = useMutation({
+    mutationFn: (file: File) => uploadAvatar(file, profile.data?.version ?? sessionProfile.version),
+    onSuccess: acceptAvatar,
+    onError: error => {
+      const result = responseError(error)
+      setAvatarError(result.message)
+    },
+  })
+  const removeAvatarMutation = useMutation({
+    mutationFn: () => removeAvatar(profile.data?.version ?? sessionProfile.version),
+    onSuccess: acceptAvatar,
+    onError: error => setAvatarError(responseError(error).message),
+  })
 
   const saveMutation = useMutation({
     mutationFn: saveProfile,
@@ -111,6 +133,13 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
       username: fields.username.trim(), displayName: fields.displayName.trim(),
       email: fields.email.trim(), ensName, expectedVersion,
     })
+  }
+  function selectAvatar(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0]
+    event.currentTarget.value = ''
+    if (!file) return
+    setAvatarError(null)
+    avatarMutation.mutate(file)
   }
 
   const fieldMessage = (name: keyof ProfileFields) => fieldErrors[name]?.[0]
@@ -163,8 +192,8 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
           </Link>
         </nav>
 
-        <form className="space-y-7" onSubmit={submit} noValidate>
-          <fieldset disabled={saveMutation.isPending} className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+        <form id="profile-form" onSubmit={submit} noValidate>
+          <fieldset disabled={saveMutation.isPending || avatarMutation.isPending || removeAvatarMutation.isPending} className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
             <legend className="sr-only">Dados do perfil</legend>
             <FormField id="displayName" label="Nome de exibição" required error={fieldMessage('displayName')}>
               <Input id="displayName" name="displayName" autoComplete="name" value={fields.displayName} aria-invalid={Boolean(fieldMessage('displayName'))} aria-describedby={fieldMessage('displayName') ? formFieldMessageId('displayName') : undefined} onChange={event => updateField('displayName', event.target.value)} />
@@ -178,15 +207,36 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
             <EnsNameField value={fields.ensName} onChange={value => updateField('ensName', value)} error={fieldMessage('ensName')} />
           </fieldset>
 
-          <div className="flex flex-col items-stretch gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
-            <Button className="w-full sm:w-auto" type="submit" disabled={!hasChanges || saveMutation.isPending}>
-              {saveMutation.isPending ? 'Salvando…' : 'Salvar'}
-            </Button>
-            {hasChanges && <Button className="w-full sm:w-auto" type="button" variant="outline" disabled={saveMutation.isPending} onClick={discardChanges}>Descartar</Button>}
-            {saved && <p role="status" className="flex items-center gap-2 text-sm text-primary"><Check size={17} aria-hidden="true" />Perfil atualizado.</p>}
-            {formError && <div className="w-full rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"><p role="alert">{formError}</p>{saveMutation.error && axios.isAxiosError(saveMutation.error) && saveMutation.error.response?.status === 409 && <Button type="button" variant="outline" className="mt-3" onClick={() => void refreshProfile()}>Recarregar dados</Button>}</div>}
-          </div>
         </form>
+
+        <section className="mt-8 border-t border-border pt-6" aria-labelledby="avatar-title">
+          <h2 id="avatar-title" className="mb-4 text-base font-semibold">Avatar</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            {profile.data.avatarUrl
+              ? <img src={profile.data.avatarUrl} alt="Avatar do perfil" className="size-20 rounded-full border border-border object-cover" />
+              : <div className="flex size-20 items-center justify-center rounded-full border border-border bg-surface-dark text-muted-foreground" aria-label="Sem avatar"><CircleUserRound size={36} aria-hidden="true" /></div>}
+            <div className="flex flex-wrap items-center gap-2">
+              <input ref={avatarInput} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Arquivo do avatar" onChange={selectAvatar} />
+              <Button type="button" variant="outline" disabled={saveMutation.isPending || avatarMutation.isPending || removeAvatarMutation.isPending} onClick={() => avatarInput.current?.click()}>
+                <ImageUp size={17} aria-hidden="true" />{avatarMutation.isPending ? 'Enviando…' : 'Alterar'}
+              </Button>
+              {profile.data.avatarUrl && <Button type="button" variant="ghost" disabled={saveMutation.isPending || avatarMutation.isPending || removeAvatarMutation.isPending} onClick={() => removeAvatarMutation.mutate()}>
+                <Trash2 size={17} aria-hidden="true" />{removeAvatarMutation.isPending ? 'Removendo…' : 'Remover'}
+              </Button>}
+              <p className="w-full text-xs text-muted-foreground">PNG, JPG ou WebP. Até 2 MB.</p>
+              {avatarError && <p role="alert" className="w-full text-sm text-destructive">{avatarError}</p>}
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-7 flex flex-col items-stretch gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
+          {saved && <p role="status" className="flex items-center gap-2 text-sm text-primary"><Check size={17} aria-hidden="true" />Perfil atualizado.</p>}
+          {formError && <div className="w-full rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"><p role="alert">{formError}</p>{saveMutation.error && axios.isAxiosError(saveMutation.error) && saveMutation.error.response?.status === 409 && <Button type="button" variant="outline" className="mt-3" onClick={() => void refreshProfile()}>Recarregar dados</Button>}</div>}
+          {hasChanges && <Button className="w-full sm:w-auto sm:order-1" type="button" variant="outline" disabled={saveMutation.isPending || avatarMutation.isPending || removeAvatarMutation.isPending} onClick={discardChanges}>Descartar</Button>}
+          <Button className="w-full sm:w-auto sm:order-2" form="profile-form" type="submit" disabled={!hasChanges || saveMutation.isPending || avatarMutation.isPending || removeAvatarMutation.isPending}>
+            {saveMutation.isPending ? 'Salvando…' : 'Salvar'}
+          </Button>
+        </div>
 
         <div className="mt-8 border-t border-border pt-3 md:hidden">
           <Button variant="ghost" className="w-full justify-start px-0 text-muted-foreground" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>

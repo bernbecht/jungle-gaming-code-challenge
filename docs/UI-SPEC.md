@@ -113,7 +113,7 @@ Proposta: preservar rotas `/login` e `/register`; apresentação de diálogo com
 
 ### UI-08 — Perfil
 
-Desktop: sidebar de conta e formulário à direita. Perfil ativo com marcador cobre; dados em duas colunas, avatar com Alterar/Remover, seção de senha numa coluna e Salvar. Header mostra Entrar apesar de ser página privada: implementação deve refletir sessão real (desvio necessário), sem reproduzir esse estado inconsistente.
+Desktop: sidebar de conta e formulário à direita. Perfil ativo com marcador cobre; campos em duas colunas, avatar com Alterar/Remover abaixo deles e, por último, a ação Salvar. O avatar aceita PNG, JPG ou WebP até 2 MB; erros de upload preservam a imagem já salva. Header mostra Entrar apesar de ser página privada: implementação deve refletir sessão real (desvio necessário), sem reproduzir esse estado inconsistente.
 
 Mobile proposto: navegação de conta compacta, campos empilhados, avatar e ações acessíveis, grupo de senha separado. Não usar a sidebar desktop com largura fixa de 310 px em uma tela de 390 px.
 

@@ -6,6 +6,8 @@ import { USERNAME_PATTERN } from '../lib/validation'
 
 const SESSION_LIFETIME_MS = 24 * 60 * 60_000
 export const PASSWORD_ITERATIONS = 100_000
+export const AVATAR_MAX_BYTES = 2 * 1024 * 1024
+export const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 
 export async function passwordVerifier(password: string, salt: string, iterations: number) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits'])
@@ -85,6 +87,15 @@ export function updateProfile(state: DatabaseState, userId: string, input: Updat
     throw error
   }
   user.profile = { ...user.profile, username, displayName, email, ensName, version: user.profile.version + 1 }
+  return user.profile
+}
+
+export function updateAvatar(state: DatabaseState, userId: string, expectedVersion: number, avatarUrl: string | null): Profile {
+  const user = state.users.find(candidate => candidate.profile.id === userId)
+  if (!user) throw new MockError(404, 'NOT_FOUND', 'Perfil não encontrado.')
+  if (user.profile.version !== expectedVersion)
+    throw new MockError(409, 'VERSION_CONFLICT', 'Este perfil foi alterado em outra sessão. Recarregue os dados e tente novamente.')
+  user.profile = { ...user.profile, avatarUrl, version: user.profile.version + 1 }
   return user.profile
 }
 

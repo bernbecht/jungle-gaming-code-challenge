@@ -4,7 +4,7 @@ import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
-import { updateProfile } from '../../src/mocks/auth'
+import { updateAvatar, updateProfile } from '../../src/mocks/auth'
 import { MockError } from '../../src/mocks/errors'
 import { BASE_TIME } from '../../src/mocks/state'
 import type { DatabaseState } from '../../src/mocks/state'
@@ -62,6 +62,16 @@ test('profile updates validate identity fields, increment versions and reject st
     username: 'x', displayName: '', email: 'invalid', ensName: 'not-ens', expectedVersion: 2,
   })).toThrow(MockError)
   expect(state.users[0]?.profile).toEqual(updated)
+})
+
+test('avatar changes persist as profile versions and reject stale writes without partial updates', async () => {
+  const state = await createFixtures()
+  const uploaded = updateAvatar(state, 'user-a', 1, 'data:image/png;base64,YQ==')
+  expect(uploaded).toMatchObject({ avatarUrl: 'data:image/png;base64,YQ==', version: 2 })
+  expect(() => updateAvatar(state, 'user-a', 1, null)).toThrow(MockError)
+  expect(state.users[0]?.profile).toEqual(uploaded)
+  const removed = updateAvatar(state, 'user-a', 2, null)
+  expect(removed).toMatchObject({ avatarUrl: null, version: 3 })
 })
 
 test('catalog combines dimensions, paginates, sorts and returns an empty result', async () => {

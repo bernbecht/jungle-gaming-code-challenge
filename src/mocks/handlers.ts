@@ -4,7 +4,7 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { addCartItem, advanceClock, createQuote, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder, PAYMENT_DELAY_MS } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
-import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateProfile } from './auth'
+import { AVATAR_MAX_BYTES, AVATAR_TYPES, login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateAvatar, updateProfile } from './auth'
 import type { Network, OrderInput } from '../contracts/marketplace'
 
 const scheduledOrders = new Set<string>()
@@ -86,6 +86,13 @@ function stringField(body: Record<string, unknown>, name: string) {
 function numberField(body: Record<string, unknown>, name: string) {
   if (typeof body[name] !== 'number' || !Number.isSafeInteger(body[name])) invalid(`Campo ${name} inválido.`)
   return body[name] as number
+}
+
+function matchesImageSignature(bytes: Uint8Array, mimeType: string) {
+  if (mimeType === 'image/png') return [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte)
+  if (mimeType === 'image/jpeg') return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+  if (mimeType === 'image/webp') return String.fromCharCode(...bytes.subarray(0, 4)) === 'RIFF' && String.fromCharCode(...bytes.subarray(8, 12)) === 'WEBP'
+  return false
 }
 
 function guestOwner(request: Request) {
@@ -252,6 +259,32 @@ export const handlers = [
       return updateProfile(state, userId, input)
     })
   })),
+  http.put('/api/profile/avatar', async ({ request }) => respond(async () => {
+    let form: FormData
+    try { form = await request.formData() } catch { throw new MockError(400, 'MALFORMED_REQUEST', 'Envie um arquivo de imagem válido.') }
+    const file = form.get('file')
+    const version = Number(form.get('expectedVersion'))
+    if (!(file instanceof File)) throw new MockError(422, 'AVATAR_REQUIRED', 'Selecione uma imagem para o avatar.')
+    if (!Number.isSafeInteger(version) || version < 1) throw new MockError(400, 'VERSION_REQUIRED', 'Informe a versão atual do perfil.')
+    if (!(AVATAR_TYPES as readonly string[]).includes(file.type)) throw new MockError(422, 'AVATAR_TYPE_INVALID', 'Use uma imagem PNG, JPG ou WebP.')
+    if (!file.size || file.size > AVATAR_MAX_BYTES) throw new MockError(422, 'AVATAR_SIZE_INVALID', 'A imagem deve ter até 2 MB.')
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    if (!matchesImageSignature(bytes, file.type)) throw new MockError(422, 'AVATAR_TYPE_INVALID', 'O conteúdo do arquivo não corresponde a uma imagem PNG, JPG ou WebP válida.')
+    let binary = ''
+    for (let index = 0; index < bytes.length; index += 0x8000)
+      binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+    const avatarUrl = `data:${file.type};base64,${btoa(binary)}`
+    return transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      return updateAvatar(state, userId, version, avatarUrl)
+    })
+  })),
+  http.delete('/api/profile/avatar', ({ request }) => respond(() => transact(state => {
+    const version = Number(request.headers.get('If-Match')?.replace(/^W\//, '').replace(/^"|"$/g, ''))
+    if (!Number.isSafeInteger(version) || version < 1) throw new MockError(400, 'VERSION_REQUIRED', 'Informe a versão atual do perfil em If-Match.')
+    const { userId } = requireSession(state, readToken(request))
+    return updateAvatar(state, userId, version, null)
+  }))),
   http.get('/api/me/favorites', ({ request }) => respond(() => transact(state => {
     const { userId } = requireSession(state, readToken(request))
     return readFavorites(state, userId)
