@@ -134,6 +134,9 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
     }
   }, [queryClient, session.isPending, userId])
 
+  // Resolve session restoration before route guards share this query. In
+  // Strict Mode the initial observer can detach and cancel an in-flight read.
+  if (session.isPending) return <main role="status" className="grid min-h-screen place-items-center text-sm text-muted-foreground">Recuperando sessão…</main>
   return children
 }
 
