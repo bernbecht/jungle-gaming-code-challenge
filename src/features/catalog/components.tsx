@@ -5,7 +5,13 @@ import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { lowestEdition } from "./price";
 
-export function NftCard({ nft, mobileHome = false }: { nft: Nft; mobileHome?: boolean }) {
+export function NftCard({
+  nft,
+  mobileHome = false,
+}: {
+  nft: Nft;
+  mobileHome?: boolean;
+}) {
   const edition = lowestEdition(nft);
   return (
     <article className="min-w-0">
@@ -16,7 +22,7 @@ export function NftCard({ nft, mobileHome = false }: { nft: Nft; mobileHome?: bo
           className="group block"
           aria-label={`Ver ${nft.name}`}
         >
-          <div className="relative bg-card p-1 md:p-3">
+          <div className="relative bg-card">
             <img
               src={nft.images[0]?.url}
               alt={nft.images[0]?.alt ?? nft.name}
@@ -31,7 +37,7 @@ export function NftCard({ nft, mobileHome = false }: { nft: Nft; mobileHome?: bo
               </span>
             )}
           </div>
-          <h3 className="mt-3 break-words px-1 text-sm font-medium group-hover:text-primary md:mt-8 md:text-base">
+          <h3 className="mt-3 break-words px-1 text-sm font-medium group-hover:text-primary md:text-base">
             {nft.name}
           </h3>
           <p className="mt-1 px-1 text-sm font-semibold text-primary md:text-lg">

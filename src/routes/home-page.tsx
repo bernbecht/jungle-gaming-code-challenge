@@ -12,7 +12,7 @@ import { HeaderSearch } from "@/features/catalog/header-search";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { ArrowUpRight, SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import { useRef } from "react";
 
 export function HomePage() {
@@ -79,7 +79,7 @@ export function HomePage() {
             href="#colecoes"
             className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary"
           >
-            Explorar <ArrowUpRight aria-hidden="true" size={14} />
+            Explorar
           </a>
         </div>
         <img
@@ -99,7 +99,7 @@ export function HomePage() {
       </section>
       <section
         aria-labelledby="hero-title"
-        className="hidden items-center gap-10 py-10 md:grid md:grid-cols-2 md:gap-16 md:py-16"
+        className="hidden items-center gap-10 py-10 justify-between md:flex md:gap-16 md:py-16"
       >
         <div className="max-w-xl">
           <p className="mb-5 text-xs font-medium tracking-widest text-muted-foreground">
@@ -116,13 +116,12 @@ export function HomePage() {
             uma comunidade de possibilidades.
           </p>
           <Button size="lg" className="mt-7" asChild>
-            <a href="#colecoes">
+            <a href="#colecoes" className="uppercase">
               Explorar
-              <ArrowUpRight aria-hidden="true" />
             </a>
           </Button>
         </div>
-        <figure className="relative mx-auto w-full max-w-md">
+        <figure className="relative w-full max-w-md">
           <img
             src="/assets/placeholders/emerald.svg"
             alt="Composição abstrata em verde e cobre, ilustração temporária da coleção"
@@ -162,7 +161,7 @@ export function HomePage() {
               <div
                 role="group"
                 aria-label="Categorias de lançamento"
-                className="flex flex-nowrap gap-0 overflow-x-auto lg:col-start-1"
+                className="flex flex-nowrap gap-3 overflow-x-auto lg:col-start-1"
               >
                 {(
                   [
