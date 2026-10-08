@@ -116,9 +116,11 @@ flowchart TD
 
 **Pré-condições:** mocks de rede ativos. Para login, a conta existe e a senha corresponde; para cadastro, os campos são válidos e e-mail/nome de usuário ainda não estão em uso.
 
-**Gatilhos:** enviar o formulário de cadastro ou login; abrir uma rota protegida sem sessão; recarregar a aplicação com uma sessão ativa; ou solicitar logout.
+**Gatilhos:** enviar o formulário de cadastro ou login; abrir uma rota protegida sem sessão; recarregar a aplicação com uma sessão ativa; ou solicitar logout. No desktop, Entrar no header e Favoritar abrem o login em dialog sobre a tela atual, sem alterar a URL. No mobile, esses mesmos acionadores levam à rota `/login`. As rotas `/login` e `/register` seguem acessíveis diretamente em qualquer viewport.
 
 ### Caminho principal — login
+
+No desktop, o dialog mantém a página de origem montada e registra o acionador para devolver o foco ao fechar. A pessoa pode alternar entre login e cadastro no próprio dialog; fechar por Escape, clique no backdrop ou botão X descarta a janela. No mobile e no acesso direto, o mesmo formulário aparece na rota dedicada.
 
 1. A pessoa abre Entrar ou tenta acessar uma rota protegida.
 2. Se veio de uma rota protegida, o sistema guarda o caminho interno solicitado. Endereços externos não são aceitos como retorno.

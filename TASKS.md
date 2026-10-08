@@ -158,10 +158,10 @@ Na entrega da TASK-05A, compra e favorito ainda estavam indisponíveis; favorito
 - [x] Recuperar sessão após refresh com token opaco em `sessionStorage`; limpar/cancelar cache ao sair e limpar cache ao autenticar outra identidade.
 - [x] Conectar favorito do catálogo e detalhe; atualizar otimisticamente e reverter em erro; separar a consulta pelo `userId` autenticado.
 - [x] Preparar `tests/e2e/auth.spec.ts` para cadastro/conflito, guard/retorno/refresh, rollback e isolamento entre usuários.
-- [ ] Executar TEST-03/TEST-04 em Chromium desktop/mobile; a tentativa do agente foi bloqueada antes da inicialização por `listen EPERM` em `127.0.0.1:4173`.
+- [x] Executar TEST-03/TEST-04 em Chromium desktop/mobile; o usuário confirmou que os E2E passaram em 08/10/2026. A tentativa do agente nesta sandbox continua bloqueada antes da inicialização por `listen EPERM` em `127.0.0.1:4173`.
 - [ ] Cobrir cenários de sessão expirada e resposta antiga após troca/reset quando os controles determinísticos da TASK-11 estiverem disponíveis.
 
-Typecheck, lint e build passaram. A suíte E2E direcionada foi preparada, mas não conseguiu iniciar o preview nesta sandbox; os novos fluxos precisam de validação local do usuário antes de encerrar a task. Perfil e carteiras continuam com páginas protegidas de indisponibilidade e serão implementados na TASK-09.
+Typecheck, lint e build passaram; o usuário confirmou os E2E anteriores de autenticação/favoritos em desktop/mobile. A modal desktop segue `Sign In Modal.png` e as medidas confirmadas pelo usuário: 500 × 600 px, abas 20 px/medium, subtítulo 13 px/regular, inputs 40 px, CTA 45 px, link de recuperação 14 px e borda inferior 10 px. Inclui mostrar senha e ações Google/Facebook; recuperação e OAuth exibem avisos de indisponibilidade, sem simular sucesso. `/login` e `/register` seguem acessíveis diretamente, e mobile mantém navegação de página. E2Es cobrem a modal e seus controles, mas a reexecução pelo agente ficou bloqueada anteriormente por `listen EPERM` em `127.0.0.1:4173`; validar localmente antes de encerrar a TASK-06. Perfil e carteiras continuam com páginas protegidas de indisponibilidade e serão implementados na TASK-09.
 
 Revisão UI-01 solicitada: item 1 (slider de faixa de preço) implementado, com dois controles, leitura ETH e Aplicar; aguardando verificação visual/E2E local. Itens 2–5 (busca, grupos da sidebar, ordenação sutil e fundo do card) serão tratados separadamente conforme orientação do usuário.
 

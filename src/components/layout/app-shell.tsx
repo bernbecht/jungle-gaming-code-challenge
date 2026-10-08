@@ -5,6 +5,8 @@ import { defaultCatalog } from "@/features/catalog/search";
 import { Link, Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sessionQuery, signOut } from "@/features/auth/api";
+import { useAuthDialog } from "@/features/auth/use-auth-dialog";
+import { AuthDialog } from "@/features/auth/auth-dialog";
 import {
   Heart,
   Home,
@@ -19,6 +21,7 @@ export function AppShell() {
   const session = useQuery(sessionQuery);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const authDialog = useAuthDialog();
   const logoutMutation = useMutation({
     mutationFn: signOut,
     onMutate: async () => { await queryClient.cancelQueries(); },
@@ -98,7 +101,16 @@ export function AppShell() {
             <Button variant="ghost" size="sm" asChild><Link to="/profile">{session.data.displayName}</Link></Button>
             <Button size="sm" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>{logoutMutation.isPending ? 'Saindo…' : 'Sair'}</Button>
           </> : <Button size="sm" asChild>
-            <Link to="/login" search={{ returnTo: undefined }}><LogIn aria-hidden="true" />Entrar</Link>
+            <Link
+              to="/login"
+              search={{ returnTo: undefined }}
+              onClick={event => {
+                if (window.matchMedia("(min-width: 768px)").matches) {
+                  event.preventDefault();
+                  authDialog.open("login", router.state.location.href, event.currentTarget);
+                }
+              }}
+            ><LogIn aria-hidden="true" />Entrar</Link>
           </Button>}
         </div>
       </header>
@@ -108,6 +120,15 @@ export function AppShell() {
       </main>
 
       <SiteFooter isHome={isHome} />
+
+      {authDialog.request && (
+        <AuthDialog
+          mode={authDialog.request.mode}
+          returnTo={authDialog.request.returnTo}
+          onClose={authDialog.close}
+          onSwitchMode={authDialog.switchMode}
+        />
+      )}
 
       {isHome && (
         <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">

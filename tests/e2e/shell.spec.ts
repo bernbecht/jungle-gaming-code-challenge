@@ -27,6 +27,10 @@ test("opens shell website, navigates and retrieves routes without runtime error"
     await page.goto("/login");
   } else {
     await page.getByRole("link", { name: "Entrar", exact: true }).click();
+    const authDialog = page.getByRole("dialog", { name: "Entrar na Kurio" });
+    await expect(authDialog).toBeVisible();
+    await authDialog.getByRole("button", { name: "Fechar janela de autenticação" }).click();
+    await page.goto("/login");
   }
   await expect(page).toHaveURL(/\/login$/);
   await page.reload();

@@ -9,7 +9,7 @@ import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, re
 // MSW normalizes Socket.IO's default `/socket.io/` path to `/` before matching ws.link.
 const socket = ws.link(window.location.origin.replace(/^http/, 'ws'))
 let catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
-let favoriteFailuresRemaining = 0
+let favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
 const closeSockets = new Set<() => void>()
 
 async function respond<T extends object>(operation: () => Promise<T>) {
@@ -61,13 +61,16 @@ export const handlers = [
   http.put('/api/me/favorites/:nftId', async ({ request, params }) => respond(async () => {
     const body = await readBody(request)
     if (typeof body.favorite !== 'boolean') invalid('Favorito inválido.')
-    if (favoriteFailuresRemaining > 0) {
-      await transact(state => requireSession(state, readToken(request)))
-      favoriteFailuresRemaining--
+    const token = readToken(request)
+    const { userId } = await transact(state => requireSession(state, token))
+    const fail = favoriteNetwork.failuresRemaining > 0
+    if (fail) favoriteNetwork.failuresRemaining--
+    if (favoriteNetwork.delayMs) await delay(favoriteNetwork.delayMs)
+    if (fail) {
       throw new MockError(503, 'TRANSIENT_FAILURE', 'Falha temporária ao atualizar favoritos.')
     }
     return transact(state => {
-      const { userId } = requireSession(state, readToken(request))
+      requireSession(state, token)
       return setFavorite(state, userId, String(params.nftId), body.favorite as boolean)
     })
   })),
@@ -81,10 +84,12 @@ export const handlers = [
   })),
   http.post('/api/__mock/favorite-network', ({ request }) => respond(async () => {
     const body = await readBody(request)
+    const delayMs = body.delayMs ?? 0
     const failuresRemaining = body.failuresRemaining ?? 0
+    if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10000) invalid('Latência inválida (0–10000 ms).')
     if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
-    favoriteFailuresRemaining = failuresRemaining
-    return { failuresRemaining }
+    favoriteNetwork = { delayMs, failuresRemaining }
+    return { ...favoriteNetwork }
   })),
   http.get('/api/nfts', async ({ request }) => {
     const delayMs = catalogNetwork.delayMs
@@ -108,7 +113,7 @@ export const handlers = [
     if (now !== undefined && (!Number.isFinite(now) || !Number.isSafeInteger(now))) invalid('Data de reset inválida.')
     await resetDatabase(now)
     catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
-    favoriteFailuresRemaining = 0
+    favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
     for (const close of closeSockets) close()
     closeSockets.clear()
     return { scenarioId: 'SCN-01', reset: true }

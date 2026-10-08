@@ -5,6 +5,7 @@ import { RouterProvider } from '@tanstack/react-router'
 import { queryClient } from '@/app/query-client'
 import { router } from '@/app/router'
 import { env } from '@/lib/env'
+import { AuthDialogProvider } from '@/features/auth/auth-dialog-context'
 
 let mockWorkerStart: Promise<void> | undefined
 
@@ -39,7 +40,9 @@ export function AppProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <MockBootstrap>
-        <RouterProvider router={router} />
+        <AuthDialogProvider>
+          <RouterProvider router={router} />
+        </AuthDialogProvider>
       </MockBootstrap>
     </QueryClientProvider>
   )
