@@ -101,3 +101,8 @@ Revisão de contagens/aparência UI-01: 15 testes unitários passaram, incluindo
 - Dialog desktop aproximado de `Sign In Modal.png` e dimensões confirmadas (500 × 600 px), com abas, campos/CTA na altura especificada, senha revelável, recuperação de senha e ações sociais com aviso honesto de indisponibilidade. E2E cobre tamanho/centralização, abertura/fechamento, foco, alternância entre login/cadastro, controles e login, além da navegação mobile. Reexecução do agente bloqueada antes das assertions por `listen EPERM`; ainda não validado pelo usuário.
 
 Revisão UI-01 de paginação: TEST-01 adaptado para números, `aria-current`, avanço/retorno e ausência de avanço na última página. Teste E2E preparado, não executado. Revisão visual da paginação pendente; estado da URL e total continuam derivados da consulta.
+
+
+## UI-02 — Comprar e navegação ao carrinho — 08/10/2026
+
+`npx playwright test tests/e2e/cart.spec.ts tests/e2e/checkout.spec.ts` executado pelo agente fora da sandbox após bloqueio inicial de `listen EPERM`. Resultado: 7 passaram e 5 falharam. TEST-05: os seis casos de carrinho passaram em Chromium desktop/mobile, incluindo Comprar → inclusão pela API → navegação, persistência, merge e cupom. Checkout confirmado desktop passou; falharam recusa desktop (mostrou confirmação), multirrede desktop (locator encontrou Ivory Baron após compra) e os três casos mobile (footer interceptou Confirmar compra). As falhas estão em etapas posteriores ao comportamento alterado no detalhe; não representam aceite da TASK-08. HTML e traces locais em `playwright-report/` e `test-results/`. Build/TypeScript e ESLint dos arquivos alterados passaram.

@@ -16,9 +16,8 @@ async function loginAndAddItem(page: Page) {
   await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/$|\/\?.*/) // AuthForm redirects to the market after the login and cart merge finish.
   await page.goto('/nfts/nft-001')
-  await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
-  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
-  await page.goto('/cart')
+  await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
+  await expect(page).toHaveURL(/\/cart$/)
   await page.getByRole('link', { name: /^Finalizar Ethereum/ }).click()
   await expect(page.getByRole('heading', { name: 'Pagamento', exact: true }).or(page.getByRole('heading', { name: 'Pagamento com carteira' }))).toBeVisible()
 }
@@ -27,11 +26,16 @@ test.beforeEach(async ({ page }) => reset(page))
 
 test('checkout connects a saved wallet and shows a confirmed order receipt', async ({ page, isMobile }) => {
   await loginAndAddItem(page)
+  if (isMobile) await expect(page.getByRole('banner')).toBeHidden()
+  else await expect(page.getByRole('banner')).toBeVisible()
+  if (isMobile) await expect(page.getByRole('contentinfo')).toBeHidden()
+  else await expect(page.getByRole('contentinfo')).toBeVisible()
   const reviewPurchase = page.getByRole('button', { name: 'Revisar compra' })
 
   if (isMobile) {
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Carteiras cadastradas' })).toBeVisible()
+    await expect(reviewPurchase).toHaveCSS('position', 'static')
   } else {
     await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
     await expect(reviewPurchase).toBeVisible()
@@ -40,8 +44,18 @@ test('checkout connects a saved wallet and shows a confirmed order receipt', asy
   await reviewPurchase.click()
   await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
   await expect(page.getByRole('heading', { name: isMobile ? 'Revisão da compra' : 'Seus NFTs' })).toBeVisible()
+  if (isMobile) {
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+    const viewport = page.viewportSize()
+    if (viewport && viewport.width > 320) {
+      await page.setViewportSize({ width: 320, height: viewport.height })
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+      await page.setViewportSize(viewport)
+    }
+  }
   const confirmPurchase = page.getByRole('button', { name: 'Confirmar compra' })
   await expect(confirmPurchase).toBeEnabled()
+  if (isMobile) await expect(confirmPurchase).toHaveCSS('position', 'static')
   const orderResponse = page.waitForResponse(response => response.url().endsWith('/api/orders') && response.request().method() === 'POST')
   await confirmPurchase.click()
   const response = await orderResponse
@@ -83,8 +97,8 @@ test('mixed-network cart finalizes one network and preserves the other group', a
 
   for (const nftId of ['nft-001', 'nft-002']) {
     await page.goto(`/nfts/${nftId}`)
-    await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
-    await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
+    await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
+    await expect(page).toHaveURL(/\/cart$/)
   }
 
   await page.goto('/cart')

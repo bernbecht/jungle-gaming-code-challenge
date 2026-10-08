@@ -83,7 +83,7 @@ export function OrderPage() {
       </dl>
       <div className="px-5 py-5 md:px-9">
         <h2 className="mb-3 font-semibold">Detalhes do pedido</h2>
-        <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto] border-b border-border pb-2 text-sm font-semibold sm:grid"><span>NFTs</span><span>Edições</span><span>Subtotal</span></div>
+        <div className="hidden grid-cols-[minmax(0,1fr)_auto] border-b border-border pb-2 text-sm font-semibold sm:grid"><span>NFTs</span><span>Subtotal</span></div>
         <ul className="space-y-3">
           {value.snapshot.items.map((item) => (
             <li key={item.id} className="flex items-center gap-3 border-b border-border/60 py-3 sm:border-0 sm:py-1">

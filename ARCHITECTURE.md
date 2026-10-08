@@ -53,6 +53,8 @@ As decisões abaixo complementam DEC-14 e substituem a espera por informações 
 | DEC-22 | Campo de código promocional reutiliza o `Input` compartilhado com estilos base e dimensões responsivas padrão, sem aparência exclusiva por breakpoint. Consolidar o campo com os formulários existentes evita exceções visuais e mantém o sistema de design coerente | TASK-07 / UI-03; revisar em TEST-14 | REQ-037, REQ-039 |
 | DEC-23 | No carrinho mobile, agrupar stepper e ação “Remover” em uma linha abaixo dos dados do NFT; usar ícone acompanhado de texto para tornar a ação clara e fácil de tocar. A imagem acompanha verticalmente os dados e a linha de ações, evitando ficar isolada no topo do card. Manter apenas o ícone de lixeira no desktop. O mockup mobile não define a remoção, então esta é uma decisão de usabilidade | TASK-07 / UI-03; validar em TEST-05 e TEST-14 | REQ-009, REQ-037, REQ-039 |
 | DEC-24 | Agrupar o carrinho por rede e permitir finalizar cada grupo separadamente. Uma compra/cotação/pedido pertence a uma só rede; a cotação inclui somente os NFTs dessa rede, a carteira compatível é selecionada para ela e as demais redes ficam no carrinho. Não simular uma transação atômica entre blockchains | TASK-08 / FLOW-01; validar em TEST-06 e TEST-17 | REQ-012, REQ-014, REQ-015, REQ-018 |
+| DEC-25 | Campos do checkout derivados da carteira e não editáveis permanecem `readOnly` (copiáveis e acessíveis por teclado); identificá-los com um cadeado discreto e fundo/borda distintos. Não repetir o texto “Somente leitura” em cada rótulo para evitar ruído visual | TASK-08 / UI-04; typecheck e lint passaram; revisar em TEST-14 | REQ-014, REQ-037, REQ-039 |
+| DEC-26 | Nas etapas mobile Carteira e Revisão, manter o CTA principal no fluxo normal do documento, após o conteúdo. Não usar botão flutuante/fixo, para evitar sobreposição dos itens, valores ou dados da carteira | TASK-08 / UI-04; validar em TEST-06 e TEST-14 | REQ-037, REQ-039 |
 
 A TASK-01 encerra a análise e a definição da abordagem. Escolher a família concreta, preparar placeholders e implementar layouts continuam trabalho das tarefas acima. Estas decisões não alteram o enunciado nem constituem evidência de conformidade visual.
 
@@ -178,3 +180,8 @@ A homepage mobile usa uma composição própria: o header desktop some apenas na
 #### Badge “Raro” no protótipo — DEC-20
 
 A screenshot mobile inclui RARO, mas o desafio não exige essa marca, e os DTOs/fixtures não definem uma classificação de raridade. Removemos o badge dos cards para não converter uma indicação visual isolada em regra de produto com critério inventado. Pergunta sugerida para a apresentação: “O selo RARO do protótipo é apenas editorial ou deveria corresponder a uma regra de raridade no domínio/API? Qual seria essa regra?” A screenshot e o registro da ausência no enunciado são evidência da dúvida, não evidência de uma regra implementada.
+
+
+### Detalhe — comportamento de Comprar
+
+Comprar no desktop e Comprar NFT no mobile enviam a edição e quantidade selecionadas à API do carrinho. Após sucesso, atualizam o cache e navegam para `/cart`; falhas permanecem no detalhe com mensagem acessível. A ação funciona para visitante e conta autenticada; autenticação continua exigida no checkout. Desktop mantém apenas Comprar e Favoritar. O ícone mobile adiciona sem navegar, preservando feedback de inclusão. Durante carregamento/envio ou sem estoque, a ação fica desabilitada. Esta é uma decisão de UX aprovada pelo usuário, não uma navegação expressamente exigida no enunciado.

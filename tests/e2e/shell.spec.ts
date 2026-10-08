@@ -8,6 +8,7 @@ test("opens shell website, navigates and retrieves routes without runtime error"
   const runtimeErrors: string[] = [];
   page.on("pageerror", (error) => runtimeErrors.push(error.message));
   await page.goto("/");
+  await expect(page.getByRole("contentinfo")).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: isMobile

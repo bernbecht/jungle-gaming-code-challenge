@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react'
 import { sessionQuery } from '@/features/auth/api'
 import { favoritesQuery, saveFavorite } from './api'
 import { useAuthDialog } from '@/features/auth/use-auth-dialog'
+import { cn } from '@/lib/utils'
 
 export function FavoriteButton({ nftId, name, className = '', showLabel = false }: { nftId: string; name: string; className?: string; showLabel?: boolean }) {
   const session = useQuery(sessionQuery)
@@ -30,7 +31,7 @@ export function FavoriteButton({ nftId, name, className = '', showLabel = false 
     },
   })
   const isFavorite = Boolean(favorites.data?.nftIds.includes(nftId))
-  const controlClass = `inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${className}`
+  const controlClass = cn('inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring', className)
   if (!userId) return (
     <Link
       to="/login"

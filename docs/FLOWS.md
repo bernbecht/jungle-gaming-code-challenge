@@ -23,7 +23,7 @@ Os fluxos abaixo são a especificação do comportamento esperado. A implementa�
 
 **Pré-condições:** usuário autenticado, carrinho com itens, dados do colecionador válidos e carteira cadastrada na rede do grupo selecionado. O carrinho pode conter NFTs de redes diferentes; a pessoa escolhe um grupo no carrinho e cada pedido/cotação inclui somente os NFTs dessa rede (DEC-24). As demais redes permanecem no carrinho para finalizações independentes. A revisão usa uma cotação da API, com preços, disponibilidade, cupom, taxa e total daquele grupo.
 
-No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobile, a compra avança em três passos — dados, carteira/rede e revisão — e mantém a ação de confirmar acessível na parte inferior. Em ambos os tamanhos, conexão e pagamento são simulações locais; não há chamada a uma carteira real. A cotação exibida expira após cinco minutos.
+No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobile, o header e o footer globais ficam ocultos nesta rota (o footer mobile só aparece na home); a compra avança em três passos — dados, carteira/rede e revisão. Nas etapas Carteira e Revisão, o CTA principal fica após o conteúdo no fluxo da página, sem flutuar sobre ele (DEC-26). Em ambos os tamanhos, conexão e pagamento são simulações locais; não há chamada a uma carteira real. A cotação exibida expira após cinco minutos.
 
 **Gatilho:** o usuário confirma a compra após revisar os dados e os valores.
 

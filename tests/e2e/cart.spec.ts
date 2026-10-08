@@ -12,10 +12,9 @@ test.beforeEach(async ({ page }) => {
 test('visitor cart persists, updates quantity and calculates valid coupon totals', async ({ page, isMobile }) => {
   await page.goto('/nfts/nft-001')
   await expect(page.getByRole('heading', { name: 'Violet Nomad', exact: true })).toBeVisible()
-  const add = page.getByRole('button', { name: /Adicionar.*carrinho/i })
+  const add = page.getByRole('button', { name: /^Comprar(?: NFT)?$/ })
   await add.click()
-  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
-  await page.goto('/cart')
+  await expect(page).toHaveURL(/\/cart$/)
   if (isMobile) {
     await expect(page.getByRole('heading', { name: 'Carrinho de NFTs' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Voltar ao mercado' })).toBeVisible()
@@ -50,8 +49,8 @@ test('visitor cart persists, updates quantity and calculates valid coupon totals
 
 test('login merges visitor items once and keeps them in the account cart', async ({ page }) => {
   await page.goto('/nfts/nft-001')
-  await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
-  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
+  await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
+  await expect(page).toHaveURL(/\/cart$/)
   await page.goto('/login')
   await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
   await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
@@ -67,8 +66,8 @@ test('login merges visitor items once and keeps them in the account cart', async
 
 test('invalid coupons show an API error without changing cart totals', async ({ page }) => {
   await page.goto('/nfts/nft-001')
-  await page.getByRole('button', { name: /Adicionar.*carrinho/i }).click()
-  await page.goto('/cart')
+  await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
+  await expect(page).toHaveURL(/\/cart$/)
   const total = page.getByRole('complementary').getByText('0.011 ETH', { exact: true })
   await expect(total).toBeVisible()
   await page.getByLabel('Código promocional', { exact: true }).fill('INVALID')

@@ -237,3 +237,8 @@ DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do c
 - [ ] Executar a nova cobertura multirrede (SCN-18) em Chromium desktop/mobile junto com a suíte de checkout.
 
 `npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. Executar `npx playwright test tests/e2e/checkout.spec.ts` no terminal local antes de encerrar a tarefa; o runner do agente foi bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. TEST-07 ainda requer cenários de timeout, cotação alterada e refresh durante pedido pendente, além dos controles determinísticos da TASK-10/11.
+
+
+### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026
+
+Implementado em `src/routes/nft-detail-page.tsx`: Comprar adiciona edição/quantidade e navega para o carrinho somente após sucesso da API; erro mantém o detalhe. Removido botão adicional desktop; ícone mobile mantém inclusão sem navegação. E2Es de carrinho/checkout atualizados para o botão Comprar. Build, TypeScript, ESLint e revisão do diff passaram. Os seis E2Es de carrinho passaram em desktop/mobile; checkout teve um teste aprovado e cinco falhas posteriores à inclusão/navegação (recusa, remoção multirrede e footer sobre Confirmar no mobile). Não encerra TASK-08; checkout em alteração por outro agente. Sem commit nesta etapa.

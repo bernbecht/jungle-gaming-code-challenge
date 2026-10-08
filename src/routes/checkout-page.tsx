@@ -22,7 +22,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import axios from "axios";
-import { ArrowLeft, LoaderCircle, WalletCards } from "lucide-react";
+import { ArrowLeft, LoaderCircle, LockKeyhole, WalletCards } from "lucide-react";
 import { fromWei, toWei } from "@/lib/money";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useEffect, useState, type FormEvent } from "react";
@@ -84,9 +84,12 @@ function Field({
 }) {
   return (
     <label htmlFor={id} className="block min-w-0 text-sm">
-      <span className="mb-2 block">
-        {label}
-        {required && <span className="ml-1 text-primary" aria-hidden="true">*</span>}
+      <span className="mb-2 flex items-center justify-between gap-2">
+        <span>
+          {label}
+          {required && <span className="ml-1 text-primary" aria-hidden="true">*</span>}
+        </span>
+        {readOnly && <span className="inline-flex shrink-0 text-secondary" title="Campo somente leitura"><LockKeyhole size={14} aria-hidden="true" /></span>}
       </span>
       <Input
         id={id}
@@ -95,7 +98,7 @@ function Field({
         readOnly={readOnly}
         value={value}
         onChange={(event) => onChange?.(event.target.value)}
-        className={readOnly ? "read-only:opacity-80" : undefined}
+        className={readOnly ? "read-only:cursor-default read-only:border-dashed read-only:border-secondary/60 read-only:bg-primary/5 read-only:text-secondary read-only:focus-visible:ring-0" : undefined}
       />
     </label>
   );
@@ -139,18 +142,18 @@ function OrderSummary({ cart, quote }: { cart: Cart; quote: Quote | null }) {
   return (
     <section aria-labelledby="checkout-items-title" className="min-w-0">
       <h2 id="checkout-items-title" className="mb-3 text-lg font-semibold">Seus NFTs</h2>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] border-b border-border pb-2 text-sm font-semibold">
+      <div className="hidden grid-cols-[minmax(0,1fr)_auto] border-b border-border pb-2 text-sm font-semibold sm:grid">
         <span>NFTs</span><span>Subtotal</span>
       </div>
       <ul className="mt-3 space-y-3">
         {items.map((item) => (
-          <li key={item.id} className="flex min-w-0 items-center gap-3 rounded-lg bg-card p-2">
-            <img src={item.imageUrl} alt="" className="size-16 shrink-0 rounded-lg object-cover" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{item.name} #{item.tokenId}</p>
+          <li key={item.id} className="grid min-w-0 grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-3 gap-y-1 rounded-lg bg-card p-2 sm:grid-cols-[4rem_minmax(0,1fr)_auto] sm:gap-y-0">
+            <img src={item.imageUrl} alt="" className="row-span-2 size-12 rounded-lg object-cover sm:row-span-1 sm:size-16" />
+            <div className="min-w-0">
+              <p className="break-words text-sm font-semibold">{item.name} #{item.tokenId}</p>
               <p className="mt-1 text-xs text-secondary">Edição {item.editionLabel} · × {item.quantity}</p>
             </div>
-            <p className="shrink-0 text-right font-semibold text-primary">{formatEth(fromWei(toWei(item.unitPrice) * BigInt(item.quantity)))}</p>
+            <p className="col-start-2 min-w-0 break-words text-xs font-semibold text-primary sm:col-start-auto sm:whitespace-nowrap sm:text-right sm:text-sm">{formatEth(fromWei(toWei(item.unitPrice) * BigInt(item.quantity)))}</p>
           </li>
         ))}
       </ul>
@@ -158,11 +161,11 @@ function OrderSummary({ cart, quote }: { cart: Cart; quote: Quote | null }) {
         {cart.couponCode ? `Cupom ${cart.couponCode} aplicado` : "Tem um código promocional?"} {" "}
         {!cart.couponCode && <Link to="/cart" className="text-primary underline">Aplique no carrinho</Link>}
       </p>
-      <dl className="space-y-2 border-t border-border pt-3 text-sm">
-        <div className="flex justify-between gap-3"><dt>Subtotal</dt><dd>{formatEth(totals.subtotal)}</dd></div>
-        <div className="flex justify-between gap-3"><dt>Desconto do lançamento</dt><dd>(−) {formatEth(totals.discount)}</dd></div>
-        <div className="flex justify-between gap-3"><dt>Taxa de rede <span className="block text-xs text-primary">Taxa estimada</span></dt><dd>{formatEth(totals.networkFee)}</dd></div>
-        <div className="flex justify-between gap-3 border-t border-border pt-3 text-base font-semibold"><dt>Total</dt><dd className="text-primary">{formatEth(totals.total)}</dd></div>
+      <dl className="min-w-0 space-y-2 border-t border-border pt-3 text-sm">
+        <div className="flex min-w-0 justify-between gap-3"><dt className="min-w-0">Subtotal</dt><dd className="shrink-0 whitespace-nowrap">{formatEth(totals.subtotal)}</dd></div>
+        <div className="flex min-w-0 justify-between gap-3"><dt className="min-w-0">Desconto do lançamento</dt><dd className="shrink-0 whitespace-nowrap">(−) {formatEth(totals.discount)}</dd></div>
+        <div className="flex min-w-0 justify-between gap-3"><dt className="min-w-0">Taxa de rede <span className="block text-xs text-primary">Taxa estimada</span></dt><dd className="shrink-0 whitespace-nowrap">{formatEth(totals.networkFee)}</dd></div>
+        <div className="flex min-w-0 justify-between gap-3 border-t border-border pt-3 text-base font-semibold"><dt className="min-w-0">Total</dt><dd className="shrink-0 whitespace-nowrap text-primary">{formatEth(totals.total)}</dd></div>
       </dl>
     </section>
   );
@@ -374,16 +377,19 @@ export function CheckoutPage() {
   if (!checkoutItems.length) return <section className="py-12 text-center"><h1 className="text-2xl font-semibold">Não há NFTs nesta rede</h1><p className="mt-3 text-secondary">Este grupo do carrinho foi atualizado ou já foi finalizado.</p><Button asChild className="mt-6"><Link to="/cart">Voltar ao carrinho</Link></Button></section>;
   const summary = <OrderSummary cart={checkoutCart} quote={quote} />;
   const reviewPanel = (
-    <section aria-labelledby="review-title" className="rounded-2xl border border-border bg-card p-5">
+    <section aria-labelledby="review-title" className="min-w-0 rounded-2xl border border-border bg-card p-5">
       <h2 id="review-title" className="text-lg font-semibold">Revisão da compra</h2>
       <p className="mt-2 text-sm text-secondary">Confira os NFTs, os dados do colecionador e a carteira antes de confirmar.</p>
       <div className="mt-5">{summary}</div>
-      <p className="mt-4 text-sm"><strong>{collector.displayName}</strong><br />{collector.email}<br />{selectedWallet?.nickname} · {networks.find((item) => item.id === network)?.label}<br />{selectedWallet?.address}</p>
+      <dl className="mt-4 min-w-0 space-y-3 border-t border-border pt-4 text-sm">
+        <div className="min-w-0"><dt className="text-xs text-secondary">Colecionador</dt><dd className="break-words font-medium">{collector.displayName}</dd><dd className="break-words">{collector.email}</dd></div>
+        <div className="min-w-0"><dt className="text-xs text-secondary">Carteira e rede</dt><dd className="break-words font-medium">{selectedWallet?.nickname} · {networks.find((item) => item.id === network)?.label}</dd><dd className="mt-1 break-all font-mono text-xs text-secondary">{selectedWallet?.address}</dd></div>
+      </dl>
     </section>
   );
 
   return (
-    <section className="py-6 md:py-10">
+    <section className={`py-6 md:py-10 ${step === "review" ? "pb-32 md:pb-10" : ""}`}>
       <div className="mb-6 flex items-center gap-3 md:hidden"><Link to="/cart" aria-label="Voltar ao carrinho" className="inline-flex size-9 items-center justify-center rounded-full border border-border text-primary"><ArrowLeft size={18} /></Link><h1 className="text-xl font-semibold">Pagamento com carteira</h1></div>
       <nav aria-label="Caminho da página" className="mb-8 hidden text-sm md:block"><Link to="/" search={defaultCatalog}>Início</Link> / <Link to="/" search={defaultCatalog}>Mercado</Link> / <Link to="/cart">Carrinho</Link> / <span aria-current="page">Pagamento</span></nav>
       <h1 className="mb-6 hidden text-2xl font-semibold md:block">Pagamento</h1>
@@ -391,15 +397,15 @@ export function CheckoutPage() {
       {problem && <div role="alert" className="mb-5 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">{problem}{recoverAvailable && <button type="button" className="ml-2 underline" onClick={() => void recoverAttempt()}>Recuperar tentativa</button>}</div>}
       {notice && <p role="status" className="mb-5 rounded-md border border-primary/40 p-3 text-sm">{notice}{recoverAvailable && <button type="button" className="ml-2 underline" onClick={() => void recoverAttempt()}>Recuperar tentativa</button>}</p>}
       <form onSubmit={(event) => void placeOrder(event)}>
-        <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1.45fr)_minmax(350px,.75fr)] xl:gap-8">
-          <div className={`${step === "data" ? "block" : "hidden"} md:block`}>
+        <div className="grid min-w-0 grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1.45fr)_minmax(350px,.75fr)] xl:gap-8">
+          <div className={`min-w-0 ${step === "data" ? "block" : "hidden"} md:block`}>
             <section aria-labelledby="collector-title">
               <h2 id="collector-title" className="mb-4 text-lg font-semibold">Perfil do colecionador</h2>
               {formFields}
             </section>
             <div className="mt-6 flex gap-3 md:hidden"><Button type="button" variant="outline" className="w-full" asChild><Link to="/cart">Voltar</Link></Button><Button type="button" className="w-full" onClick={(event) => { if (event.currentTarget.form?.reportValidity()) { setProblem(""); setStep("wallet"); } }}>Continuar</Button></div>
           </div>
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <div className={`${step === "review" ? "block" : "hidden"} md:block`}>
               <div className="hidden md:block">{summary}</div>
               {step === "review" && <div className="md:hidden">{reviewPanel}</div>}
@@ -416,7 +422,7 @@ export function CheckoutPage() {
               {paymentOptions}
               <div className="mt-3 md:hidden"><Button type="button" variant="ghost" className="w-full" onClick={() => setStep("data")}>Voltar aos dados</Button></div>
             </div>
-            <Button type="submit" className={`${step === "data" ? "hidden" : "flex"} fixed inset-x-5 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 min-h-[60px] rounded-full text-base md:static md:mt-5 md:min-h-11 md:w-full md:rounded-md md:text-sm md:flex`} disabled={!canPrepare || updating || (step === "review" && !canSubmit)}>{orderMutation.isPending || connectMutation.isPending || quoteMutation.isPending ? <><LoaderCircle className="animate-spin" />{orderMutation.isPending ? "Enviando pedido…" : "Preparando revisão…"}</> : actionLabel}</Button>
+            <Button type="submit" className={`${step === "data" ? "hidden" : "flex"} mt-5 min-h-[60px] w-full rounded-full text-base md:min-h-11 md:rounded-md md:text-sm`} disabled={!canPrepare || updating || (step === "review" && !canSubmit)}>{orderMutation.isPending || connectMutation.isPending || quoteMutation.isPending ? <><LoaderCircle className="animate-spin" />{orderMutation.isPending ? "Enviando pedido…" : "Preparando revisão…"}</> : actionLabel}</Button>
           </div>
         </div>
       </form>

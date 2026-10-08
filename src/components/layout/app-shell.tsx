@@ -37,6 +37,7 @@ export function AppShell() {
   const isHome = pathname === "/";
   const isNftDetail = pathname.startsWith("/nfts/");
   const isCart = pathname === "/cart";
+  const isCheckout = pathname === "/checkout";
   const isMarketActive = isNftDetail || pathname === "/cart" || pathname === "/checkout" || (isHome && hash === "colecoes");
   const isHomeActive = isHome && !isMarketActive;
   return (
@@ -45,7 +46,7 @@ export function AppShell() {
         Pular para o conteúdo
       </a>
       <header
-        className={`page-container flex min-h-20 items-center justify-between gap-4 ${isHome || isNftDetail || isCart ? "hidden md:flex" : ""}`}
+        className={`page-container flex min-h-20 items-center justify-between gap-4 ${isHome || isNftDetail || isCart || isCheckout ? "hidden md:flex" : ""}`}
       >
         <Link
           to="/"
@@ -125,7 +126,7 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      <SiteFooter isHome={isHome} hideOnMobile={isCart} />
+      <SiteFooter isHome={isHome} />
 
       {authDialog.request && (
         <AuthDialog
