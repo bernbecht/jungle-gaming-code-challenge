@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
@@ -22,7 +23,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import axios from "axios";
-import { ArrowLeft, LoaderCircle, LockKeyhole, WalletCards } from "lucide-react";
+import { ArrowLeft, LoaderCircle, WalletCards } from "lucide-react";
 import { fromWei, toWei } from "@/lib/money";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useEffect, useState, type FormEvent } from "react";
@@ -83,14 +84,12 @@ function Field({
   id: string;
 }) {
   return (
-    <label htmlFor={id} className="block min-w-0 text-sm">
-      <span className="mb-2 flex items-center justify-between gap-2">
-        <span>
-          {label}
-          {required && <span className="ml-1 text-primary" aria-hidden="true">*</span>}
-        </span>
-        {readOnly && <span className="inline-flex shrink-0 text-secondary" title="Campo somente leitura"><LockKeyhole size={14} aria-hidden="true" /></span>}
-      </span>
+    <FormField
+      id={id}
+      label={label}
+      required={required}
+      readOnly={readOnly}
+    >
       <Input
         id={id}
         type={type}
@@ -98,9 +97,8 @@ function Field({
         readOnly={readOnly}
         value={value}
         onChange={(event) => onChange?.(event.target.value)}
-        className={readOnly ? "read-only:cursor-default read-only:border-dashed read-only:border-secondary/60 read-only:bg-primary/5 read-only:text-secondary read-only:focus-visible:ring-0" : undefined}
       />
-    </label>
+    </FormField>
   );
 }
 

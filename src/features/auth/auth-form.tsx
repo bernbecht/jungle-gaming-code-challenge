@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import type {
   LoginInput,
@@ -123,19 +124,7 @@ export function AuthForm({
       >
         {isRegister && (
           <>
-            <div
-              className={
-                dialogStyle
-                  ? "auth-modal-field"
-                  : "grid gap-2 text-sm font-medium"
-              }
-            >
-              <label
-                className={dialogStyle ? "sr-only" : undefined}
-                htmlFor="display-name"
-              >
-                Nome de exibição
-              </label>
+            <FormField id="display-name" label="Nome de exibição" required labelClassName={dialogStyle ? "sr-only" : undefined} className={dialogStyle ? "auth-modal-field gap-0" : "gap-2 text-sm font-medium"}>
               <Input
                 className={dialogStyle ? "auth-modal-input" : undefined}
                 id="display-name"
@@ -150,20 +139,8 @@ export function AuthForm({
                   setValues({ ...values, displayName: event.target.value })
                 }
               />
-            </div>
-            <div
-              className={
-                dialogStyle
-                  ? "auth-modal-field"
-                  : "grid gap-2 text-sm font-medium"
-              }
-            >
-              <label
-                className={dialogStyle ? "sr-only" : undefined}
-                htmlFor="username"
-              >
-                Nome de usuário
-              </label>
+            </FormField>
+            <FormField id="username" label="Nome de usuário" required labelClassName={dialogStyle ? "sr-only" : undefined} className={dialogStyle ? "auth-modal-field gap-0" : "gap-2 text-sm font-medium"}>
               <Input
                 className={dialogStyle ? "auth-modal-input" : undefined}
                 id="username"
@@ -178,20 +155,10 @@ export function AuthForm({
                   setValues({ ...values, username: event.target.value })
                 }
               />
-            </div>
+            </FormField>
           </>
         )}
-        <div
-          className={
-            dialogStyle ? "auth-modal-field" : "grid gap-2 text-sm font-medium"
-          }
-        >
-          <label
-            className={dialogStyle ? "sr-only" : undefined}
-            htmlFor="email"
-          >
-            E-mail
-          </label>
+        <FormField id="email" label="E-mail" required labelClassName={dialogStyle ? "sr-only" : undefined} className={dialogStyle ? "auth-modal-field gap-0" : "gap-2 text-sm font-medium"}>
           <Input
             className={dialogStyle ? "auth-modal-input" : undefined}
             id="email"
@@ -205,20 +172,8 @@ export function AuthForm({
               setValues({ ...values, email: event.target.value })
             }
           />
-        </div>
-        <div
-          className={
-            dialogStyle
-              ? "auth-modal-password"
-              : "grid gap-2 text-sm font-medium"
-          }
-        >
-          <label
-            className={dialogStyle ? "sr-only" : undefined}
-            htmlFor="password"
-          >
-            Senha
-          </label>
+        </FormField>
+        <FormField id="password" label="Senha" required labelClassName={dialogStyle ? "sr-only" : undefined} className={dialogStyle ? "auth-modal-password gap-0" : "gap-2 text-sm font-medium"}>
           <Input
             className={dialogStyle ? "auth-modal-input" : undefined}
             id="password"
@@ -259,7 +214,7 @@ export function AuthForm({
               Esqueceu a senha?
             </button>
           )}
-        </div>
+        </FormField>
         {error && (
           <p role="alert" className="text-sm text-destructive">
             {error}

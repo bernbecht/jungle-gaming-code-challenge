@@ -1,4 +1,4 @@
-import type { AuthResponse, Favorites, LoginInput, Profile, RegisterInput, Session } from '../contracts/marketplace'
+import type { AuthResponse, Favorites, LoginInput, Profile, RegisterInput, Session, UpdateProfileInput } from '../contracts/marketplace'
 import { MockError } from './errors'
 import type { DatabaseState, StoredUser } from './state'
 import { nextId } from './state'
@@ -51,6 +51,40 @@ export function register(state: DatabaseState, input: RegisterInput, password: S
   state.wallets[id] = []
   state.carts[`user:${id}`] = { id: nextId(state, 'cart'), version: 1, items: [], couponCode: null }
   return issueSession(state, user)
+}
+
+export function updateProfile(state: DatabaseState, userId: string, input: UpdateProfileInput): Profile {
+  const user = state.users.find(candidate => candidate.profile.id === userId)
+  if (!user) throw new MockError(404, 'NOT_FOUND', 'Perfil não encontrado.')
+  if (user.profile.version !== input.expectedVersion)
+    throw new MockError(409, 'VERSION_CONFLICT', 'Este perfil foi alterado em outra sessão. Recarregue os dados e tente novamente.')
+
+  const username = input.username.trim().toLowerCase()
+  const displayName = input.displayName.trim()
+  const email = input.email.trim().toLowerCase()
+  const ensName = input.ensName?.trim().toLowerCase() || null
+  const fieldErrors: Record<string, string[]> = {}
+  if (!/^[a-z0-9_]{3,24}$/.test(username)) fieldErrors.username = ['Use de 3 a 24 letras, números ou _.']
+  if (displayName.length < 2 || displayName.length > 60) fieldErrors.displayName = ['Informe um nome entre 2 e 60 caracteres.']
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fieldErrors.email = ['Informe um e-mail válido.']
+  if (ensName && !/^(?=.{3,255}$)[a-z0-9-]+(?:\.[a-z0-9-]+)*\.eth$/.test(ensName)) fieldErrors.ensName = ['Informe um nome ENS válido terminado em .eth.']
+  if (Object.keys(fieldErrors).length) {
+    const error = new MockError(422, 'VALIDATION_ERROR', 'Revise os campos destacados.')
+    error.body.error.fieldErrors = fieldErrors
+    throw error
+  }
+  const duplicate = state.users.find(candidate => candidate.profile.id !== userId &&
+    (candidate.profile.email.toLowerCase() === email || candidate.profile.username.toLowerCase() === username))
+  if (duplicate) {
+    const error = new MockError(409, 'ACCOUNT_EXISTS', 'Já existe uma conta com esse e-mail ou nome de usuário.')
+    error.body.error.fieldErrors = {
+      ...(duplicate.profile.email.toLowerCase() === email ? { email: ['Este e-mail já está em uso.'] } : {}),
+      ...(duplicate.profile.username.toLowerCase() === username ? { username: ['Este nome de usuário já está em uso.'] } : {}),
+    }
+    throw error
+  }
+  user.profile = { ...user.profile, username, displayName, email, ensName, version: user.profile.version + 1 }
+  return user.profile
 }
 
 export function requireSession(state: DatabaseState, token: string | null): { userId: string; session: Session } {

@@ -2,6 +2,7 @@ import { useId, useRef } from 'react'
 import { useLocation, useNavigate, useSearch } from '@tanstack/react-router'
 import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { FormField } from '@/components/ui/form-field'
 import { Input } from '@/components/ui/input'
 import { defaultCatalog, validateCatalogSearch } from './search'
 
@@ -53,8 +54,9 @@ export function HeaderSearch({ variant = 'icon' }: { variant?: 'icon' | 'field' 
           void navigate({ search: { ...params, q, page: 1 }, hash: 'colecoes' })
             .then(() => dialog.current?.close())
         }}>
-          <label className="sr-only" htmlFor={`${id}-input`}>Buscar NFTs</label>
-          <Input ref={input} id={`${id}-input`} name="q" type="search" defaultValue={params.q} placeholder="Obra, coleção ou criador" />
+          <FormField id={`${id}-input`} label="Buscar NFTs" className="gap-0" labelClassName="sr-only">
+            <Input ref={input} id={`${id}-input`} name="q" type="search" defaultValue={params.q} placeholder="Obra, coleção ou criador" />
+          </FormField>
           <Button type="submit" className="mt-4 w-full">Buscar</Button>
         </form>
       </dialog>

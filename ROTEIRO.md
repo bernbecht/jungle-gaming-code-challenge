@@ -122,9 +122,14 @@ Horários relativos ao início do dia. Testes pequenos acompanham cada bloco.
 
 ## 6. Dia 2 — completar conta, falhas e evidências
 
+Com a decomposição, o bloco da antiga TASK-09 foi reestimado de 1h30 para 1h50.
+
 | Bloco | Tempo | Trabalho | Critério de conclusão |
 | --- | ---: | --- | --- |
-| 7 | 1h30 | Perfil, avatar, senha, carteiras principal/secundária; completar validações | Alterações persistem; erros da API aparecem nos campos; mobile utilizável |
+| 7A | 30 min | TASK-09A — editar dados do perfil e tratar validação/versão | Perfil persiste; erros da API aparecem nos campos |
+| 7B | 20 min | TASK-09B — enviar, validar e remover avatar | Avatar permitido persiste; arquivo inválido é rejeitado sem salvar |
+| 7C | 20 min | TASK-09C — alterar senha com confirmação | Senha antiga falha e nova autentica; segredo não fica em claro |
+| 7D | 40 min | TASK-09D — cadastrar/editar carteiras principal e secundária | Carteiras persistem, mostram erros e aparecem atualizadas no checkout |
 | 8 | 2h | Eventos completos, reconexão, expiração, preço/estoque, recusa e timeout | Cotação antiga bloqueada; mesma tentativa recupera mesmo pedido; sem vazamento entre usuários |
 | 9 | 1h30 | Conferência Figma em 390/768/1440, skeletons, teclado, foco, zoom e movimento reduzido | Telas coerentes, sem overflow, feedback acessível |
 | 10 | 2h | Completar e executar os 12 grupos E2E; baselines das quatro telas | Suíte isolada e reproduzível, HTML report e traces em falhas |

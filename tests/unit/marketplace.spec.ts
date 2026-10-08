@@ -4,6 +4,8 @@ import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
+import { updateProfile } from '../../src/mocks/auth'
+import { MockError } from '../../src/mocks/errors'
 import { BASE_TIME } from '../../src/mocks/state'
 import type { DatabaseState } from '../../src/mocks/state'
 
@@ -41,6 +43,25 @@ test('fixtures have stable IDs, distinct private resources and no stored plainte
   expect(state.favorites['user-a']).not.toEqual(state.favorites['user-b'])
   expect(JSON.stringify(state)).not.toContain('DemoNft!2026')
   expect(state.users[0]!.password.verifier).not.toBe(state.users[1]!.password.verifier)
+})
+
+test('profile updates validate identity fields, increment versions and reject stale or duplicate changes', async () => {
+  const state = await createFixtures()
+  const updated = updateProfile(state, 'user-a', {
+    username: 'Collector_A', displayName: 'Collector A Updated', email: 'COLLECTOR-A@EXAMPLE.TEST',
+    ensName: 'Collector.eth', expectedVersion: 1,
+  })
+  expect(updated).toMatchObject({ username: 'collector_a', displayName: 'Collector A Updated', email: 'collector-a@example.test', ensName: 'collector.eth', version: 2 })
+  expect(() => updateProfile(state, 'user-a', {
+    username: 'collector_a', displayName: 'Collector A Updated', email: 'collector-a@example.test', ensName: null, expectedVersion: 1,
+  })).toThrow(MockError)
+  expect(() => updateProfile(state, 'user-a', {
+    username: 'collector-b', displayName: 'Collector A Updated', email: 'collector-b@example.test', ensName: null, expectedVersion: 2,
+  })).toThrow(MockError)
+  expect(() => updateProfile(state, 'user-a', {
+    username: 'x', displayName: '', email: 'invalid', ensName: 'not-ens', expectedVersion: 2,
+  })).toThrow(MockError)
+  expect(state.users[0]?.profile).toEqual(updated)
 })
 
 test('catalog combines dimensions, paginates, sorts and returns an empty result', async () => {

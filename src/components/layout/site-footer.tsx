@@ -1,5 +1,6 @@
 import { SocialBrandIcon, type SocialBrand } from "@/components/icons/social-brand-icon";
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { defaultCatalog } from "@/features/catalog/search";
 import { Link } from "@tanstack/react-router";
@@ -97,16 +98,15 @@ function NewsletterSignup() {
           setMessage("Inscrição indisponível nesta demonstração.");
         }}
       >
-        <label className="sr-only" htmlFor="newsletter-email">
-          Seu e-mail
-        </label>
-        <Input
-          id="newsletter-email"
-          type="email"
-          placeholder="digite seu e-mail..."
-          autoComplete="email"
-          required
-        />
+        <FormField id="newsletter-email" label="Seu e-mail" required className="gap-0" labelClassName="sr-only">
+          <Input
+            id="newsletter-email"
+            type="email"
+            placeholder="digite seu e-mail..."
+            autoComplete="email"
+            required
+          />
+        </FormField>
         <Button type="submit" size="sm">
           Enviar
         </Button>

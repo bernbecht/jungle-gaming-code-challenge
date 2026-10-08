@@ -4,7 +4,7 @@ Cronograma: [ROTEIRO.md](ROTEIRO.md). Requisitos: [REQUIREMENTS.md](REQUIREMENTS
 
 Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → Em andamento → Em verificação → Concluído; Bloqueado deve incluir motivo. Uma tarefa só é concluída com critérios de aceite e evidências dos testes indicados, sem marcar requisitos atendidos apenas por existir código.
 
-## Situação atual — 06/10/2026
+## Situação atual — 08/10/2026
 
 - [x] Roteiro de desenvolvimento criado em [ROTEIRO](ROTEIRO.md).
 - [x] Documentação inicial criada: requisitos, tarefas, arquitetura, contratos propostos, interface, cenários, matriz de testes, entrega e README.
@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A e TASK-07 concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-08 implementada, aguardando E2E local por bloqueio de rede do runner; TASK-09 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A e TASK-07/08 concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-09A em verificação; TASK-09B–09D e TASK-10 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -30,8 +30,12 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: destaque sob os filtros, banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | TEST-19; comparação com UI-01 em TEST-14 (TASK-12) | Concluída |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback (FLOW-03, FLOW-04) | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | Em andamento |
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | Concluída |
-| TASK-08 | 4 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | Implementada; E2E local pendente |
-| TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
+| TASK-08 | 4 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | Concluída |
+| TASK-09 (épico) | 2 / 7 | Completar gestão de perfil, avatar, senha e carteiras; concluir quando todas as subtarefas passarem no TEST-08 | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
+| TASK-09A | 2 / 7 | Implementar consulta/edição dos dados do perfil; validar campos e versão, persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-024 | TEST-08A | Em verificação |
+| TASK-09B | 2 / 7 | Implementar envio, validação e remoção do avatar; validar arquivo/tamanho, persistir a escolha e mostrar erros sem salvar parcialmente | TASK-09A | REQ-003, REQ-024 | TEST-08B | A fazer |
+| TASK-09C | 2 / 7 | Implementar alteração de senha com senha atual/nova; atualizar verificador com salt, sem persistir texto em claro; confirmar que senha antiga falha e nova autentica | TASK-09A | REQ-024 | TEST-08C, TEST-03 | A fazer |
+| TASK-09D | 2 / 7 | Implementar cadastro e edição das carteiras principal/secundária; validar endereço/rede/slot, persistir e refletir alterações no checkout | TASK-08 | REQ-014, REQ-024 | TEST-08D, TEST-06 | A fazer |
 | TASK-10 | 2 / 8 | Eventos versionados, limpeza de sessão, cotação inválida, reconexão REST e recuperação de pedido sem repetir efeitos | TASK-08 | REQ-013, REQ-015, REQ-017, REQ-019, REQ-023, REQ-027, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 | TEST-09, TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
 | TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
@@ -220,7 +224,7 @@ Adaptação mobile de UI-03: header geral substituído por voltar/título; cart�
 
 DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do cartão e foi agrupada ao stepper numa linha abaixo dos dados do NFT, com ícone e rótulo para melhorar localização e clareza. Após revisão, a imagem passou a acompanhar verticalmente as linhas de detalhes e ações para não ficar isolada no topo. Desktop mantém a lixeira compacta. O mockup mobile não especifica esse controle; verificar toque, disposição e remoção em TEST-05/TEST-14.
 
-### TASK-08 — checkout e pedido (implementada; validação E2E local pendente)
+### TASK-08 — checkout e pedido (concluída)
 
 - [x] Conectar checkout à sessão, ao carrinho de conta e às carteiras seed; exibir dados do colecionador, edição, quantidades e totais.
 - [x] Implementar adaptação mobile em etapas Dados → Carteira/rede → Revisão e resumo responsivo no desktop.
@@ -233,12 +237,27 @@ DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do c
 - [x] Implementar estados pendente, confirmado e recusado; recibo só após confirmação e sempre identificado como simulação.
 - [x] Persistir chave e conteúdo da tentativa no navegador antes do envio; recuperar pedido pela mesma chave ou reenviar o mesmo conteúdo sem duplicar.
 - [x] Preparar testes E2E de compra confirmada e recusa com carrinho preservado em [checkout.spec.ts](tests/e2e/checkout.spec.ts).
-- [ ] Executar TEST-06/parte de TEST-07 em Chromium desktop/mobile; o runner do agente foi bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`.
-- [ ] Executar a nova cobertura multirrede (SCN-18) em Chromium desktop/mobile junto com a suíte de checkout.
+- [x] Executar TEST-06/parte de TEST-07 em Chromium desktop/mobile; execução confirmada pelo usuário.
+- [x] Executar a cobertura multirrede (SCN-18) em Chromium desktop/mobile junto com a suíte de checkout; execução confirmada pelo usuário.
 
-`npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. Executar `npx playwright test tests/e2e/checkout.spec.ts` no terminal local antes de encerrar a tarefa; o runner do agente foi bloqueado antes das assertions por `listen EPERM` em `127.0.0.1:4173`. TEST-07 ainda requer cenários de timeout, cotação alterada e refresh durante pedido pendente, além dos controles determinísticos da TASK-10/11.
+`npm run typecheck`, `npm run lint`, `npm run build` e os 18 testes unitários passaram nesta árvore. O usuário confirmou a execução da suíte de checkout em Chromium desktop/mobile e da cobertura multirrede; TASK-08 encerrada. TEST-07 ainda requer cenários de timeout, cotação alterada e refresh durante pedido pendente, além dos controles determinísticos da TASK-10/11, previstos nas TASK-10/11.
+
+### TASK-09 — gestão de perfil e carteiras (épico)
+
+Quebrada em quatro entregas verificáveis para manter escopo e evidências menores: TASK-09A (dados do perfil), TASK-09B (avatar), TASK-09C (senha) e TASK-09D (carteiras). O épico só será concluído após todas passarem na cobertura correspondente do TEST-08.
+
+### TASK-09A — dados do perfil
+
+- [x] Implementar leitura e edição de nome de exibição, nome de usuário, e-mail e ENS opcional em `/profile`.
+- [x] Persistir via `GET/PATCH /api/profile`, com validação, unicidade de e-mail/usuário e controle `expectedVersion`.
+- [x] Atualizar a sessão/cache e o nome exibido no header depois de salvar; manter feedback de sucesso, erros por campo e conflito de versão.
+- [x] Adaptar formulário e navegação de conta para mobile sem overflow horizontal.
+- [x] Cobrir validação, conflito, normalização e versionamento com teste unitário de domínio.
+- [ ] Executar `npx playwright test tests/e2e/profile.spec.ts` em Chromium desktop/mobile; a tentativa nesta sandbox parou antes do preview por `listen EPERM` em `127.0.0.1:4173`.
+
+Os campos de ENS são opcionais conforme DEC-19 e não fazem consulta externa. Apelido da carteira deriva da carteira principal; edição fica na TASK-09D. Avatar e senha ficam em TASK-09B/C. Typecheck, lint e build passaram; E2E aguarda execução local para aceite final.
 
 
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026
 
-Implementado em `src/routes/nft-detail-page.tsx`: Comprar adiciona edição/quantidade e navega para o carrinho somente após sucesso da API; erro mantém o detalhe. Removido botão adicional desktop; ícone mobile mantém inclusão sem navegação. E2Es de carrinho/checkout atualizados para o botão Comprar. Build, TypeScript, ESLint e revisão do diff passaram. Os seis E2Es de carrinho passaram em desktop/mobile; checkout teve um teste aprovado e cinco falhas posteriores à inclusão/navegação (recusa, remoção multirrede e footer sobre Confirmar no mobile). Não encerra TASK-08; checkout em alteração por outro agente. Sem commit nesta etapa.
+Implementado em `src/routes/nft-detail-page.tsx`: Comprar adiciona edição/quantidade e navega para o carrinho somente após sucesso da API; erro mantém o detalhe. Removido botão adicional desktop; ícone mobile mantém inclusão sem navegação. E2Es de carrinho/checkout atualizados para o botão Comprar. Build, TypeScript, ESLint e revisão do diff passaram. Os seis E2Es de carrinho passaram em desktop/mobile. Sem commit nesta etapa.

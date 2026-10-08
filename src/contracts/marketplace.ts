@@ -21,6 +21,9 @@ export type Profile = {
   id: string; version: number; username: string; displayName: string; email: string
   ensName: string | null; avatarUrl: string | null
 }
+export type UpdateProfileInput = {
+  username: string; displayName: string; email: string; ensName: string | null; expectedVersion: number
+}
 export type Session = { id: string; user: Profile; expiresAt: string }
 export type LoginInput = { email: string; password: string }
 export type RegisterInput = { username: string; displayName: string; email: string; password: string }

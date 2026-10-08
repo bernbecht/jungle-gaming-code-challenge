@@ -4,7 +4,7 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { addCartItem, advanceClock, createQuote, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder, PAYMENT_DELAY_MS } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
-import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite } from './auth'
+import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite, updateProfile } from './auth'
 import type { Network, OrderInput } from '../contracts/marketplace'
 
 const scheduledOrders = new Set<string>()
@@ -236,6 +236,22 @@ export const handlers = [
   })),
   http.get('/api/auth/session', ({ request }) => respond(() => transact(state => requireSession(state, readToken(request)).session))),
   http.post('/api/auth/logout', ({ request }) => respond(() => transact(state => logout(state, readToken(request))))),
+  http.get('/api/profile', ({ request }) => respond(() => transact(state => {
+    const { userId } = requireSession(state, readToken(request))
+    return state.users.find(user => user.profile.id === userId)!.profile
+  }))),
+  http.patch('/api/profile', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const input = {
+      username: stringField(body, 'username'), displayName: stringField(body, 'displayName'),
+      email: stringField(body, 'email'), ensName: body.ensName === null ? null : stringField(body, 'ensName'),
+      expectedVersion: numberField(body, 'expectedVersion'),
+    }
+    return transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      return updateProfile(state, userId, input)
+    })
+  })),
   http.get('/api/me/favorites', ({ request }) => respond(() => transact(state => {
     const { userId } = requireSession(state, readToken(request))
     return readFavorites(state, userId)

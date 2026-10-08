@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Cart, Network } from "@/contracts/marketplace";
@@ -376,13 +377,13 @@ export function CartPage() {
               Resumo da carteira
             </h2>
             <form onSubmit={submitCoupon} className="mb-3 mt-0 md:mb-6 md:mt-5">
-              <label
-                htmlFor="cart-coupon"
-                className="sr-only mb-2 text-sm font-semibold md:mb-3 md:not-sr-only md:block"
+              <FormField
+                id="cart-coupon"
+                label="Código promocional"
+                className="gap-0"
+                labelClassName="sr-only mb-2 text-sm font-semibold md:mb-3 md:not-sr-only md:block"
               >
-                Código promocional
-              </label>
-              <div className="flex gap-2">
+                <div className="flex gap-2">
                 <Input
                   id="cart-coupon"
                   className="min-w-0"
@@ -398,7 +399,8 @@ export function CartPage() {
                 >
                   Aplicar
                 </Button>
-              </div>
+                </div>
+              </FormField>
             </form>
             {data.couponCode && (
               <div className="mb-5 flex items-center justify-between text-sm">

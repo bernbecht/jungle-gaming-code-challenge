@@ -7,6 +7,7 @@ import { NftDetailPage } from '@/routes/nft-detail-page'
 import { validateCatalogSearch } from '@/features/catalog/search'
 import { HomePage } from '@/routes/home-page'
 import { UnavailablePage } from '@/routes/unavailable-page'
+import { ProfilePage } from '@/routes/profile-page'
 import { NotFoundPage } from '@/routes/not-found-page'
 import { ErrorPage } from '@/routes/error-page'
 import { IntegrationProofPage } from '@/routes/integration-proof-page'
@@ -59,7 +60,7 @@ const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/profile',
   beforeLoad: requireUser,
-  component: () => createElement(UnavailablePage, { title: 'Perfil do colecionador', showMobileSignOut: true }),
+  component: ProfilePage,
 })
 const walletsRoute = createRoute({
   getParentRoute: () => rootRoute,
