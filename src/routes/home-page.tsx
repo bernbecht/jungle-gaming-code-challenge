@@ -102,9 +102,7 @@ export function HomePage() {
         className="hidden items-center gap-10 py-10 justify-between md:flex md:gap-16 md:py-16"
       >
         <div className="max-w-xl">
-          <p className="mb-5 text-xs font-medium tracking-widest text-muted-foreground">
-            Bem-vindo à Kurio
-          </p>
+          <p className="mb-5 font-medium tracking-widest ">Bem-vindo à Kurio</p>
           <h1
             id="hero-title"
             className="text-3xl leading-snug font-semibold tracking-tight uppercase lg:text-5xl lg:leading-snug"
@@ -112,10 +110,11 @@ export function HomePage() {
             Seja dono do futuro da arte digital
           </h1>
           <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-            Descubra novas formas de colecionar. Arte digital, criatividade e
-            uma comunidade de possibilidades.
+            Descubra NFTs selecionados de criadores emergentes e consagrados.
+            Colecione arte digital rara, apoie artistas e tenha uma parte da
+            cultura da internet.
           </p>
-          <Button size="lg" className="mt-7" asChild>
+          <Button className="mt-7" asChild>
             <a href="#colecoes" className="uppercase">
               Explorar
             </a>

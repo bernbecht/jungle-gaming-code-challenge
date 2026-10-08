@@ -11,7 +11,8 @@ export const buttonVariants = cva(
         ghost: "text-foreground hover:bg-secondary hover:text-primary",
       },
       size: {
-        default: "min-h-11 px-5 py-2",
+        default: "min-h-11 px-8 py-2",
+        sm: "min-h-9 px-3 py-1",
         lg: "min-h-14 rounded-full px-8 py-3 md:rounded-md",
         icon: "size-11 shrink-0 p-0",
         stepper:

@@ -87,7 +87,7 @@ export function PriceFilter({ minPrice, maxPrice, catalogMax, apply }: Props) {
       <p id={`${id}-value`} className="text-base">
         Preço: {minimum.replace(".", ",")} – {maximum.replace(".", ",")} ETH
       </p>
-      <Button type="submit" className="mt-5 min-h-9 px-3 py-1 text-xs">
+      <Button type="submit" size={"sm"} className="mt-5 text-xs">
         Aplicar
       </Button>
     </form>
