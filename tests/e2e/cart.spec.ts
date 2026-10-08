@@ -9,6 +9,20 @@ test.beforeEach(async ({ page }) => {
   })
 })
 
+test('mobile home navigation shows the cart item count', async ({ page, isMobile }) => {
+  test.skip(!isMobile)
+  await page.goto('/nfts/nft-001')
+  await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
+  await expect(page).toHaveURL(/\/cart$/)
+  await page.getByRole('button', { name: 'Aumentar Violet Nomad' }).click()
+  await expect(page.getByLabel('Quantidade de Violet Nomad selecionada')).toHaveText('2')
+  await page.goto('/')
+
+  const mobileNavigation = page.getByRole('navigation', { name: 'Navegação mobile' })
+  const cartLink = mobileNavigation.getByRole('link', { name: 'Carrinho de NFTs, 2 itens' })
+  await expect(cartLink.getByText('2', { exact: true })).toBeVisible()
+})
+
 test('visitor cart persists, updates quantity and calculates valid coupon totals', async ({ page, isMobile }) => {
   await page.goto('/nfts/nft-001')
   await expect(page.getByRole('heading', { name: 'Violet Nomad', exact: true })).toBeVisible()

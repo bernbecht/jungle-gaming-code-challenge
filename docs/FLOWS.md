@@ -33,8 +33,8 @@ No desktop, o formulário do colecionador e o resumo ficam lado a lado. No mobil
 2. O usuário preenche/revisa os dados e aciona **“Revisar compra”**. A interface simula a conexão da carteira e busca uma cotação atualizada para aquele grupo.
 3. A interface mostra os itens, valores, taxa e total cotados; o usuário confere a revisão e aciona **“Confirmar compra”** para enviar o pedido. A interface impede cliques concorrentes enquanto resolve essa tentativa.
 4. A API revalida a tentativa: sessão, cotação, estoque, cupom, taxas, carteira e conexão.
-5. Se estiver tudo válido, cria um pedido **pendente** e reserva as quantidades compradas. A resposta do POST já contém esse pedido; o cliente usa-a para mostrar o estado pendente imediatamente e depois consulta o pedido para acompanhar a confirmação. Os itens do grupo continuam no carrinho enquanto o resultado é aguardado.
-6. O pagamento simulado termina em confirmação ou recusa.
+5. Se estiver tudo válido, cria um pedido **pendente** e reserva as quantidades compradas. A resposta do POST já contém esse pedido; o cliente navega para `/orders/:orderId`, mostra o estado pendente imediatamente e consulta o pedido para acompanhar a confirmação. A rota própria permite recuperar o estado após refresh e acessar o pedido diretamente (DEC-28). Os itens do grupo continuam no carrinho enquanto o resultado é aguardado.
+6. O pagamento simulado termina em confirmação ou recusa. A mesma rota apresenta o estado terminal correspondente: recibo após confirmação ou explicação da recusa com retorno ao carrinho.
 7. Se confirmado, o pedido passa a **confirmado**, o estoque reservado é consumido e somente as quantidades capturadas desse grupo são removidas do carrinho. Outros grupos de rede permanecem intactos. A interface mostra o recibo com os dados registrados na compra.
 
 O pedido fica pendente **depois de ser criado pela API e antes de haver resultado do pagamento**. Estar na revisão, clicar no botão ou aguardar a resposta de uma chamada não comprova, por si só, que o pedido existe. Quando o resultado do envio é desconhecido, seguir FLOW-02.

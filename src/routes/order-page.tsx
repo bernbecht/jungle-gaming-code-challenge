@@ -4,7 +4,7 @@ import type { Wallet } from "@/contracts/marketplace";
 import { orderQuery } from "@/features/checkout/api";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
-import { CheckCircle2, CircleAlert, LoaderCircle, X } from "lucide-react";
+import { CircleAlert, LoaderCircle } from "lucide-react";
 import { fromWei, toWei } from "@/lib/money";
 import { defaultCatalog } from "@/features/catalog/search";
 import { useEffect } from "react";
@@ -69,14 +69,12 @@ export function OrderPage() {
 
   return (
     <section className="mx-auto my-6 max-w-[580px] overflow-hidden rounded-xl border border-border border-b-[10px] border-b-primary bg-card md:my-12">
-      <header className="relative px-5 pt-8 pb-5 text-center md:px-10">
-        <Link to="/" search={defaultCatalog} aria-label="Fechar confirmação e voltar ao início" className="absolute top-4 right-4 text-primary hover:text-accent"><X size={18} /></Link>
-        <CheckCircle2 className="mx-auto text-primary" size={50} />
-        <h1 className="mt-4 text-lg font-semibold text-secondary">Compra simulada confirmada</h1>
-        <p className="mt-1 text-sm text-secondary">Seu pedido foi confirmado na simulação.</p>
+      <header className="px-5 pt-8 pb-5 text-center md:px-10">
+        <img src="/thank-you.svg" alt="" aria-hidden="true" className="mx-auto size-20" />
+        <h1 className="mt-4 text-lg font-semibold text-secondary">Seus NFTs agora estão na sua carteira</h1>
       </header>
       <dl className="grid grid-cols-2 gap-x-3 gap-y-4 border-y border-primary px-5 py-4 text-sm sm:grid-cols-4 md:px-9">
-        <div><dt className="text-secondary">ID do pedido</dt><dd className="mt-1 break-all font-medium">{value.id}</dd></div>
+        <div><dt className="text-secondary">ID da transação</dt><dd className="mt-1 break-all font-medium">{value.transaction?.reference}</dd></div>
         <div><dt className="text-secondary">Data</dt><dd className="mt-1">{new Date(value.createdAt).toLocaleDateString("pt-BR")}</dd></div>
         <div><dt className="text-secondary">Total</dt><dd className="mt-1 font-semibold text-primary">{formatEth(value.snapshot.totals.total)}</dd></div>
         <div><dt className="text-secondary">Carteira</dt><dd className="mt-1">{providerNames[value.snapshot.walletProvider]}</dd></div>
@@ -98,7 +96,7 @@ export function OrderPage() {
           <div className="flex justify-between gap-4 border-t border-border pt-2 font-semibold"><dt>Total</dt><dd className="text-primary">{formatEth(value.snapshot.totals.total)}</dd></div>
         </dl>
         <p className="mt-5 text-center text-sm leading-relaxed text-secondary">Este pedido foi confirmado apenas na simulação local. A referência <span className="font-medium text-foreground">{value.transaction?.reference}</span> não corresponde a uma transação em blockchain.</p>
-        <Button type="button" variant="outline" disabled className="mx-auto mt-5 flex">Explorador indisponível na simulação</Button>
+        <Button type="button" variant="outline" disabled className="mx-auto mt-5 flex">Ver no Etherscan</Button>
         <Button asChild className="mt-4 w-full"><Link to="/" search={defaultCatalog}>Continuar explorando</Link></Button>
       </div>
     </section>

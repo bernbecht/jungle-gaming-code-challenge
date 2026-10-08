@@ -65,7 +65,12 @@ test('checkout connects a saved wallet and shows a confirmed order receipt', asy
   expect(order.id).not.toBe('')
   await expect(page).toHaveURL(new RegExp(`/orders/${order.id}$`))
   await expect(page.getByRole('heading', { name: 'Aguardando confirmação do pagamento' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Compra simulada confirmada' })).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' })).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByText('ID da transação')).toBeVisible()
+  const transactionId = page.getByRole('definition').filter({ hasText: `simulated-${order.id}` })
+  await expect(transactionId).toHaveText(`simulated-${order.id}`)
+  await expect(page.getByRole('button', { name: 'Ver no Etherscan' })).toBeDisabled()
+  await expect(page.getByText('Seu pedido foi confirmado na simulação.')).toHaveCount(0)
   await expect(page.getByText('não corresponde a uma transação em blockchain')).toBeVisible()
 })
 
@@ -117,7 +122,7 @@ test('mixed-network cart finalizes one network and preserves the other group', a
   await expect(checkout).toContainText('Ivory Baron')
   await expect(checkout).not.toContainText('Violet Nomad')
   await confirmPurchase.click()
-  await expect(page.getByRole('heading', { name: 'Compra simulada confirmada' })).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' })).toBeVisible({ timeout: 10_000 })
 
   await page.goto('/cart')
   const cartItems = page.getByRole('region', { name: 'Carrinho de NFTs' }).getByRole('list')

@@ -21,6 +21,8 @@ export function AppShell() {
   const session = useQuery(sessionQuery);
   const cartIdentity = session.data ? `user:${session.data.id}` : `guest:${getGuestId()}`;
   const cart = useQuery({ ...cartQuery(cartIdentity), enabled: !session.isPending });
+  const cartItemCount = cart.data?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
+  const cartLabel = `Carrinho de NFTs, ${cartItemCount} ${cartItemCount === 1 ? "item" : "itens"}`;
   const queryClient = useQueryClient();
   const router = useRouter();
   const authDialog = useAuthDialog();
@@ -93,10 +95,10 @@ export function AppShell() {
         <div className="flex items-center gap-2">
           <HeaderSearch />
           <Button variant="ghost" size="icon" asChild>
-            <Link to="/cart" aria-label="Carrinho de NFTs">
+            <Link to="/cart" aria-label={cartLabel}>
               <span className="relative inline-flex">
                 <ShoppingCart aria-hidden="true" />
-                {!!cart.data?.items.length && <span aria-hidden="true" className="absolute -right-2 -top-2 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-4 text-primary-foreground">{cart.data.items.reduce((total, item) => total + item.quantity, 0)}</span>}
+                {cartItemCount > 0 && <span aria-hidden="true" className="absolute -right-2 -top-2 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-4 text-primary-foreground">{cartItemCount}</span>}
               </span>
             </Link>
           </Button>
@@ -163,9 +165,12 @@ export function AppShell() {
           <Link
             to="/cart"
             activeProps={{ className: "text-primary" }}
-            aria-label="Carrinho"
+            aria-label={cartLabel}
           >
-            <ShoppingCart aria-hidden="true" size={20} />
+            <span className="relative inline-flex">
+              <ShoppingCart aria-hidden="true" size={20} />
+              {cartItemCount > 0 && <span aria-hidden="true" className="absolute -right-2 -top-2 inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-4 text-primary-foreground">{cartItemCount}</span>}
+            </span>
           </Link>
           <Link
             to="/profile"
