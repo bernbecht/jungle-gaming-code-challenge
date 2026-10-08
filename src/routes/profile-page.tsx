@@ -133,7 +133,7 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
 
   return (
     <section className="mx-auto grid max-w-[1120px] gap-8 py-8 md:grid-cols-[280px_minmax(0,1fr)] md:gap-10 md:py-10" aria-labelledby="profile-title">
-      <aside className="overflow-hidden rounded-sm bg-card" aria-label="Meu perfil">
+      <aside className="hidden overflow-hidden rounded-sm bg-card md:block" aria-label="Meu perfil">
         <div className="border-b border-border px-5 py-4">
           <h2 className="text-lg font-semibold">Meu perfil</h2>
         </div>
@@ -145,18 +145,22 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
             <WalletCards size={18} aria-hidden="true" />Carteiras
           </Link>
         </nav>
-        <div className="border-t border-border p-2 md:hidden">
-          <Button variant="ghost" className="w-full justify-start" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>
-            <LogOut size={18} aria-hidden="true" />{logoutMutation.isPending ? 'Saindo…' : 'Sair'}
-          </Button>
-        </div>
       </aside>
 
       <div className="min-w-0">
-        <div className="mb-7 flex items-center gap-3">
-          <Link to="/" search={defaultCatalog} aria-label="Voltar ao início" className="inline-flex size-10 items-center justify-center rounded-md text-muted-foreground hover:text-primary md:hidden"><ArrowLeft size={20} aria-hidden="true" /></Link>
-          <h1 id="profile-title" className="text-2xl font-semibold">Perfil do colecionador</h1>
+        <div className="mb-5 flex items-center gap-3 md:mb-7">
+          <Link to="/" search={defaultCatalog} aria-label="Voltar ao início" className="inline-flex size-10 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-primary md:hidden"><ArrowLeft size={20} aria-hidden="true" /></Link>
+          <h1 id="profile-title" className="text-xl font-semibold md:text-2xl">Perfil do colecionador</h1>
         </div>
+
+        <nav aria-label="Navegação da conta" className="mb-6 grid grid-cols-2 border-b border-border md:hidden">
+          <Link to="/profile" aria-current="page" className="flex min-h-12 items-center justify-center border-b-2 border-primary px-3 text-sm font-medium text-primary">
+            Dados do perfil
+          </Link>
+          <Link to="/wallets" className="flex min-h-12 items-center justify-center border-b-2 border-transparent px-3 text-sm font-medium text-muted-foreground hover:text-primary">
+            Carteiras
+          </Link>
+        </nav>
 
         <form className="space-y-7" onSubmit={submit} noValidate>
           <fieldset disabled={saveMutation.isPending} className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -173,15 +177,21 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
             <EnsNameField value={fields.ensName} onChange={value => updateField('ensName', value)} error={fieldMessage('ensName')} />
           </fieldset>
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
-            <Button type="submit" disabled={!hasChanges || saveMutation.isPending}>
+          <div className="flex flex-col items-stretch gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
+            <Button className="w-full sm:w-auto" type="submit" disabled={!hasChanges || saveMutation.isPending}>
               {saveMutation.isPending ? 'Salvando…' : 'Salvar'}
             </Button>
-            {hasChanges && <Button type="button" variant="outline" disabled={saveMutation.isPending} onClick={discardChanges}>Descartar</Button>}
+            {hasChanges && <Button className="w-full sm:w-auto" type="button" variant="outline" disabled={saveMutation.isPending} onClick={discardChanges}>Descartar</Button>}
             {saved && <p role="status" className="flex items-center gap-2 text-sm text-primary"><Check size={17} aria-hidden="true" />Perfil atualizado.</p>}
             {formError && <div className="w-full rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"><p role="alert">{formError}</p>{saveMutation.error && axios.isAxiosError(saveMutation.error) && saveMutation.error.response?.status === 409 && <Button type="button" variant="outline" className="mt-3" onClick={() => void refreshProfile()}>Recarregar dados</Button>}</div>}
           </div>
         </form>
+
+        <div className="mt-8 border-t border-border pt-3 md:hidden">
+          <Button variant="ghost" className="w-full justify-start px-0 text-muted-foreground" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>
+            <LogOut size={18} aria-hidden="true" />{logoutMutation.isPending ? 'Saindo…' : 'Sair'}
+          </Button>
+        </div>
       </div>
     </section>
   )

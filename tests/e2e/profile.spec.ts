@@ -30,7 +30,12 @@ test('profile fields save through the API and persist after refresh', async ({ p
   await ensName.fill('colecionadora.eth')
   await page.getByRole('button', { name: 'Salvar', exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Perfil atualizado.' })).toBeVisible()
-  if (isMobile) await expect(page.getByRole('complementary', { name: 'Meu perfil' })).toContainText('Meu perfil')
+  if (isMobile) {
+    const accountNavigation = page.getByRole('navigation', { name: 'Navegação da conta' })
+    await expect(accountNavigation.getByRole('link', { name: 'Dados do perfil' })).toHaveAttribute('aria-current', 'page')
+    await expect(accountNavigation.getByRole('link', { name: 'Carteiras' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible()
+  }
   else await expect(page.getByRole('banner').getByRole('link', { name: 'Colecionadora A' })).toBeVisible()
 
   await page.reload()
