@@ -124,10 +124,10 @@ function NewsletterSignup() {
   );
 }
 
-export function SiteFooter({ isHome }: { isHome: boolean }) {
+export function SiteFooter({ isHome, hideOnMobile = false }: { isHome: boolean; hideOnMobile?: boolean }) {
   return (
     <footer
-      className={`site-footer page-container ${isHome ? "pb-28 md:pb-8" : "pb-8"}`}
+      className={`site-footer page-container ${isHome ? "pb-28 md:pb-8" : "pb-8"} ${hideOnMobile ? "hidden md:block" : ""}`}
     >
       <div className="site-footer-feature-band">
         {benefits.map(({ icon: Icon, title, description }) => (

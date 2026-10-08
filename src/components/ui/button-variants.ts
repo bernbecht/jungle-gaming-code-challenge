@@ -8,7 +8,7 @@ export const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-accent",
         outline: "border border-primary/60 text-primary hover:bg-primary/10",
-        ghost: "text-foreground hover:bg-secondary hover:text-primary",
+        ghost: "text-foreground hover:bg-muted hover:text-primary",
       },
       size: {
         default: "min-h-11 px-8 py-2",

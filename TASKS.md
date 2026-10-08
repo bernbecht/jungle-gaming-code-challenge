@@ -215,3 +215,7 @@ Revisão UI-01 — navegação desktop: adicionados Criadores (leva ao catálogo
 Execução desta etapa: typecheck, lint, build e 17 testes unitários passaram. E2E `tests/e2e/cart.spec.ts` preparado; execução pelo agente bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`.
 
 Refino visual após comparar UI-03: breadcrumb e navegação Mercado ativa; colunas NFTs/Preço/Edições/Total, token ID, linhas compactas e steppers preenchidos; resumo alinhado e sem card destacado, com rótulos do mockup, CTA/link agrupados; recomendações com cinco cards e paginação antes do footer. Revisão visual final e E2E local permanecem pendentes.
+
+Adaptação mobile de UI-03: header geral substituído por voltar/título; cartões com imagem 100 × 100, edição, preço e steppers; resumo, cupom e CTA fixos no rodapé com safe area; recomendações e footer ocultos nesta rota mobile. Typecheck, lint e build passaram; E2E mobile bloqueado pelo ambiente ao iniciar preview (`listen EPERM` em `127.0.0.1:4173`).
+
+DEC-23 / revisão mobile do carrinho: ação Remover saiu do canto superior do cartão e foi agrupada ao stepper numa linha abaixo dos dados do NFT, com ícone e rótulo para melhorar localização e clareza. Após revisão, a imagem passou a acompanhar verticalmente as linhas de detalhes e ações para não ficar isolada no topo. Desktop mantém a lixeira compacta. O mockup mobile não especifica esse controle; verificar toque, disposição e remoção em TEST-05/TEST-14.
