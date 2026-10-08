@@ -15,6 +15,7 @@ import { signIn, signUp } from "./api";
 import type { AuthDialogMode } from "./auth-dialog-types";
 import { cartQuery, getGuestId, mergeGuestCart } from "@/features/cart/api";
 import type { Cart } from "@/contracts/marketplace";
+import { USERNAME_PATTERN } from "@/lib/validation";
 
 export function AuthForm({
   mode,
@@ -149,7 +150,7 @@ export function AuthForm({
                 required
                 minLength={3}
                 maxLength={24}
-                pattern="[A-Za-z0-9_]+"
+                pattern={USERNAME_PATTERN.source}
                 value={values.username}
                 onChange={(event) =>
                   setValues({ ...values, username: event.target.value })

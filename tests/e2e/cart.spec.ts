@@ -66,8 +66,8 @@ test('login merges visitor items once and keeps them in the account cart', async
   await page.getByRole('button', { name: /^Comprar(?: NFT)?$/ }).click()
   await expect(page).toHaveURL(/\/cart$/)
   await page.goto('/login')
-  await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
-  await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
+  await page.getByLabel(/^E-mail/).fill('collector-a@example.test')
+  await page.getByLabel(/^Senha/).fill('DemoNft!2026')
   const mergeResponsePromise = page.waitForResponse(response => response.url().endsWith('/api/cart/merge'))
   await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
   const mergeResponse = await mergeResponsePromise

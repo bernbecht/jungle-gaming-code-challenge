@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A e TASK-07/08 concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-09A em verificação; TASK-09B–09D e TASK-10 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08 e TASK-09A concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-09B–09D e TASK-10 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -32,7 +32,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | Concluída |
 | TASK-08 | 4 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | Concluída |
 | TASK-09 (épico) | 2 / 7 | Completar gestão de perfil, avatar, senha e carteiras; concluir quando todas as subtarefas passarem no TEST-08 | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
-| TASK-09A | 2 / 7 | Implementar consulta/edição dos dados do perfil; validar campos e versão, persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-024 | TEST-08A | Em verificação |
+| TASK-09A | 2 / 7 | Implementar consulta/edição dos dados do perfil; validar campos e versão, persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-024 | TEST-08A | Concluída |
 | TASK-09B | 2 / 7 | Implementar envio, validação e remoção do avatar; validar arquivo/tamanho, persistir a escolha e mostrar erros sem salvar parcialmente | TASK-09A | REQ-003, REQ-024 | TEST-08B | A fazer |
 | TASK-09C | 2 / 7 | Implementar alteração de senha com senha atual/nova; atualizar verificador com salt, sem persistir texto em claro; confirmar que senha antiga falha e nova autentica | TASK-09A | REQ-024 | TEST-08C, TEST-03 | A fazer |
 | TASK-09D | 2 / 7 | Implementar cadastro e edição das carteiras principal/secundária; validar endereço/rede/slot, persistir e refletir alterações no checkout | TASK-08 | REQ-014, REQ-024 | TEST-08D, TEST-06 | A fazer |
@@ -253,9 +253,9 @@ Quebrada em quatro entregas verificáveis para manter escopo e evidências menor
 - [x] Atualizar a sessão/cache e o nome exibido no header depois de salvar; manter feedback de sucesso, erros por campo e conflito de versão.
 - [x] Adaptar formulário e navegação de conta para mobile sem overflow horizontal.
 - [x] Cobrir validação, conflito, normalização e versionamento com teste unitário de domínio.
-- [ ] Executar `npx playwright test tests/e2e/profile.spec.ts` em Chromium desktop/mobile; a tentativa nesta sandbox parou antes do preview por `listen EPERM` em `127.0.0.1:4173`.
+- [x] Executar `npx playwright test tests/e2e/profile.spec.ts` em Chromium desktop/mobile; usuário confirmou que todos os testes passaram em 08/10/2026.
 
-Os campos de ENS são opcionais conforme DEC-19 e não fazem consulta externa. Apelido da carteira deriva da carteira principal; edição fica na TASK-09D. Avatar e senha ficam em TASK-09B/C. Typecheck, lint e build passaram; E2E aguarda execução local para aceite final.
+Os campos de ENS são opcionais conforme DEC-29 e não fazem consulta externa. Apelido da carteira deriva da carteira principal; edição fica na TASK-09D. Avatar e senha ficam em TASK-09B/C. Typecheck, lint, build e E2E desktop/mobile passaram. A tarefa cobre somente os dados básicos do perfil; TASK-09B/C/D e o épico TASK-09 permanecem abertos.
 
 
 ### Ajuste UI-02 — Comprar abre o carrinho — 08/10/2026

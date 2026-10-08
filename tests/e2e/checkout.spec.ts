@@ -11,8 +11,8 @@ async function reset(page: Page) {
 
 async function loginAndAddItem(page: Page) {
   await page.goto('/login')
-  await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
-  await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
+  await page.getByLabel(/^E-mail/).fill('collector-a@example.test')
+  await page.getByLabel(/^Senha/).fill('DemoNft!2026')
   await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/$|\/\?.*/) // AuthForm redirects to the market after the login and cart merge finish.
   await page.goto('/nfts/nft-001')
@@ -96,8 +96,8 @@ test('declined payment keeps the items in the cart and does not show a receipt',
 
 test('mixed-network cart finalizes one network and preserves the other group', async ({ page, isMobile }) => {
   await page.goto('/login')
-  await page.getByLabel('E-mail', { exact: true }).fill('collector-a@example.test')
-  await page.getByLabel('Senha', { exact: true }).fill('DemoNft!2026')
+  await page.getByLabel(/^E-mail/).fill('collector-a@example.test')
+  await page.getByLabel(/^Senha/).fill('DemoNft!2026')
   await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/$|\/\?.*/)
 

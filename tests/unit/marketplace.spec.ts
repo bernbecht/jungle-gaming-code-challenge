@@ -48,10 +48,10 @@ test('fixtures have stable IDs, distinct private resources and no stored plainte
 test('profile updates validate identity fields, increment versions and reject stale or duplicate changes', async () => {
   const state = await createFixtures()
   const updated = updateProfile(state, 'user-a', {
-    username: 'Collector_A', displayName: 'Collector A Updated', email: 'COLLECTOR-A@EXAMPLE.TEST',
+    username: 'Collector-A', displayName: 'Collector A Updated', email: 'COLLECTOR-A@EXAMPLE.TEST',
     ensName: 'Collector.eth', expectedVersion: 1,
   })
-  expect(updated).toMatchObject({ username: 'collector_a', displayName: 'Collector A Updated', email: 'collector-a@example.test', ensName: 'collector.eth', version: 2 })
+  expect(updated).toMatchObject({ username: 'collector-a', displayName: 'Collector A Updated', email: 'collector-a@example.test', ensName: 'collector.eth', version: 2 })
   expect(() => updateProfile(state, 'user-a', {
     username: 'collector_a', displayName: 'Collector A Updated', email: 'collector-a@example.test', ensName: null, expectedVersion: 1,
   })).toThrow(MockError)

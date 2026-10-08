@@ -137,6 +137,8 @@ Asteriscos são observados no PNG; regras de negócio desses campos não são de
 
 O campo ENS do checkout mostra apenas seletor `.eth`, enquanto perfil/carteiras mostram também entrada de texto. Tratar como lacuna de composição: propor entrada completa consistente e registrar ajuste. Não congelar os schemas v0 antes de fechar estas decisões em TASK-04/TASK-09.
 
+Nome de usuário aceita de 3 a 24 letras, números, hífen (`-`) e sublinhado (`_`). O hífen é necessário para preservar os usernames das contas seed (`collector-a` e `collector-b`); cadastro, edição do perfil, validação da API e texto de ajuda devem manter a mesma regra.
+
 ## Componentes compartilhados propostos
 
 - Header global do shell só aparece a partir de `md`; em qualquer rota mobile, o header desktop fica oculto. Os fluxos usam suas composições mobile próprias; navegação inferior e footer mobile aparecem apenas na home (DEC-27).

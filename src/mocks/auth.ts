@@ -2,6 +2,7 @@ import type { AuthResponse, Favorites, LoginInput, Profile, RegisterInput, Sessi
 import { MockError } from './errors'
 import type { DatabaseState, StoredUser } from './state'
 import { nextId } from './state'
+import { USERNAME_PATTERN } from '../lib/validation'
 
 const SESSION_LIFETIME_MS = 24 * 60 * 60_000
 export const PASSWORD_ITERATIONS = 100_000
@@ -32,7 +33,7 @@ export function register(state: DatabaseState, input: RegisterInput, password: S
   const displayName = input.displayName.trim()
   const email = input.email.trim().toLowerCase()
   const fieldErrors: Record<string, string[]> = {}
-  if (!/^[a-z0-9_]{3,24}$/.test(username)) fieldErrors.username = ['Use de 3 a 24 letras, números ou _.']
+  if (!USERNAME_PATTERN.test(username)) fieldErrors.username = ['Use de 3 a 24 letras, números, hífen ou _.']
   if (displayName.length < 2 || displayName.length > 60) fieldErrors.displayName = ['Informe um nome entre 2 e 60 caracteres.']
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fieldErrors.email = ['Informe um e-mail válido.']
   if (input.password.length < 8) fieldErrors.password = ['Use ao menos 8 caracteres.']
@@ -64,7 +65,7 @@ export function updateProfile(state: DatabaseState, userId: string, input: Updat
   const email = input.email.trim().toLowerCase()
   const ensName = input.ensName?.trim().toLowerCase() || null
   const fieldErrors: Record<string, string[]> = {}
-  if (!/^[a-z0-9_]{3,24}$/.test(username)) fieldErrors.username = ['Use de 3 a 24 letras, números ou _.']
+  if (!USERNAME_PATTERN.test(username)) fieldErrors.username = ['Use de 3 a 24 letras, números, hífen ou _.']
   if (displayName.length < 2 || displayName.length > 60) fieldErrors.displayName = ['Informe um nome entre 2 e 60 caracteres.']
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fieldErrors.email = ['Informe um e-mail válido.']
   if (ensName && !/^(?=.{3,255}$)[a-z0-9-]+(?:\.[a-z0-9-]+)*\.eth$/.test(ensName)) fieldErrors.ensName = ['Informe um nome ENS válido terminado em .eth.']

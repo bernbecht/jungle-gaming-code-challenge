@@ -11,6 +11,7 @@ import { formFieldMessageId } from '@/lib/form-field'
 import { defaultCatalog } from '@/features/catalog/search'
 import { clearSessionToken, sessionQuery, signOut } from '@/features/auth/api'
 import { profileQuery, saveProfile } from '@/features/profile/api'
+import { USERNAME_PATTERN } from '@/lib/validation'
 
 type ProfileFields = Omit<UpdateProfileInput, 'ensName' | 'expectedVersion'> & { ensName: string }
 
@@ -168,8 +169,8 @@ function ProfileEditor({ sessionProfile }: { sessionProfile: Profile }) {
             <FormField id="displayName" label="Nome de exibição" required error={fieldMessage('displayName')}>
               <Input id="displayName" name="displayName" autoComplete="name" value={fields.displayName} aria-invalid={Boolean(fieldMessage('displayName'))} aria-describedby={fieldMessage('displayName') ? formFieldMessageId('displayName') : undefined} onChange={event => updateField('displayName', event.target.value)} />
             </FormField>
-            <FormField id="username" label="Nome de usuário" required description="3–24 caracteres: letras minúsculas, números e _." error={fieldMessage('username')}>
-              <Input id="username" name="username" autoComplete="off" value={fields.username} aria-invalid={Boolean(fieldMessage('username'))} aria-describedby={formFieldMessageId('username')} onChange={event => updateField('username', event.target.value)} />
+            <FormField id="username" label="Nome de usuário" required description="3–24 caracteres: letras, números, hífen (-) e sublinhado (_)." error={fieldMessage('username')}>
+              <Input id="username" name="username" autoComplete="off" minLength={3} maxLength={24} pattern={USERNAME_PATTERN.source} value={fields.username} aria-invalid={Boolean(fieldMessage('username'))} aria-describedby={formFieldMessageId('username')} onChange={event => updateField('username', event.target.value)} />
             </FormField>
             <FormField id="email" label="E-mail" required error={fieldMessage('email')}>
               <Input id="email" name="email" type="email" autoComplete="email" value={fields.email} aria-invalid={Boolean(fieldMessage('email'))} aria-describedby={fieldMessage('email') ? formFieldMessageId('email') : undefined} onChange={event => updateField('email', event.target.value)} />
