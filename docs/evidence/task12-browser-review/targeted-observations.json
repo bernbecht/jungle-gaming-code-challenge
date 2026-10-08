@@ -1,0 +1,839 @@
+[
+  {
+    "name": "home-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": true,
+    "clipped": []
+  },
+  {
+    "name": "register-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "display-name",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "favorites-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "profile-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "",
+        "text": "",
+        "width": 1,
+        "scroll": 244
+      }
+    ]
+  },
+  {
+    "name": "wallets-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "wallet-primary-address",
+        "text": "",
+        "width": 306,
+        "scroll": 435
+      },
+      {
+        "tag": "INPUT",
+        "id": "wallet-secondary-address",
+        "text": "",
+        "width": 306,
+        "scroll": 435
+      }
+    ]
+  },
+  {
+    "name": "wallet-error-390",
+    "describedby": null,
+    "focused": false
+  },
+  {
+    "name": "wallet-error-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "Salvar carteira",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "wallet-secondary-address",
+        "text": "",
+        "width": 306,
+        "scroll": 435
+      }
+    ]
+  },
+  {
+    "name": "detail-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H2",
+        "id": "",
+        "text": "Sobre este NFT",
+        "width": 1,
+        "scroll": 134
+      }
+    ]
+  },
+  {
+    "name": "cart-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H2",
+        "id": "summary-title",
+        "text": "Resumo da carteira",
+        "width": 1,
+        "scroll": 194
+      }
+    ]
+  },
+  {
+    "name": "checkout-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "collector-wallet-address",
+        "text": "",
+        "width": 340,
+        "scroll": 435
+      }
+    ]
+  },
+  {
+    "name": "checkout-review-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "reduced-motion-order-390",
+    "animation": "spin"
+  },
+  {
+    "name": "order-pending-reduced-motion-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "order-confirmed-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "home-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": true,
+    "clipped": []
+  },
+  {
+    "name": "register-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "display-name",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "favorites-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "profile-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "email",
+        "text": "",
+        "width": 186,
+        "scroll": 234
+      },
+      {
+        "tag": "INPUT",
+        "id": "",
+        "text": "",
+        "width": 1,
+        "scroll": 244
+      }
+    ]
+  },
+  {
+    "name": "wallets-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "wallet-primary-address",
+        "text": "",
+        "width": 348,
+        "scroll": 385
+      },
+      {
+        "tag": "INPUT",
+        "id": "wallet-secondary-address",
+        "text": "",
+        "width": 348,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "wallet-error-768",
+    "describedby": null,
+    "focused": false
+  },
+  {
+    "name": "wallet-error-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "Salvar carteira",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "wallet-secondary-address",
+        "text": "",
+        "width": 348,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "detail-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "cart-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H1",
+        "id": "",
+        "text": "Carrinho de NFTs",
+        "width": 1,
+        "scroll": 154
+      }
+    ]
+  },
+  {
+    "name": "checkout-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "collector-wallet-address",
+        "text": "",
+        "width": 346,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "checkout-review-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "collector-wallet-address",
+        "text": "",
+        "width": 346,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "reduced-motion-order-768",
+    "animation": "spin"
+  },
+  {
+    "name": "order-pending-reduced-motion-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "order-confirmed-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "home-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": true,
+    "clipped": []
+  },
+  {
+    "name": "register-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "display-name",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "favorites-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "profile-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "",
+        "text": "",
+        "width": 1,
+        "scroll": 244
+      }
+    ]
+  },
+  {
+    "name": "wallets-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "wallet-error-1440",
+    "describedby": null,
+    "focused": false
+  },
+  {
+    "name": "wallet-error-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "Salvar carteira",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "detail-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "cart-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H1",
+        "id": "",
+        "text": "Carrinho de NFTs",
+        "width": 1,
+        "scroll": 154
+      }
+    ]
+  },
+  {
+    "name": "checkout-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "collector-wallet-address",
+        "text": "",
+        "width": 371,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "checkout-review-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "collector-wallet-address",
+        "text": "",
+        "width": 371,
+        "scroll": 385
+      }
+    ]
+  },
+  {
+    "name": "reduced-motion-order-1440",
+    "animation": "spin"
+  },
+  {
+    "name": "order-pending-reduced-motion-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "order-confirmed-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "detail-loading-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "detail-loaded-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "detail-layout-shift-768",
+    "skeletonBounds": {
+      "x": 24,
+      "y": 120,
+      "width": 344,
+      "height": 344
+    },
+    "loadedBounds": {
+      "x": 144,
+      "y": 148,
+      "width": 600,
+      "height": 600
+    }
+  },
+  {
+    "name": "login-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "email",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "login-768",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "email",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "login-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "email",
+    "mobileNav": false,
+    "clipped": []
+  },
+  {
+    "name": "auth-modal-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "Entrar",
+    "mobileNav": true,
+    "clipped": [
+      {
+        "tag": "H1",
+        "id": "auth-title",
+        "text": "Entrar na Kurio",
+        "width": 1,
+        "scroll": 144
+      }
+    ]
+  },
+  {
+    "name": "modal-keyboard",
+    "focusInside": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    "returnToTrigger": true,
+    "inputStyles": {
+      "border": "rgb(75, 43, 31)",
+      "background": "rgb(36, 22, 18)"
+    }
+  },
+  {
+    "name": "editorial-inactive-read-more-1440",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "overflow": 0,
+    "activeElement": "Entrar",
+    "mobileNav": true,
+    "clipped": []
+  },
+  {
+    "name": "editorial-read-more",
+    "controls": [
+      {
+        "tag": "SPAN",
+        "text": "Ler mais ",
+        "ariaHidden": "true"
+      },
+      {
+        "tag": "SPAN",
+        "text": "Ler mais ",
+        "ariaHidden": "true"
+      },
+      {
+        "tag": "SPAN",
+        "text": "Ler mais ",
+        "ariaHidden": "true"
+      },
+      {
+        "tag": "SPAN",
+        "text": "Ler mais ",
+        "ariaHidden": "true"
+      }
+    ]
+  },
+  {
+    "name": "profile-error-focus",
+    "focused": false
+  },
+  {
+    "name": "profile-error-focus-768",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "email",
+        "text": "",
+        "width": 186,
+        "scroll": 234
+      },
+      {
+        "tag": "INPUT",
+        "id": "",
+        "text": "",
+        "width": 1,
+        "scroll": 244
+      }
+    ]
+  },
+  {
+    "name": "cart-short-height-390x450",
+    "viewport": {
+      "width": 390,
+      "height": 450
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H2",
+        "id": "summary-title",
+        "text": "Resumo da carteira",
+        "width": 1,
+        "scroll": 194
+      }
+    ]
+  },
+  {
+    "name": "cart-fixed-summary-obstruction",
+    "quantity": {
+      "bounds": {
+        "x": 184,
+        "y": 204.5,
+        "width": 20,
+        "height": 32
+      },
+      "coveredBy": "summary-title",
+      "focused": true
+    }
+  },
+  {
+    "name": "cart-focused-control-covered-390x450",
+    "viewport": {
+      "width": 390,
+      "height": 450
+    },
+    "overflow": 0,
+    "activeElement": "+",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "H2",
+        "id": "summary-title",
+        "text": "Resumo da carteira",
+        "width": 1,
+        "scroll": 194
+      }
+    ]
+  },
+  {
+    "name": "profile-reflow-720x450",
+    "viewport": {
+      "width": 720,
+      "height": 450
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": [
+      {
+        "tag": "INPUT",
+        "id": "",
+        "text": "",
+        "width": 1,
+        "scroll": 244
+      }
+    ]
+  },
+  {
+    "name": "reduced-motion-spinner",
+    "preference": true,
+    "animation": "spin"
+  },
+  {
+    "name": "spinner-ignores-reduced-motion-390",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": 0,
+    "activeElement": "\n    Pular para o conteúdoKURIOInícioMercadoCriadoresAprenda",
+    "mobileNav": false,
+    "clipped": []
+  }
+]

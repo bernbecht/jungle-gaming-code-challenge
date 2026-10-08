@@ -2,7 +2,7 @@
 
 Cronograma: [ROTEIRO.md](ROTEIRO.md). Requisitos: [REQUIREMENTS.md](REQUIREMENTS.md). As dependências abaixo representam ordem técnica; não pressupõem trabalho por múltiplos agentes.
 
-Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → Em andamento → Em verificação → Concluído; Bloqueado deve incluir motivo. Uma tarefa só é concluída com critérios de aceite e evidências dos testes indicados, sem marcar requisitos atendidos apenas por existir código.
+Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → Em andamento → Em verificação → Concluído; Bloqueado deve incluir motivo. Adiada indica trabalho postergado por decisão do usuário, com condição de retomada registrada. Uma tarefa só é concluída com critérios de aceite e evidências dos testes indicados, sem marcar requisitos atendidos apenas por existir código.
 
 ## Situação atual — 08/10/2026
 
@@ -16,9 +16,11 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C/D/E concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-11A em andamento; TASK-11B/C concluídas; TASK-11D e TASK-12 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C/D/E concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-11A em andamento; TASK-11B/C concluídas; TASK-11D a fazer; TASK-12 e suas subtarefas adiadas até nova análise; TASK-13 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
+
+**Decisão — 08/10/2026:** por solicitação do usuário, a **TASK-12 e todas as subtarefas TASK-12A a TASK-12F ficam adiadas até uma nova análise, sem prazo de retomada**. Antes de iniciar a implementação, revisar o relatório e a situação atual da aplicação para definir escopo, prioridades e ordem de execução. O relatório, as 51 screenshots e as medições estão preservados para versionamento em [docs/evidence/task12-browser-review/RELATORIO.md](docs/evidence/task12-browser-review/RELATORIO.md), conforme solicitação do usuário. Os achados permanecem como pendências e não representam critérios concluídos ou aceite integral da TASK-12. Retomar a execução da TASK-12 somente após essa análise e a confirmação do usuário sobre o trabalho a realizar. O relatório retrata a versão observada durante a revisão; alterações posteriores exigem nova validação.
 
 | ID | Dia / bloco do roteiro | Trabalho e critérios de aceite | Dependências | Requisitos | Testes | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -47,7 +49,13 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-11B | 2 / 8 | Completar controles determinísticos de latência, erro de rede e respostas 4xx/5xx para os recursos cobertos por TEST-07/08/12 | TASK-11A | REQ-030, REQ-031, REQ-044 | TEST-07, TEST-08, TEST-12 | Concluída |
 | TASK-11C | 2 / 8 | Tornar reset e seleção/preparação de cenários reproduzíveis, incluindo limpeza coerente do estado de navegador e simulação | TASK-11A, TASK-11B | REQ-030, REQ-031, REQ-044 | TEST-16 | Concluída |
 | TASK-11D | 2 / 8 | Fechar cobertura dos cenários publicados, documentar limites reais e validar execuções E2E desktop/mobile dos grupos afetados | TASK-11A, TASK-11B, TASK-11C | REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
-| TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
+| TASK-12 (épico) | 2 / 9 | Concluir revisão visual, responsiva e de acessibilidade de todas as telas; aceite quando TASK-12A a TASK-12F estiverem concluídas com evidências | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | Adiada — aguarda nova análise |
+| TASK-12A | 2 / 9 | Revisar fidelidade visual das nove telas contra os PNGs disponíveis, incluindo a home completa da TASK-05A; ajustar composição, tokens, tipografia e imagens locais e documentar substituições DEC-16/DEC-17 | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-037, REQ-040 | TEST-14 | Adiada — aguarda nova análise |
+| TASK-12B | 2 / 9 | Ajustar todas as telas em 390/768/1440, adaptações DEC-18 e favoritos; resolver o follow-up de navegação global mobile, barras fixas/safe-area e zoom 200%, sem conteúdo coberto ou overflow indevido | TASK-12A | REQ-004, REQ-037, REQ-039 | TEST-14 | Adiada — aguarda nova análise |
+| TASK-12C | 2 / 9 | Revisar loading/vazio/erro/sucesso e atualização em background; assegurar skeletons com shimmer e dimensões estáveis em catálogo/detalhe/resumo, respeitar reduced motion e verificar retry/recuperação | TASK-12B; controles da TASK-11B/C | REQ-026, REQ-038 | TEST-12, TEST-14 | Adiada — aguarda nova análise |
+| TASK-12D | 2 / 9 | Revisar teclado, ordem e visibilidade de foco, contenção/retorno em diálogo e drawer, semântica, labels/erros associados, alt, contraste e feedback acessível de mutations/eventos | TASK-12B, TASK-12C | REQ-039 | TEST-11, TEST-14 | Adiada — aguarda nova análise |
+| TASK-12E | 2 / 9 | Revisar ações auxiliares e destinos do shell, autenticação, detalhe, conteúdo editorial e footer; garantir ação coerente ou aviso acessível de indisponibilidade, sem falso sucesso | TASK-12B, TASK-12D | REQ-004, REQ-026, REQ-039 | TEST-11, TEST-14 | Adiada — aguarda nova análise |
+| TASK-12F | 2 / 9 | Consolidar aceite visual/responsivo/acessível: capturas das nove telas e favoritos em 390/768/1440, snapshots estáveis de início/detalhe/carrinho/checkout em 390/1440 e evidências/desvios em UI-SPEC/TEST-MATRIX | TASK-12A, TASK-12B, TASK-12C, TASK-12D, TASK-12E | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | Adiada — aguarda nova análise |
 | TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
 | TASK-14 | 2 / 11 | Auditar cedo; concluir 12 medições no build final, medianas/métricas, HTML/JSON e análise de desvios | TASK-12 | REQ-001, REQ-045, REQ-046 | TEST-15 | A fazer |
 | TASK-15 | 2 / 12 | Atualizar docs para implementação real, checkout limpo, entregar artefatos, deploy final e smoke público | TASK-13, TASK-14 | REQ-028, REQ-033, REQ-047, REQ-048, REQ-049, REQ-050 | TEST-16, TEST-18 | A fazer |
@@ -350,6 +358,8 @@ Motivação registrada em DEC-32 no documento de decisões para avaliação e em
 
 ### Follow-up — Navegação global mobile — A fazer
 
+Escopo incorporado à TASK-12B; este checklist continua sendo o detalhamento do follow-up.
+
 Por solicitação do usuário, a página de favoritos adota temporariamente o padrão atual de carrinho e perfil: sem barra inferior e com voltar ao início. O coração da barra da homepage continua abrindo favoritos; “Explorar catálogo” fica abaixo da lista no mobile. Removido o espaço reservado para a barra na página de favoritos.
 
 Ajuste temporário verificado: seis E2Es de favoritos passaram em desktop/mobile, incluindo ausência da barra e presença do controle de voltar no mobile; typecheck, build, lint e diff check passaram. Sem commit. A revisão global abaixo permanece pendente.
@@ -365,6 +375,19 @@ Ajuste temporário verificado: seis E2Es de favoritos passaram em desktop/mobile
 Reproduzido `CancelledError` ao abrir ou atualizar `/favorites` no Vite dev com Strict Mode: a desmontagem inicial do observador cancelava a leitura de sessão compartilhada com o guard. O bootstrap agora aguarda a recuperação da sessão antes de montar o roteador; a autenticação das rotas continua usando o guard existente. Adicionada `playwright.dev.config.ts` para executar os E2Es com Strict Mode ativo e artefatos separados da suíte de produção; comando documentado no README.
 
 Verificação: 18 E2Es de favoritos/autenticação/shell passaram em desenvolvimento e outros 18 em produção, nos projetos desktop/mobile, incluindo acesso direto e refresh. Typecheck, build, lint e diff check passaram. Sem commit desta correção.
+
+### TASK-12 — Decomposição em subtarefas — 08/10/2026
+
+Planejamento dividido em TASK-12A a TASK-12F, todas **adiadas até nova análise**, por decisão do usuário. O épico mantém seu escopo e as dependências de TASK-13/14 continuam apontando para sua conclusão integral. Ordem técnica: revisão visual → responsividade/navegação → estados → acessibilidade → ações auxiliares → aceite consolidado.
+
+- [ ] **TASK-12A — Fidelidade visual e assets:** comparar as nove telas com as referências disponíveis; incluir hero, catálogo, destaque, banners, cards editoriais e footer da home; revisar IBM Plex Mono e placeholders locais, registrar diferenças e atualizar UI-SPEC/ASSETS quando necessário. Nos layouts sem frame, registrar a adaptação, sem afirmar equivalência com uma referência inexistente.
+- [ ] **TASK-12B — Responsividade e navegação:** revisar as nove telas obrigatórias e favoritos em 390/768/1440; aplicar DEC-18 a perfil, carteiras e confirmação; resolver o checklist de navegação global mobile acima, preservando o comportamento temporário até a revisão; validar safe-area, barras fixas, toque, rolagem, zoom 200% e acesso integral às ações.
+- [ ] **TASK-12C — Estados e movimento:** exercitar loading, vazio, erro, sucesso, retry e atualização em background; conferir dimensões dos skeletons e estabilidade do conteúdo em catálogo/detalhe/resumo; verificar shimmer e ausência de animação com reduced motion. Reutilizar os controles determinísticos da TASK-11B/C e registrar evidências de TEST-12.
+- [ ] **TASK-12D — Acessibilidade:** percorrer os fluxos principais por teclado; verificar ordem/foco visível, contenção e retorno de foco em diálogo/drawer, labels, erros associados e foco no campo inválido; conferir semântica, alt, contraste e anúncio acessível de mutations e eventos. Registrar resultados de TEST-11/14 e ajustes de acessibilidade que alterem a referência.
+- [ ] **TASK-12E — Ações auxiliares:** inventariar e verificar OAuth, recuperação de senha, newsletter, compartilhamento, avaliações, links editoriais/suporte e controles sem significado confirmado; oferecer comportamento coerente ou aviso explícito de indisponibilidade, acessível por teclado e sem simular envio/autenticação/sucesso.
+- [ ] **TASK-12F — Aceite e evidências:** executar TEST-11/12 em desktop/mobile e TEST-14 em 390/768/1440; revisar capturas das nove telas e favoritos; preparar/revisar snapshots de início/detalhe/carrinho/checkout para TEST-13 com cenário, relógio, fontes e imagens estáveis; registrar viewport, referência, resultados e desvios em TEST-MATRIX/UI-SPEC. Baselines devem ser revisadas contra as referências, não apenas aprovadas por coincidirem com a aplicação. TASK-13 permanece responsável pela consolidação da suíte e entrega das baselines, HTML e traces.
+
+Verificação desta decomposição: revisão documental do escopo, requisitos, grupos de teste e dependências, além de `git diff --check`. Nenhum teste da aplicação executado ou critério de implementação marcado como concluído. Próximo passo: analisar as evidências e a situação atual da aplicação para definir o escopo e as prioridades; a execução da TASK-12 permanece adiada até essa análise e a confirmação do usuário. Sem commit nesta etapa.
 
 ### Destinos auxiliares em construção — 08/10/2026 — Concluído
 
