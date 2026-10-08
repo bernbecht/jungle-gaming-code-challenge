@@ -18,7 +18,7 @@ Fonte normativa: [challenge-description.md](challenge-description.md). Este docu
 | --- | --- | --- | --- | --- | --- |
 | REQ-001 | E | §2, §11 | Usar efetivamente React, TypeScript, TanStack Router, TanStack Query, Axios, REST, Socket.IO, Tailwind CSS, shadcn/ui, MSW, Playwright e Lighthouse | TASK-02, TASK-03, TASK-14 | TEST-16 |
 | REQ-002 | E | §1, §3, §11 | Fluxos de descoberta, compra e conta funcionais, integrados a APIs, autenticação, carteiras e pagamentos simulados | TASK-05, TASK-06, TASK-07, TASK-08, TASK-09 | TEST-01, TEST-03, TEST-06, TEST-08 |
-| REQ-003 | O | §1, §3 | Implementar as nove telas: início, detalhe, carrinho, pagamento, confirmação, login, cadastro, perfil e carteiras | TASK-05, TASK-05A, TASK-06, TASK-07, TASK-08, TASK-09 | TEST-06, TEST-08, TEST-14 |
+| REQ-003 | O | §1, §3 | Implementar as nove telas: início, detalhe, carrinho, pagamento, confirmação, login, cadastro, perfil e carteiras | TASK-05, TASK-05A, TASK-06, TASK-07, TASK-08, TASK-09 | TEST-06, TEST-08, TEST-14, TEST-19 |
 | REQ-004 | O | §1, §3 | Seguir frames desktop/mobile; adaptar perfil, carteiras e confirmação para mobile; ações auxiliares coerentes sem falso sucesso | TASK-01, TASK-05A, TASK-12 | TEST-14 |
 
 ## Catálogo e carrinho

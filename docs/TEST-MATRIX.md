@@ -31,6 +31,7 @@ Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENAR
 | TEST-16 | Estrutural/reprodutibilidade | Checkout limpo, instalação lockfile, tipos/lint/build; conferir stack efetiva, contratos, ownership nos mocks, cleanup, senhas sem claro, reset completo, E2E executável e isolado, HTML/traces, scripts e docs reais | REQ-001, REQ-024, REQ-025, REQ-028, REQ-029, REQ-030, REQ-032, REQ-033, REQ-036, REQ-040, REQ-041, REQ-044, REQ-047, REQ-049, REQ-050 |
 | TEST-17 | Unidade/domínio complementar | Casos de ETH com 18 casas, soma/desconto/taxa sem perda; fingerprint/idempotência, transições terminais e remoção apenas dos lotes comprados. Complementa, não substitui E2E | REQ-012, REQ-016 |
 | TEST-18 | Smoke público | Registrar commit/URL; em contexto limpo abrir rotas diretamente e refresh, autenticar, comprar, emitir atualização pelo mock, recuperar pedido; conferir assets/worker e ausência de dependência privada | REQ-033, REQ-048 |
+| TEST-19 | E2E de homepage (TASK-05A) | Desktop/mobile: destacar dois banners, quatro cards editoriais, mostrar o destaque apenas na sidebar desktop e exibir mensagem honesta ao enviar newsletter | REQ-003 |
 
 ## Política de execução
 
@@ -71,9 +72,16 @@ Após instalação pelo usuário, npm ls, typecheck completo, lint e build passa
 
 - 14 testes unitários passaram na árvore de trabalho: 12 anteriores e dois de normalização/serialização de URL (`tests/unit/catalog-search.spec.ts`). Typecheck, lint e build passaram.
 - `tests/e2e/catalog.spec.ts` prepara TEST-01 (busca/filtros/ordenação/paginação/histórico), TEST-02 (detalhe/galeria/limites/404) e parte de TEST-12 (shimmer lento, resposta antiga, falha 503 e retry), em desktop/mobile, com reset por teste e controle MSW de rede.
-- Execuções locais reportadas pelo usuário: primeiro 13/22 passaram, depois 19/22; após os ajustes finais para consultar a saída de quantidade visível e acessar `/login` diretamente no cenário mobile, o usuário confirmou que `npm run test:e2e` passou. O usuário também confirmou que a validação das resoluções 390/768/1440 passou para as telas da TASK-05. Relatório/trace e screenshots não anexados. A execução do agente segue bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`. A fidelidade visual dos componentes abaixo do catálogo segue separada na TASK-05A.
+- `tests/e2e/home-editorial.spec.ts` cobre TEST-19: conteúdo promocional/editorial, destaque desktop responsivo e ausência de falso sucesso no formulário. A conclusão da execução e da revisão visual está registrada na seção de evidência TASK-05A abaixo.
+- Execuções locais reportadas pelo usuário: primeiro 13/22 passaram, depois 19/22; após os ajustes finais para consultar a saída de quantidade visível e acessar `/login` diretamente no cenário mobile, o usuário confirmou que `npm run test:e2e` passou. O usuário também confirmou que a validação das resoluções 390/768/1440 passou para as telas da TASK-05. Relatório/trace e screenshots não anexados. A execução do agente segue bloqueada antes das assertions por `listen EPERM` em `127.0.0.1:4173`. A fidelidade abaixo do catálogo foi concluída na TASK-05A; aceite visual geral e baselines permanecem na TASK-12/TEST-14 e TASK-13.
 
 Revisão UI-01, item 1: slider de preço implementado; 14 testes unitários, typecheck, lint, build e `git diff --check` passaram. E2E adicional em `catalog.spec.ts` verifica teclado, aplicação explícita e restauração de preços após refresh; preparado, não executado. Comparação visual e teste de arrastar os dois controles permanecem pendentes no navegador local.
+
+## Evidência TASK-05A — 07/10/2026
+
+- Implementados o destaque de NFT na sidebar, os dois banners, quatro cards do Diário da Cunhagem e o footer em faixas. Placeholders locais mantidos; links sem destino real não simulam navegação e a newsletter informa que não está conectada.
+- `npm run lint`, `npm run build` e `git diff --check` passaram. `npm run test:e2e -- --list` encontrou 24 testes em cinco arquivos, incluindo TEST-19 (`tests/e2e/home-editorial.spec.ts`).
+- Após ajustar os locators ambíguos, o usuário confirmou que toda a suíte E2E e as resoluções foram testadas com sucesso em 07/10/2026. O runner do agente continua bloqueado por `listen EPERM` em `127.0.0.1:4173`; screenshots não foram anexadas. O aceite visual abrangente e as baselines continuam na TASK-12/TEST-14 e TASK-13.
 
 Revisão UI-01, item 2: E2E de busca/histórico/resposta antiga adaptados para abrir a lupa e submeter o diálogo. Typecheck, lint e build passaram; testes E2E adaptados não foram executados nesta etapa. Validação visual e foco do diálogo pendentes no navegador local.
 

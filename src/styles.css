@@ -163,6 +163,57 @@
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
+.home-editorial { @apply mt-16 space-y-20 md:mt-20 md:space-y-24; }
+.home-promos { @apply grid gap-5 lg:grid-cols-2 lg:gap-6; }
+.home-promo-card {
+  @apply grid min-h-48 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] overflow-hidden rounded-lg bg-card;
+}
+.home-promo-card > img { @apply h-full min-h-48 w-full object-cover; }
+.home-promo-copy { @apply flex flex-col items-end justify-center gap-3 p-4 text-right sm:p-6; }
+.home-promo-copy h2 { @apply text-sm leading-snug font-semibold sm:text-lg; }
+.home-text-link { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-sm bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring; }
+.home-journal-heading { @apply mb-8 text-center; }
+.home-journal-heading h2 { @apply text-2xl font-bold sm:text-3xl; }
+.home-journal-heading p { @apply mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground; }
+.home-story-grid { @apply grid gap-5 sm:grid-cols-2 lg:grid-cols-4; }
+.home-story-card { @apply overflow-hidden rounded-lg bg-card; }
+.home-story-card > img { @apply aspect-[4/3] w-full object-cover; }
+.home-story-copy { @apply space-y-2 p-4; }
+.home-story-meta { @apply flex flex-wrap gap-2 text-[10px] text-muted-foreground; }
+.home-story-copy h3 { @apply text-sm leading-snug font-semibold; }
+.home-story-more { @apply inline-flex items-center gap-1 pt-1 text-xs font-semibold text-primary; }
+.home-nft-spotlight { @apply mt-8 border-t border-border pt-6; }
+.home-nft-spotlight h2 { @apply text-base font-bold uppercase text-primary; }
+.home-spotlight-label { @apply mt-1 text-center text-xs font-semibold uppercase; }
+.home-spotlight-link { @apply mt-3 block overflow-hidden rounded-lg bg-background; }
+.home-spotlight-link img { @apply aspect-square w-full object-cover; }
+.home-spotlight-details { @apply flex flex-col gap-1 p-3 text-sm; }
+.home-spotlight-details > :last-child { @apply font-semibold text-primary; }
+
+.site-footer { @apply mt-16; }
+.site-footer-feature-band { @apply grid gap-7 rounded-t-lg bg-card p-5 sm:p-7 md:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:p-8; }
+.site-footer-benefit { @apply border-b border-border pb-6 lg:mr-6 lg:border-r lg:border-b-0 lg:pb-0 lg:pr-6; }
+.site-footer-benefit-icon { @apply mb-4 inline-flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground; }
+.site-footer-benefit h2,
+.site-newsletter h2 { @apply text-sm font-semibold; }
+.site-footer-benefit p { @apply mt-2 text-xs leading-5 text-muted-foreground; }
+.site-newsletter { @apply space-y-3; }
+.site-newsletter-form { @apply flex items-stretch gap-2; }
+.site-newsletter-form input { @apply min-h-10 min-w-0 px-3 py-2 text-xs; }
+.site-newsletter-form button { @apply shrink-0 px-4 text-xs; }
+.site-footer-contact-band { @apply grid grid-cols-2 items-center gap-x-4 gap-y-3 bg-secondary px-5 py-5 text-xs sm:grid-cols-4 sm:px-7 lg:px-8; }
+.site-footer-contact-band p { @apply text-muted-foreground; }
+.site-footer-contact-band > :nth-child(n + 3) { @apply text-muted-foreground; }
+.site-footer-directory { @apply grid gap-8 rounded-b-lg bg-card px-5 py-8 sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:px-8; }
+.site-footer-directory h2 { @apply mb-3 text-sm font-semibold; }
+.site-footer-directory ul { @apply space-y-2; }
+.site-footer-directory li { @apply text-xs text-muted-foreground; }
+.site-footer-directory a { @apply transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring; }
+.site-footer-socials h2:not(:first-child) { @apply mt-6; }
+.site-social-icon { @apply inline-flex size-7 items-center justify-center rounded-sm border border-border text-primary; }
+.site-wallet-badge { @apply rounded-sm bg-secondary px-2 py-1 text-[8px] font-semibold tracking-wide text-muted-foreground; }
+.site-footer-copyright { @apply py-5 text-center text-[10px] text-muted-foreground; }
+
 @media (max-width: 767px) {
   .nft-detail-layout { gap: 0; }
   .nft-detail-gallery > img {

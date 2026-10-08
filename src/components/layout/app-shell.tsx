@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { HeaderSearch } from "@/features/catalog/header-search";
 import { defaultCatalog } from "@/features/catalog/search";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
@@ -92,19 +93,7 @@ export function AppShell() {
         <Outlet />
       </main>
 
-      <footer
-        className={`page-container mt-16 border-t border-border pt-8 ${isHome ? "pb-28 md:pb-8" : "pb-8"}`}
-      >
-        <div className="flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-semibold tracking-widest">KURIO</span>
-          <p className="text-muted-foreground">
-            Feito para colecionadores, criadores e cultura.
-          </p>
-        </div>
-        <p className="mt-6 text-xs text-muted-foreground">
-          Demonstração. Nenhuma transação real é realizada.
-        </p>
-      </footer>
+      <SiteFooter isHome={isHome} />
 
       {isHome && (
         <nav aria-label="Navegação mobile" className="mobile-nav md:hidden">

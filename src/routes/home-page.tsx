@@ -10,6 +10,8 @@ import {
 import { CatalogFilters } from "@/features/catalog/filters";
 import { HeaderSearch } from "@/features/catalog/header-search";
 import { defaultCatalog } from "@/features/catalog/search";
+import { HomeEditorial } from "@/features/home/home-editorial";
+import { NftSpotlight } from "@/features/home/nft-spotlight";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { SlidersHorizontal, X } from "lucide-react";
@@ -154,6 +156,7 @@ export function HomePage() {
               update={update}
               clear={clear}
             />
+            <NftSpotlight />
           </aside>
           <div className="min-w-0">
             <div className="flex w-full flex-wrap items-center justify-between gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] mb-9">
@@ -298,83 +301,7 @@ export function HomePage() {
           </Button>
         </dialog>
       </section>
-      <section
-        aria-label="Descubra a Kurio"
-        className="mt-12 grid gap-6 md:grid-cols-2"
-      >
-        <div className="border border-border bg-card p-8">
-          <p className="text-xs text-primary">ARTE E CULTURA</p>
-          <h2 className="mt-4 text-xl font-semibold">
-            Encontre sua próxima coleção
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-muted-foreground">
-            Conheça as obras que estão em alta na comunidade.
-          </p>
-          <Button className="mt-5" asChild>
-            <Link
-              to="/"
-              search={{ ...defaultCatalog, tab: "trending" }}
-              hash="colecoes"
-            >
-              Explorar destaques
-            </Link>
-          </Button>
-        </div>
-        <div className="border border-border bg-secondary p-8">
-          <p className="text-xs text-primary">NOVAS PERSPECTIVAS</p>
-          <h2 className="mt-4 text-xl font-semibold">
-            Descubra os novos lançamentos
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-muted-foreground">
-            Explore as obras adicionadas recentemente ao mercado.
-          </p>
-          <Button variant="outline" className="mt-5" asChild>
-            <Link
-              to="/"
-              search={{ ...defaultCatalog, tab: "new", sort: "recent" }}
-              hash="colecoes"
-            >
-              Ver lançamentos
-            </Link>
-          </Button>
-        </div>
-      </section>
-      <section aria-labelledby="collecting-title" className="mt-12">
-        <h2
-          id="collecting-title"
-          className="border-b border-border pb-4 text-lg font-semibold text-primary"
-        >
-          Colecione com confiança
-        </h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            [
-              "Explore",
-              "Combine busca, coleções e redes para encontrar a arte que combina com você.",
-            ],
-            [
-              "Conheça a obra",
-              "Confira imagens, criador, edições e disponibilidade antes de escolher.",
-            ],
-            [
-              "Escolha sua edição",
-              "Cada edição tem preço e quantidade próprios. Respeite os limites disponíveis.",
-            ],
-            [
-              "Uma experiência simulada",
-              "Este mercado usa dados fictícios. Nenhum pagamento ou transferência real é realizado.",
-            ],
-          ].map(([title, text], index) => (
-            <article key={title} className="border border-border bg-card p-5">
-              <span className="text-3xl text-primary">0{index + 1}</span>
-              <h3 className="mt-4 font-semibold">{title}</h3>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                {text}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <HomeEditorial />
     </>
   );
 }

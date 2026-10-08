@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05 concluídas; TASK-05A (finalização visual da home) e TASK-06 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. O núcleo de domínio e catálogo simulado existem; a fidelidade da home abaixo do catálogo será acompanhada separadamente na TASK-05A. Sua entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. O núcleo de domínio e catálogo simulado existem; a fidelidade da home abaixo do catálogo foi finalizada na TASK-05A. Sua entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -27,7 +27,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-03 | 1 / 1 | Provar Axios→MSW e MSW→Socket.IO→cliente no build; smoke Playwright; primeiro deploy com rota interna | TASK-02 | REQ-001, REQ-029, REQ-032, REQ-033, REQ-041, REQ-048 | TEST-16, TEST-18 | Concluído |
 | TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | Concluída |
 | TASK-05 | 1 / 3 | Base da home (hero/catálogo) e detalhe; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Concluída |
-| TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | Comparação com UI-01 em TEST-14 (TASK-12) | A fazer |
+| TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: destaque sob os filtros, banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | TEST-19; comparação com UI-01 em TEST-14 (TASK-12) | Concluída |
 | TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | A fazer |
 | TASK-08 | 1 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | A fazer |
@@ -144,10 +144,10 @@ API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 
 
 ### TASK-05A — finalização visual da homepage
 
-- [ ] Comparar os elementos abaixo do catálogo com o PNG desktop de UI-01: conteúdo, ordem, hierarquia, dimensões, cores, tipografia, imagens, fundos e espaçamento dos dois banners, quatro cards editoriais e footer em faixas.
-- [ ] Ajustar os componentes existentes para se aproximarem da referência; manter links e ações coerentes e não inventar integrações/conteúdo editorial.
-- [ ] Definir e implementar a composição responsiva em 390/768 px seguindo os PNGs disponíveis e DEC-18; onde não houver referência, registrar a decisão em UI-SPEC.
-- [ ] Registrar screenshots e desvios restantes para o aceite visual da TASK-12/TEST-14.
+- [x] Comparar a home com o PNG desktop de UI-01; incluir o destaque de NFT abaixo dos filtros, dois banners, quatro cards editoriais e footer em faixas.
+- [x] Ajustar os componentes para seguir a hierarquia, imagens/placeholders, cores e espaçamento da referência, mantendo links coerentes e sem simular conteúdo/editoriais indisponíveis.
+- [x] Implementar a composição responsiva em uma coluna no mobile, duas colunas intermediárias e a grade desktop; não há PNG do conteúdo abaixo do catálogo em mobile/tablet (DEC-18).
+- [x] Revisar a nova composição no browser nos viewports previstos; o usuário confirmou os testes e a revisão das resoluções. O aceite visual geral e as baselines permanecem na TASK-12/TEST-14 e TASK-13.
 
 Compra e favorito têm indicação de indisponibilidade nesta etapa; serão conectados nas TASK-06/TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
 
