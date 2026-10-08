@@ -178,3 +178,5 @@ Revisão UI-02 — galeria: miniaturas ocupam 100 × 100 px quadrados. A imagem 
 Refino da imagem principal: cantos arredondados e recorte de overflow aplicados também no desktop, com o mesmo raio amplo usado no mobile.
 
 Revisão UI-01 — header desktop: removido o border-bottom global; links Início/Mercado usam estado ativo de aba (texto cobre, borda inferior com respiro) conforme home/detalhe/catálogo.
+
+Revisão UI-01 — navegação desktop: adicionados Criadores (leva ao catálogo, pois páginas editoriais de criadores estão fora do escopo) e Aprenda (leva à seção explicativa existente); ícone do carrinho do header trocado de sacola para carrinho.

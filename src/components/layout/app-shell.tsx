@@ -1,7 +1,7 @@
 import { HeaderSearch } from '@/features/catalog/header-search'
 import { defaultCatalog } from '@/features/catalog/search'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
-import { Heart, Home, LogIn, ScanLine, ShoppingBag, UserRound } from 'lucide-react'
+import { Heart, Home, LogIn, ScanLine, ShoppingBag, ShoppingCart, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function AppShell() {
@@ -35,11 +35,27 @@ export function AppShell() {
           >
             Mercado
           </Link>
+          <Link
+            to="/"
+            search={defaultCatalog}
+            hash="colecoes"
+            className="flex h-20 items-center border-b-2 border-transparent px-0 pb-3 pt-3 text-foreground transition-colors hover:text-primary"
+          >
+            Criadores
+          </Link>
+          <Link
+            to="/"
+            search={defaultCatalog}
+            hash="collecting-title"
+            className="flex h-20 items-center border-b-2 border-transparent px-0 pb-3 pt-3 text-foreground transition-colors hover:text-primary"
+          >
+            Aprenda
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <HeaderSearch />
           <Button variant="ghost" size="icon" asChild>
-            <Link to="/cart" aria-label="Carrinho de NFTs"><ShoppingBag aria-hidden="true" /></Link>
+            <Link to="/cart" aria-label="Carrinho de NFTs"><ShoppingCart aria-hidden="true" /></Link>
           </Button>
           <Button asChild>
             <Link to="/login"><LogIn aria-hidden="true" />Entrar</Link>
