@@ -31,6 +31,37 @@ test('protected routes return to their destination after sign-in and session sur
   await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible()
 })
 
+test('expired session returns to login and can resume the protected destination', async ({ page }) => {
+  await login(page)
+  await page.goto('/profile')
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+
+  const clockAdvanced = await page.evaluate(async () => {
+    const response = await fetch('/api/__mock/clock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ advanceMs: 24 * 60 * 60_000 + 1 }),
+    })
+    return response.ok
+  })
+  expect(clockAdvanced).toBeTruthy()
+
+  const expiredSessionResponse = page.waitForResponse(response =>
+    response.url().endsWith('/api/auth/session') && response.status() === 401,
+  )
+  await page.goto('/profile')
+  expect((await expiredSessionResponse).status()).toBe(401)
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile$/)
+  await expect(page.getByRole('heading', { name: 'Entrar na Kurio' })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('kurio-session-token'))).toBeNull()
+  await page.getByLabel(/^E-mail/).fill('collector-a@example.test')
+  await page.getByLabel(/^Senha/).fill('DemoNft!2026')
+  await page.getByRole('main').getByRole('button', { name: 'Entrar', exact: true }).click()
+
+  await expect(page).toHaveURL(/\/profile$/)
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+})
+
 test('desktop opens the login dialog over the current page; mobile keeps the login route', async ({ page, isMobile }) => {
   if (isMobile) {
     await page.goto('/nfts/nft-001')

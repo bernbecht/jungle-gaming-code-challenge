@@ -4,7 +4,7 @@ import { calculateTotals, fromWei, toWei } from '../../src/lib/money'
 import { catalogFacets, listNfts, parseCatalogParams, readNft } from '../../src/mocks/catalog'
 import { addCartItem, advanceClock, createQuote, getStoredCart, mergeGuestCart, readCart, readOrder, removeCartItem, setCartCoupon, setCartQuantity, settleOrder, submitOrder } from '../../src/mocks/commerce'
 import { createFixtures } from '../../src/mocks/fixtures'
-import { changePassword, updateAvatar, updateProfile } from '../../src/mocks/auth'
+import { changePassword, requireSession, updateAvatar, updateProfile } from '../../src/mocks/auth'
 import { nftUpdatedEvent, orderUpdatedEvent } from '../../src/mocks/domain-events'
 import { createWallet, updateWallet } from '../../src/mocks/wallets'
 import { MockError } from '../../src/mocks/errors'
@@ -45,6 +45,19 @@ test('fixtures have stable IDs, distinct private resources and no stored plainte
   expect(state.favorites['user-a']).not.toEqual(state.favorites['user-b'])
   expect(JSON.stringify(state)).not.toContain('DemoNft!2026')
   expect(state.users[0]!.password.verifier).not.toBe(state.users[1]!.password.verifier)
+})
+
+test('session remains valid until its exact expiry and is removed when the simulated clock reaches it', async () => {
+  const state = await createFixtures()
+  const expiresAt = state.now + 24 * 60 * 60_000
+  state.sessions['session-expiring'] = { id: 'session-expiring', userId: 'user-a', expiresAt }
+
+  state.now = expiresAt - 1
+  expect(requireSession(state, 'session-expiring').userId).toBe('user-a')
+
+  state.now = expiresAt
+  expect(() => requireSession(state, 'session-expiring')).toThrow('Sua sessão expirou. Entre novamente.')
+  expect(state.sessions['session-expiring']).toBeUndefined()
 })
 
 test('domain event envelopes carry stable resource versions and private order identity', async () => {
