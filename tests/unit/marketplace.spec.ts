@@ -141,8 +141,9 @@ test('removing and re-adding a line during pending keeps the new line', async ()
 
 test('declining preserves the cart and releases reserved inventory only once', async () => {
   const { state, input } = await purchase()
-  const result = submitOrder(state, 'user-a', 'decline', input, 'declined')
+  const result = submitOrder(state, 'user-a', 'decline', input, 'declined', 0)
   if (!('order' in result)) throw new Error('Expected order')
+  expect(state.orders[result.order.id]!.delayMs).toBe(0)
   advanceClock(state, 2_000)
   expect(readCart(state, 'user:user-a').items[0]!.quantity).toBe(2)
   expect(readNft(state, 'nft-001').editions[1]!.available).toBe(10)

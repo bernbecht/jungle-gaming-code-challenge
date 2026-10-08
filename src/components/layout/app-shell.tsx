@@ -36,8 +36,6 @@ export function AppShell() {
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
   const isNftDetail = pathname.startsWith("/nfts/");
-  const isCart = pathname === "/cart";
-  const isCheckout = pathname === "/checkout";
   const isMarketActive = isNftDetail || pathname === "/cart" || pathname === "/checkout" || (isHome && hash === "colecoes");
   const isHomeActive = isHome && !isMarketActive;
   return (
@@ -45,9 +43,7 @@ export function AppShell() {
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
-      <header
-        className={`page-container flex min-h-20 items-center justify-between gap-4 ${isHome || isNftDetail || isCart || isCheckout ? "hidden md:flex" : ""}`}
-      >
+      <header className="page-container hidden min-h-20 items-center justify-between gap-4 md:flex">
         <Link
           to="/"
           search={defaultCatalog}

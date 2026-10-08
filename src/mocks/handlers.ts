@@ -7,15 +7,14 @@ import { invalid, MockError } from './errors'
 import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite } from './auth'
 import type { Network, OrderInput } from '../contracts/marketplace'
 
-let paymentSimulation = { delayMs: PAYMENT_DELAY_MS, outcome: 'confirmed' as 'confirmed' | 'declined' }
 const scheduledOrders = new Set<string>()
 
-function scheduleOrderResolution(orderId: string) {
+function scheduleOrderResolution(orderId: string, delayMs: number) {
   if (scheduledOrders.has(orderId)) return
   scheduledOrders.add(orderId)
   setTimeout(() => {
     void transact(state => settleOrder(state, orderId)).catch(() => undefined).finally(() => scheduledOrders.delete(orderId))
-  }, paymentSimulation.delayMs)
+  }, delayMs)
 }
 
 function validNetwork(value: unknown): value is Network {
@@ -196,26 +195,30 @@ export const handlers = [
     const input = parseOrderInput(body)
     const key = request.headers.get('Idempotency-Key') ?? ''
     const { userId } = await transact(state => ({ userId: requireSession(state, readToken(request)).userId }))
-    const result = await transact(state => submitOrder(state, userId, key, input, paymentSimulation.outcome))
+    const result = await transact(state => submitOrder(state, userId, key, input, state.paymentSimulation.outcome, state.paymentSimulation.delayMs))
     if ('status' in result) throw new MockError(result.status, result.body.error.code, result.body.error.message, result.body.error.details)
-    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id)
+    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id, await transact(state => state.orders[result.order.id]!.delayMs))
     return HttpResponse.json(result.order, { status: result.replayed ? 200 : 201 })
   })),
   http.get('/api/orders/:id', ({ request, params }) => respond(async () => {
-    const order = await transact(state => readOrder(state, requireSession(state, readToken(request)).userId, String(params.id)))
-    if (order.status === 'pending') scheduleOrderResolution(order.id)
-    return order
+    const result = await transact(state => {
+      const id = String(params.id)
+      const order = readOrder(state, requireSession(state, readToken(request)).userId, id)
+      return { order, delayMs: state.orders[id]!.delayMs }
+    })
+    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id, result.delayMs)
+    return result.order
   })),
   http.get('/api/order-attempts/:key', ({ request, params }) => respond(async () => {
     const { userId } = await transact(state => ({ userId: requireSession(state, readToken(request)).userId }))
     const result = await transact(state => {
       const attempt = state.attempts[userId]?.[String(params.key)]
       if (!attempt) throw new MockError(404, 'NOT_FOUND', 'Tentativa não encontrada.')
-      if ('orderId' in attempt.result) return { order: readOrder(state, userId, attempt.result.orderId) }
+      if ('orderId' in attempt.result) return { order: readOrder(state, userId, attempt.result.orderId), delayMs: state.orders[attempt.result.orderId]!.delayMs }
       throw new MockError(attempt.result.status, attempt.result.body.error.code, attempt.result.body.error.message, attempt.result.body.error.details)
     })
-    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id)
-    return result
+    if (result.order.status === 'pending') scheduleOrderResolution(result.order.id, result.delayMs)
+    return { order: result.order }
   })),
   http.post('/api/auth/login', async ({ request }) => respond(async () => {
     const body = await readBody(request)
@@ -293,7 +296,6 @@ export const handlers = [
     await resetDatabase(now)
     catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
     favoriteNetwork = { delayMs: 0, failuresRemaining: 0 }
-    paymentSimulation = { delayMs: PAYMENT_DELAY_MS, outcome: 'confirmed' }
     scheduledOrders.clear()
     for (const close of closeSockets) close()
     closeSockets.clear()
@@ -311,8 +313,10 @@ export const handlers = [
     const delayMs = body.delayMs ?? PAYMENT_DELAY_MS
     if (outcome !== 'confirmed' && outcome !== 'declined') invalid('Resultado de pagamento inválido.')
     if (typeof delayMs !== 'number' || !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 10_000) invalid('Latência de pagamento inválida.')
-    paymentSimulation = { outcome, delayMs }
-    return paymentSimulation
+    return transact(state => {
+      state.paymentSimulation = { outcome, delayMs }
+      return state.paymentSimulation
+    })
   })),
   http.get('/api/__proof', () => HttpResponse.json({
     source: 'msw',

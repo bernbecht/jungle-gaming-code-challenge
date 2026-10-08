@@ -16,10 +16,8 @@ test("homepage presents its editorial sections and honest newsletter feedback", 
     });
     if (!response.ok) throw new Error("Reset failed");
   });
-  await page
-    .getByRole("banner")
-    .getByRole("link", { name: "Kurio — início" })
-    .click();
+  if (isMobile) await page.getByRole("link", { name: "Ir à página inicial" }).click()
+  else await page.getByRole("banner").getByRole("link", { name: "Kurio — início" }).click()
 
   const promotions = page.getByRole("region", { name: "Destaques da Kurio" });
   await expect(promotions.getByRole("article")).toHaveCount(2);

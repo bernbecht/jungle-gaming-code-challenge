@@ -8,6 +8,8 @@ test("opens shell website, navigates and retrieves routes without runtime error"
   const runtimeErrors: string[] = [];
   page.on("pageerror", (error) => runtimeErrors.push(error.message));
   await page.goto("/");
+  if (isMobile) await expect(page.getByRole("banner")).toBeHidden();
+  else await expect(page.getByRole("banner")).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -34,6 +36,8 @@ test("opens shell website, navigates and retrieves routes without runtime error"
     await page.goto("/login");
   }
   await expect(page).toHaveURL(/\/login$/);
+  if (isMobile) await expect(page.getByRole("banner")).toBeHidden();
+  else await expect(page.getByRole("banner")).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Entrar na Kurio" }),

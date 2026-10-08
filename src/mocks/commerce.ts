@@ -10,10 +10,10 @@ import { assertQuantity, calculateTotals, fromWei, toWei } from "../lib/money";
 import { readNft } from "./catalog";
 import { invalid, MockError } from "./errors";
 import type { DatabaseState, StoredCart, StoredQuote } from "./state";
-import { nextId } from "./state";
+import { DEFAULT_PAYMENT_DELAY_MS, nextId } from "./state";
 
 export const QUOTE_VALIDITY_MS = 5 * 60_000;
-export const PAYMENT_DELAY_MS = 2_000;
+export const PAYMENT_DELAY_MS = DEFAULT_PAYMENT_DELAY_MS;
 export type Submission =
   | { order: Order; replayed: boolean }
   | { status: number; body: MockError["body"] };
@@ -408,6 +408,7 @@ export function submitOrder(
   key: string,
   input: OrderInput,
   outcome: "confirmed" | "declined" = "confirmed",
+  delayMs = PAYMENT_DELAY_MS,
 ): Submission {
   requireUser(state, userId);
   if (!key.trim() || key.length > 200)
@@ -474,7 +475,8 @@ export function submitOrder(
   };
   state.orders[order.id] = {
     order,
-    resolveAt: state.now + PAYMENT_DELAY_MS,
+    resolveAt: state.now + delayMs,
+    delayMs,
     outcome,
     cartId: quote.cartId,
     lots: structuredClone(storedQuote.lots),

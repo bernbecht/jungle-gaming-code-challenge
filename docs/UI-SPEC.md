@@ -139,7 +139,7 @@ O campo ENS do checkout mostra apenas seletor `.eth`, enquanto perfil/carteiras 
 
 ## Componentes compartilhados propostos
 
-- Shell desktop, header mobile por fluxo, barra inferior e navegação de conta.
+- Header global do shell só aparece a partir de `md`; em qualquer rota mobile, o header desktop fica oculto. Os fluxos usam suas composições mobile próprias; navegação inferior e footer mobile aparecem apenas na home (DEC-27).
 - NFTCard com variantes catálogo/recomendação; NFTGallery; badges e selector de edição.
 - QuantityStepper e linha de item com variantes carrinho/resumo/recibo.
 - Money, CouponForm e OrderSummary reutilizados com valores vindos da API.

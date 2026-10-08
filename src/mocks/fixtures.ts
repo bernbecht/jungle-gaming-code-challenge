@@ -1,5 +1,5 @@
 import type { Network, Nft, Wallet } from '../contracts/marketplace'
-import { BASE_TIME, SCHEMA_VERSION } from './state'
+import { BASE_TIME, DEFAULT_PAYMENT_DELAY_MS, SCHEMA_VERSION } from './state'
 import type { DatabaseState, StoredUser } from './state'
 
 const networks: Network[] = ['ethereum', 'polygon', 'solana']
@@ -59,6 +59,7 @@ export async function createFixtures(now = BASE_TIME): Promise<DatabaseState> {
     },
     mergedGuestCarts: {},
     sessions: {}, connections: {}, quotes: {}, orders: {}, attempts: {}, reservations: {},
+    paymentSimulation: { delayMs: DEFAULT_PAYMENT_DELAY_MS, outcome: 'confirmed' },
     coupons: { NFT10: { discountBps: 1000, expiresAt: now + 365 * 86_400_000 }, EXPIRED: { discountBps: 1000, expiresAt: now - 1 } },
     networkFees: { ethereum: '0.001', polygon: '0.0001', solana: '0.00001' },
   }

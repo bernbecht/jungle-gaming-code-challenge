@@ -13,10 +13,9 @@ async function searchNfts(page: Page, query: string) {
 }
 
 async function goHomeWithoutReload(page: Page) {
-  await page
-    .getByRole("contentinfo")
-    .getByRole("link", { name: "Kurio — início" })
-    .click();
+  const mobileHomeLink = page.getByRole("link", { name: "Ir à página inicial" })
+  if (await mobileHomeLink.isVisible().catch(() => false)) await mobileHomeLink.click()
+  else await page.getByRole("contentinfo").getByRole("link", { name: "Kurio — início" }).click()
   await expect(page).toHaveURL(/\/$|\/?\?.*/);
 }
 

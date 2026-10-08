@@ -59,7 +59,7 @@ const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/profile',
   beforeLoad: requireUser,
-  component: () => createElement(UnavailablePage, { title: 'Perfil do colecionador' }),
+  component: () => createElement(UnavailablePage, { title: 'Perfil do colecionador', showMobileSignOut: true }),
 })
 const walletsRoute = createRoute({
   getParentRoute: () => rootRoute,

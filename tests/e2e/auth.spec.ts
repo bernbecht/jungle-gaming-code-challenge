@@ -144,7 +144,7 @@ test('favorites update optimistically, roll back on failure and remain isolated 
   await expect.poll(() => new URL(page.url()).pathname).toBe('/')
   await login(page, 'collector-b@example.test')
   await page.goto('/profile')
-  await expect(page.getByRole('link', { name: 'Collector B' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
   await page.goto('/nfts/nft-001')
   await expect(page.getByRole('button', { name: 'Favoritar Violet Nomad' }).first()).toHaveAttribute('aria-pressed', 'false')
 })

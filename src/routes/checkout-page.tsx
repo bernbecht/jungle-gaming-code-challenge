@@ -422,7 +422,7 @@ export function CheckoutPage() {
               {paymentOptions}
               <div className="mt-3 md:hidden"><Button type="button" variant="ghost" className="w-full" onClick={() => setStep("data")}>Voltar aos dados</Button></div>
             </div>
-            <Button type="submit" className={`${step === "data" ? "hidden" : "flex"} mt-5 min-h-[60px] w-full rounded-full text-base md:min-h-11 md:rounded-md md:text-sm`} disabled={!canPrepare || updating || (step === "review" && !canSubmit)}>{orderMutation.isPending || connectMutation.isPending || quoteMutation.isPending ? <><LoaderCircle className="animate-spin" />{orderMutation.isPending ? "Enviando pedido…" : "Preparando revisão…"}</> : actionLabel}</Button>
+            <Button type="submit" className={`${step === "data" ? "hidden md:flex" : "flex"} mt-5 min-h-[60px] w-full rounded-full text-base md:min-h-11 md:rounded-md md:text-sm`} disabled={!canPrepare || updating || (step === "review" && !canSubmit)}>{orderMutation.isPending || connectMutation.isPending || quoteMutation.isPending ? <><LoaderCircle className="animate-spin" />{orderMutation.isPending ? "Enviando pedido…" : "Preparando revisão…"}</> : actionLabel}</Button>
           </div>
         </div>
       </form>

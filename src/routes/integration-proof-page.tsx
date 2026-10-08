@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { http } from '@/lib/http'
+import { Link } from '@tanstack/react-router'
+import { defaultCatalog } from '@/features/catalog/search'
 
 type ProofResponse = { source: string; transport: string; scenario: string }
 
@@ -62,6 +64,7 @@ export function IntegrationProofPage() {
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 py-16">
+      <Link to="/" search={defaultCatalog} className="text-sm text-primary underline">Ir à página inicial</Link>
       <p className="text-xs font-medium tracking-widest text-muted-foreground">DIAGNÓSTICO INTERNO · TASK-03</p>
       <h1 className="text-2xl font-semibold">Prova de integração de rede</h1>
       <p className="text-sm leading-6 text-muted-foreground">Esta rota de diagnóstico valida requisições Axios e eventos Socket.IO recebidos do MSW no navegador.</p>

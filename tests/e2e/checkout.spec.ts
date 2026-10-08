@@ -85,7 +85,8 @@ test('declined payment keeps the items in the cart and does not show a receipt',
   await expect(page.getByRole('heading', { name: 'Pagamento não confirmado' })).toBeVisible({ timeout: 10_000 })
   await expect(page.getByRole('link', { name: 'Voltar ao carrinho' })).toBeVisible()
   await page.getByRole('link', { name: 'Voltar ao carrinho' }).click()
-  await expect(page.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
+  const cartItems = page.getByRole('region', { name: 'Carrinho de NFTs' }).getByRole('list')
+  await expect(cartItems.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
 })
 
 test('mixed-network cart finalizes one network and preserves the other group', async ({ page, isMobile }) => {
@@ -119,6 +120,7 @@ test('mixed-network cart finalizes one network and preserves the other group', a
   await expect(page.getByRole('heading', { name: 'Compra simulada confirmada' })).toBeVisible({ timeout: 10_000 })
 
   await page.goto('/cart')
-  await expect(page.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Ver Ivory Baron', exact: true })).toHaveCount(0)
+  const cartItems = page.getByRole('region', { name: 'Carrinho de NFTs' }).getByRole('list')
+  await expect(cartItems.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
+  await expect(cartItems.getByRole('link', { name: 'Ver Ivory Baron', exact: true })).toHaveCount(0)
 })
