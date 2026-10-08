@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
@@ -10,6 +10,7 @@ import { getSessionToken, sessionQuery } from '@/features/auth/api'
 import { nftQuery } from '@/features/catalog/api'
 import type { Nft, Order, Page } from '@/contracts/marketplace'
 import { clearPrivateQueriesForUser, isNftUpdatedEvent, isOrderUpdatedEvent, shouldApplyNftEvent, shouldApplyOrderEvent } from '@/features/realtime/domain-event-consumer'
+import { reconnectGenerationQueryKey } from '@/features/realtime/reconciliation'
 
 let mockWorkerStart: Promise<void> | undefined
 
@@ -22,6 +23,7 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
   const session = useQuery(sessionQuery)
   const queryClient = useQueryClient()
   const userId = session.data?.id ?? ''
+  const hasSocketConnected = useRef(false)
 
   useEffect(() => {
     if (!env.mocksEnabled || session.isPending) return
@@ -30,6 +32,28 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
     const seenEventIds = new Set<string>()
     let socket: import('socket.io-client').Socket | undefined
     let authenticatedSessionId: string | null = null
+    let reconnectCycle = 0
+    let pendingReconnectCycle: number | null = null
+    const reconcileAfterReconnect = async (cycle: number, includePrivate: boolean) => {
+      const invalidations = [
+        queryClient.invalidateQueries({ queryKey: ['nfts', 'detail'] }),
+        queryClient.invalidateQueries({ queryKey: ['nfts', 'list'] }),
+        queryClient.invalidateQueries({ queryKey: ['nfts', 'facets'] }),
+        queryClient.invalidateQueries({ queryKey: ['cart'] }),
+      ]
+      if (includePrivate) invalidations.push(queryClient.invalidateQueries({ queryKey: ['orders'] }))
+      await Promise.all(invalidations)
+      if (!active || cycle !== reconnectCycle) return
+      const generation = queryClient.getQueryData<number>(reconnectGenerationQueryKey) ?? 0
+      queryClient.setQueryData(reconnectGenerationQueryKey, generation + 1)
+    }
+    const handleOnline = () => {
+      if (!hasSocketConnected.current) return
+      const cycle = ++reconnectCycle
+      pendingReconnectCycle = null
+      void reconcileAfterReconnect(cycle, Boolean(userId && getSessionToken()))
+    }
+    window.addEventListener('online', handleOnline)
     const remember = (eventId: string) => {
       if (seenEventIds.has(eventId)) return false
       seenEventIds.add(eventId)
@@ -42,19 +66,38 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
       socket = io(window.location.origin, { path: '/socket.io/', transports: ['websocket'] })
       socket.on('connect', () => {
         if (!active) return
+        // Keep this across effect restarts (for example, when sign-in changes
+        // userId) so a replacement socket still reconciles missed REST state.
+        const isReconnect = hasSocketConnected.current
+        hasSocketConnected.current = true
         authenticatedSessionId = null
         const token = userId ? getSessionToken() : null
+        if (isReconnect) {
+          const cycle = ++reconnectCycle
+          pendingReconnectCycle = token ? cycle : null
+          if (!token) void reconcileAfterReconnect(cycle, false)
+        }
         if (token) socket?.emit('session.authenticate', { token })
       })
       socket.on('session.authenticated', (payload: unknown) => {
         if (!active) return
         if (payload && typeof payload === 'object' && 'sessionId' in payload && typeof payload.sessionId === 'string')
           authenticatedSessionId = payload.sessionId
+        if (pendingReconnectCycle !== null) {
+          const cycle = pendingReconnectCycle
+          pendingReconnectCycle = null
+          void reconcileAfterReconnect(cycle, true)
+        }
       })
       socket.on('session.authenticationFailed', () => {
         if (!active) return
         authenticatedSessionId = null
         void queryClient.invalidateQueries({ queryKey: ['session'] })
+        if (pendingReconnectCycle !== null) {
+          const cycle = pendingReconnectCycle
+          pendingReconnectCycle = null
+          void reconcileAfterReconnect(cycle, false)
+        }
       })
       socket.on('nft.updated', (payload: unknown) => {
         if (!active) return
@@ -85,6 +128,7 @@ function DomainEventConsumer({ children }: { children: ReactNode }) {
 
     return () => {
       active = false
+      window.removeEventListener('online', handleOnline)
       socket?.disconnect()
       clearPrivateQueriesForUser(queryClient, userId)
     }

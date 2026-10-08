@@ -94,6 +94,34 @@ test('declined payment keeps the items in the cart and does not show a receipt',
   await expect(cartItems.getByRole('link', { name: 'Ver Violet Nomad', exact: true })).toBeVisible()
 })
 
+test('checkout reconciles a missed cart change after the socket reconnects and requires a fresh review', async ({ page, isMobile }) => {
+  await loginAndAddItem(page)
+  if (isMobile) await page.getByRole('button', { name: 'Continuar', exact: true }).click()
+  await page.getByRole('button', { name: 'Revisar compra' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'cotação atualizada' })).toBeVisible()
+
+  const couponResponse = await page.evaluate(async () => {
+    const token = sessionStorage.getItem('kurio-session-token')
+    const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    const cartResponse = await fetch('/api/cart', { headers })
+    const cart = await cartResponse.json()
+    const response = await fetch('/api/cart/coupon', { method: 'PUT', headers, body: JSON.stringify({ code: 'NFT10', expectedVersion: cart.version }) })
+    return { status: response.status, body: await response.json() }
+  })
+  expect(couponResponse.status).toBe(200)
+
+  await page.context().setOffline(true)
+  await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(false)
+  // Let Socket.IO detect the dropped transport and enter its retry cycle
+  // before restoring connectivity.
+  await page.waitForTimeout(2_500)
+  await page.context().setOffline(false)
+
+  await expect(page.getByRole('status').filter({ hasText: 'A cotação mudou enquanto a conexão estava instável' })).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeEnabled()
+  await expect(page.getByRole('region', { name: 'Seus NFTs' }).getByText('Cupom NFT10 aplicado', { exact: true })).toBeVisible()
+})
+
 test('mixed-network cart finalizes one network and preserves the other group', async ({ page, isMobile }) => {
   await page.goto('/login')
   await page.getByLabel(/^E-mail/).fill('collector-a@example.test')

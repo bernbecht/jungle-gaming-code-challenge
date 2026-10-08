@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10D a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D e TASK-10A/B/C concluídas; TASK-06 em andamento (cenários de sessão expirada/resposta antiga ficam para TASK-11); TASK-10D em verificação; TASK-10E a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -40,7 +40,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-10A | 2 / 8 | Publicar EVT-01/EVT-02 somente após persistir mudanças de NFT e pedido, com identidade, versão e dados coerentes | TASK-08 | REQ-013, REQ-017, REQ-032 | TEST-09 | Concluída |
 | TASK-10B | 2 / 8 | Consumir eventos no cliente com deduplicação, comparação de versão, proteção contra regressão de estado e invalidação das queries afetadas | TASK-10A | REQ-013, REQ-015, REQ-034, REQ-035 | TEST-09 | Concluída |
 | TASK-10C | 2 / 8 | Limpar listeners, conexões e estado privado ao fazer logout ou trocar de usuário, impedindo que respostas/eventos da sessão anterior contaminem a nova | TASK-06, TASK-10B | REQ-023, REQ-027, REQ-034 | TEST-10 | Concluída |
-| TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | A fazer |
+| TASK-10D | 2 / 8 | Ao reconectar Socket.IO, reconciliar por REST os recursos afetados; atualizar cotação e exigir nova revisão se preço, estoque ou taxa mudou | TASK-10B | REQ-015, REQ-032, REQ-033, REQ-034, REQ-035 | TEST-09, TEST-10 | Em verificação |
 | TASK-10E | 2 / 8 | Recuperar pedidos após timeout, refresh ou resposta perdida usando a mesma chave de idempotência, sem duplicar pedido, baixa de estoque ou limpeza do carrinho | TASK-10C, TASK-10D | REQ-017, REQ-019, REQ-023, REQ-036 | TEST-10 | A fazer |
 | TASK-11 | 2 / 8 | Completar controles determinísticos de rede/sessão/falhas; reset por teste; cenários de SCENARIOS reproduzíveis | TASK-09, TASK-10 | REQ-022, REQ-030, REQ-031, REQ-044 | TEST-03, TEST-07, TEST-08, TEST-12, TEST-16 | A fazer |
 | TASK-12 | 2 / 9 | Revisar todas as telas em 390/768/1440, incluindo aceite visual da home finalizada na TASK-05A; adaptações próprias (DEC-18), fonte/placeholders (DEC-16, DEC-17), shimmer, reduced motion, teclado, foco, zoom e ações auxiliares | TASK-05A, TASK-09, TASK-10 | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | A fazer |
@@ -315,9 +315,12 @@ TASK-10C concluída. Typecheck, lint, build e 27 testes unitários passaram; o u
 
 ### TASK-10D — Reconciliação REST depois de reconectar
 
-- [ ] Detectar reconexão Socket.IO e refazer consultas REST para os recursos que podem ter mudado durante a desconexão.
-- [ ] Reconciliar pedidos pendentes e dados do carrinho/catálogo com versões atuais; REST prevalece quando eventos foram perdidos.
-- [ ] Se a atualização alterar preço, estoque, cupom ou taxa da cotação, bloquear envio até a pessoa revisar a nova cotação.
+- [x] Detectar reconexão Socket.IO e refazer consultas REST de detalhe/listas/facetas, carrinhos e pedidos ativos que podem ter mudado durante a desconexão.
+- [x] Usar o evento `online` do navegador como fallback para iniciar a mesma reconciliação caso a rede volte antes de o Socket.IO emitir `connect`; REST permanece a fonte autoritativa e os eventos continuam fornecendo atualizações em tempo real.
+- [x] Reconciliar pedidos pendentes e dados do carrinho/catálogo com versões atuais; a API REST fornece o estado autoritativo após eventos possivelmente perdidos.
+- [x] Revalidar a cotação ativa após a reconciliação; comparar preço, estoque, cupom, taxa e totais, e encaminhar para revisão quando os termos mudarem.
+- [x] Adicionar E2E de reconciliação de carrinho/cotação após desconexão, com alteração de cupom não observada pelo socket; typecheck, lint, 28 testes unitários e build passaram.
+- [ ] Executar o novo E2E de reconexão em Chromium desktop/mobile; a tentativa nesta sandbox foi bloqueada por `listen EPERM 127.0.0.1:4173` ao iniciar o servidor Playwright.
 
 ### TASK-10E — Recuperação idempotente de pedido
 

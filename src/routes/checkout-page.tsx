@@ -26,7 +26,8 @@ import axios from "axios";
 import { ArrowLeft, LoaderCircle, WalletCards } from "lucide-react";
 import { fromWei, toWei } from "@/lib/money";
 import { defaultCatalog } from "@/features/catalog/search";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { quoteTermsChanged, reconnectGenerationQueryKey } from "@/features/realtime/reconciliation";
 
 type Provider = Wallet["provider"];
 type CheckoutStep = "data" | "wallet" | "review";
@@ -177,6 +178,7 @@ export function CheckoutPage() {
   const wallets = useQuery({ ...walletsQuery(userId), enabled: Boolean(userId) });
   const network = search.network ?? cart.data?.items[0]?.network ?? "ethereum";
   const queryClient = useQueryClient();
+  const reconnectGeneration = useQuery({ queryKey: reconnectGenerationQueryKey, queryFn: async () => 0, enabled: false, initialData: 0 }).data;
   const navigate = useNavigate();
   const [walletId, setWalletId] = useState(() => wallets.data?.[0]?.id ?? "");
   const [provider, setProvider] = useState<Provider>(() => wallets.data?.[0]?.provider ?? "metamask");
@@ -228,6 +230,26 @@ export function CheckoutPage() {
     onSuccess: (nextQuote) => { setQuote(nextQuote); setQuoteExpired(false); setProblem(""); },
     onError: (error) => setProblem(errorMessage(error)),
   });
+
+  const handledReconnectGeneration = useRef(0);
+  useEffect(() => {
+    if (reconnectGeneration <= handledReconnectGeneration.current) return;
+    handledReconnectGeneration.current = reconnectGeneration;
+    if (!quote || !connected || !cart.data || !userId) return;
+
+    const previousQuote = quote;
+    void quoteMutation.mutateAsync({ cartVersion: cart.data.version, network: previousQuote.network }).then((latestQuote) => {
+      if (quoteTermsChanged(previousQuote, latestQuote)) {
+        setStep("review");
+        setNotice("A cotação mudou enquanto a conexão estava instável. Revise os valores atualizados antes de confirmar.");
+      } else {
+        setNotice("Conexão restabelecida. A cotação foi validada novamente.");
+      }
+    }).catch(() => {
+      setQuoteExpired(true);
+      setProblem("Não foi possível validar novamente a cotação. Atualize-a antes de confirmar.");
+    });
+  }, [cart.data, connected, quote, quoteMutation, reconnectGeneration, userId]);
 
   const orderMutation = useMutation({
     mutationFn: ({ input, key }: { input: OrderInput; key: string }) => submitOrder(input, key),

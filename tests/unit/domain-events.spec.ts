@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
-import type { Order, OrderUpdated } from '../../src/contracts/marketplace'
+import type { Order, OrderUpdated, Quote } from '../../src/contracts/marketplace'
 import { createFixtures } from '../../src/mocks/fixtures'
 import { nftUpdatedEvent, orderUpdatedEvent } from '../../src/mocks/domain-events'
 import { QueryClient } from '@tanstack/react-query'
 import { clearPrivateQueriesForUser, isNftUpdatedEvent, isOrderUpdatedEvent, isPrivateQueryForUser, shouldApplyNftEvent, shouldApplyOrderEvent } from '../../src/features/realtime/domain-event-consumer'
+import { quoteTermsChanged } from '../../src/features/realtime/reconciliation'
 
 const pendingOrder: Order = {
   id: 'order-event-test',
@@ -96,4 +97,20 @@ test('session cleanup cancels and removes only the previous user private cache',
   expect(queryClient.getQueryData(['cart', 'guest:guest-a'])).toEqual({ total: '3' })
   expect(queryClient.getQueryData(['nfts', 'detail', 'nft-1'])).toEqual({ id: 'nft-1' })
   expect(queryClient.getQueryData(['domain-events', 'nft', 'nft-1'])).toEqual({ resourceId: 'nft-1' })
+})
+
+test('quote reconciliation detects changed purchase terms but ignores new quote IDs and expiry', () => {
+  const quote: Quote = {
+    id: 'quote-1', version: 1, cartId: 'cart-a', cartVersion: 2, network: 'ethereum', couponCode: 'NFT10',
+    expiresAt: '2026-10-08T12:00:00.000Z',
+    items: [{ id: 'line-1', nftId: 'nft-1', editionId: 'edition-1', editionLabel: 'Limited', tokenId: '1', quantity: 1, name: 'NFT', imageUrl: '/nft.png', unitPrice: '0.01', available: 2, network: 'ethereum', availability: 'available' }],
+    totals: { subtotal: '0.01', discount: '0.001', networkFee: '0.001', total: '0.01' },
+  }
+  const refreshed = { ...quote, id: 'quote-2', version: 2, expiresAt: '2026-10-08T12:05:00.000Z' }
+
+  expect(quoteTermsChanged(quote, refreshed)).toBe(false)
+  expect(quoteTermsChanged(quote, { ...refreshed, items: [{ ...quote.items[0]!, unitPrice: '0.02' }] })).toBe(true)
+  expect(quoteTermsChanged(quote, { ...refreshed, items: [{ ...quote.items[0]!, available: 1 }] })).toBe(true)
+  expect(quoteTermsChanged(quote, { ...refreshed, couponCode: null })).toBe(true)
+  expect(quoteTermsChanged(quote, { ...refreshed, totals: { ...quote.totals, networkFee: '0.002' } })).toBe(true)
 })

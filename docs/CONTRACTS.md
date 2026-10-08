@@ -82,7 +82,7 @@ No Socket.IO, o cliente envia `session.authenticate` com `{token}` depois de con
 | EVT-01 | `nft.updated`: `{nft:Nft}` | Comparar versão; atualizar detalhe, reconsultar listagens afetadas, invalidar carrinho/cotação; anunciar mudança relevante | REQ-013, REQ-015, REQ-034, REQ-035 |
 | EVT-02 | `order.updated`: `{order:Order}`; privado | Comparar identidade/versão; atualizar pedido; reconsultar carrinho no confirmado; nunca executar baixa local nem regredir terminal | REQ-017, REQ-018, REQ-019, REQ-023, REQ-034, REQ-035 |
 
-Após desconexão/reconexão, buscar REST mesmo sem evento. Listeners antigos são liberados. Reemissão duplicada mantém eventId/versão; teste de evento antigo usa versão inferior e payload antigo sem reverter o banco. Transporte de DEC-11 validado na TASK-03; publicação dos eventos de domínio permanece na TASK-10.
+Após desconexão/reconexão, buscar REST mesmo sem evento: a reconexão do Socket.IO inicia a reconciliação e o evento do navegador `online` também a inicia como fallback, pois a rede pode voltar antes de o transporte WebSocket emitir `connect`. REST continua sendo a fonte autoritativa; o fallback não substitui os eventos em tempo real. Na tela de checkout, a cotação ativa é recriada com os dados reconciliados e, se preço, estoque, cupom, taxa ou totais mudaram, o usuário precisa revisar novamente antes de confirmar. Listeners antigos são liberados. Reemissão duplicada mantém eventId/versão; teste de evento antigo usa versão inferior e payload antigo sem reverter o banco. Transporte de DEC-11 validado na TASK-03; publicação dos eventos de domínio permanece na TASK-10.
 
 ### Complementos API-03/API-13 — TASK-05
 

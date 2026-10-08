@@ -277,12 +277,21 @@ test("catalog displays API failure and recovers after explicit retry", async ({
     fetch("/api/__mock/catalog-network", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ failuresRemaining: 2 }),
+      // Keep the error state stable even if the query retries or refetches
+      // while the test navigates back to the home page.
+      body: JSON.stringify({ failuresRemaining: 10 }),
     }),
   );
   await goHomeWithoutReload(page);
   await expect(page.getByRole("alert")).toContainText(
     "Não foi possível carregar os NFTs.",
+  );
+  await page.evaluate(() =>
+    fetch("/api/__mock/catalog-network", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    }),
   );
   await page
     .getByRole("button", { name: "Tentar novamente", exact: true })
