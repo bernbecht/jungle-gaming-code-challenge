@@ -152,19 +152,19 @@ function NftDetail({ nft }: { nft: Nft }) {
         aria-labelledby="nft-title"
         className="nft-detail-layout grid gap-8 lg:grid-cols-2"
       >
-        <div className="nft-detail-gallery flex flex-col gap-4 md:flex-row-reverse">
+        <div className="nft-detail-gallery flex flex-col gap-4 md:grid md:grid-cols-[104px_minmax(0,1fr)] md:items-start">
           <img
             src={image?.url}
             alt={image?.alt ?? nft.name}
             width={640}
             height={640}
             fetchPriority="high"
-            className="aspect-square min-w-0 flex-1 rounded-xl border-[12px] border-card object-cover md:w-[calc(100%-100px)]"
+            className="aspect-square w-full min-w-0 overflow-hidden rounded-3xl border-[12px] border-card object-cover md:col-start-2 md:row-start-1"
           />
           <div
             role="group"
             aria-label="Galeria do NFT"
-            className="hidden gap-3 md:flex md:w-20 md:flex-col"
+            className="hidden gap-4 md:col-start-1 md:row-start-1 md:flex md:w-[104px] md:flex-col"
           >
             {nft.images.map((item, index) => (
               <button
@@ -172,14 +172,14 @@ function NftDetail({ nft }: { nft: Nft }) {
                 aria-label={`Ver imagem ${index + 1}`}
                 aria-pressed={imageIndex === index}
                 onClick={() => setImageIndex(index)}
-                className={`w-16 shrink-0 rounded-lg border-2 p-1 md:w-20 ${imageIndex === index ? "border-primary" : "border-transparent"}`}
+                className={`size-[104px] shrink-0 rounded-lg border-2 p-0 ${imageIndex === index ? "border-primary" : "border-transparent"}`}
               >
                 <img
                   src={item.url}
                   alt=""
-                  width={80}
-                  height={80}
-                  className="aspect-square rounded object-cover"
+                  width={100}
+                  height={100}
+                  className="aspect-square size-full rounded object-cover"
                 />
               </button>
             ))}

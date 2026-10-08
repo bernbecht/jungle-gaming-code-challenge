@@ -172,3 +172,7 @@ Ajuste dos steppers do detalhe: os controles de quantidade desktop e mobile usam
 Revisão UI-02 — compartilhar: botão de copiar link substituído pela composição do PNG desktop, com o texto “Compartilhar este NFT:” e links iconográficos acessíveis para LinkedIn, email e Twitter. Os links compartilham a URL atual sem simular confirmação de publicação. Validação visual e lint/build pendentes.
 
 Revisão UI-02 — tabs: removido o aspecto de botões; abas usam texto plano, selecionada em cobre com sublinhado, contagem de avaliações no rótulo e navegação por setas/Home/End. Estado ligado aos respectivos painéis acessíveis. Lint/build pendentes.
+
+Revisão UI-02 — galeria: miniaturas ocupam 100 × 100 px quadrados. A imagem selecionada agora fica na segunda coluna de uma grade dedicada e usa largura total + `aspect-square`, garantindo proporção 1:1 em vez de depender do cálculo flex. Lint/build pendentes.
+
+Refino da imagem principal: cantos arredondados e recorte de overflow aplicados também no desktop, com o mesmo raio amplo usado no mobile.
