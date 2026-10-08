@@ -77,17 +77,15 @@ export function AppShell() {
             Mercado
           </Link>
           <Link
-            to="/"
-            search={defaultCatalog}
-            hash="colecoes"
+            to="/em-construcao"
+            search={{ recurso: 'Criadores' }}
             className="flex h-20 items-center border-b-2 border-transparent px-0 pb-3 pt-3 text-foreground transition-colors hover:text-primary"
           >
             Criadores
           </Link>
           <Link
-            to="/"
-            search={defaultCatalog}
-            hash="collecting-title"
+            to="/em-construcao"
+            search={{ recurso: 'Aprenda' }}
             className="flex h-20 items-center border-b-2 border-transparent px-0 pb-3 pt-3 text-foreground transition-colors hover:text-primary"
           >
             Aprenda
@@ -160,14 +158,14 @@ export function AppShell() {
           >
             <Heart aria-hidden="true" size={20} />
           </Link>
-          <button
-            type="button"
+          <Link
+            to="/em-construcao"
+            search={{ recurso: 'Ação central' }}
             className="mobile-nav-center"
-            disabled
-            aria-label="Ação central não disponível nesta demonstração"
+            aria-label="Ação central — em construção"
           >
             <ScanLine aria-hidden="true" size={25} />
-          </button>
+          </Link>
           <Link
             to="/cart"
             activeProps={{ className: "text-primary" }}

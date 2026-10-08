@@ -213,13 +213,9 @@
     padding-bottom: 1.5rem;
   }
 }
-.mobile-nav-center {
+.mobile-nav .mobile-nav-center {
   @apply -mt-8 inline-flex size-16 shrink-0 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-lg;
 }
-.mobile-nav-center:disabled {
-  opacity: 1;
-}
-
 .mobile-detail-toolbar {
   @apply flex items-center justify-between py-6;
 }
@@ -536,7 +532,7 @@
   display: grid;
   gap: 12px;
 }
-.auth-modal-socials button {
+.auth-modal-socials a {
   display: flex;
   min-height: 42px;
   align-items: center;

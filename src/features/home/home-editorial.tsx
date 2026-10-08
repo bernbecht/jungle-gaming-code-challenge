@@ -125,12 +125,9 @@ export function HomeEditorial() {
                 <p className="text-sm leading-6 text-muted-foreground">
                   {story.summary}
                 </p>
-                <span className="home-story-more" aria-hidden="true">
+                <Link to="/em-construcao" search={{ recurso: story.title }} className="home-story-more" aria-label={`Ler mais: ${story.title}`}>
                   Ler mais <ArrowRight aria-hidden="true" size={14} />
-                </span>
-                <span className="sr-only">
-                  Artigo demonstrativo; o conteúdo não está disponível.
-                </span>
+                </Link>
               </div>
             </article>
           ))}

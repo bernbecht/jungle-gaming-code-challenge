@@ -96,7 +96,7 @@ export function OrderPage() {
           <div className="flex justify-between gap-4 border-t border-border pt-2 font-semibold"><dt>Total</dt><dd className="text-primary">{formatEth(value.snapshot.totals.total)}</dd></div>
         </dl>
         <p className="mt-5 text-center text-sm leading-relaxed text-secondary">Este pedido foi confirmado apenas na simulação local. A referência <span className="font-medium text-foreground">{value.transaction?.reference}</span> não corresponde a uma transação em blockchain.</p>
-        <Button type="button" variant="outline" disabled className="mx-auto mt-5 flex">Ver no Etherscan</Button>
+        <Button asChild variant="outline" className="mx-auto mt-5 flex"><Link to="/em-construcao" search={{ recurso: 'Explorador de transações' }}>Ver no Etherscan</Link></Button>
         <Button asChild className="mt-4 w-full"><Link to="/" search={defaultCatalog}>Continuar explorando</Link></Button>
       </div>
     </section>

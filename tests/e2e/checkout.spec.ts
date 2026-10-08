@@ -69,9 +69,11 @@ test('checkout connects a saved wallet and shows a confirmed order receipt', asy
   await expect(page.getByText('ID da transação')).toBeVisible()
   const transactionId = page.getByRole('definition').filter({ hasText: `simulated-${order.id}` })
   await expect(transactionId).toHaveText(`simulated-${order.id}`)
-  await expect(page.getByRole('button', { name: 'Ver no Etherscan' })).toBeDisabled()
+  await expect(page.getByRole('link', { name: 'Ver no Etherscan' })).toHaveAttribute('href', /\/em-construcao\?recurso=/)
   await expect(page.getByText('Seu pedido foi confirmado na simulação.')).toHaveCount(0)
   await expect(page.getByText('não corresponde a uma transação em blockchain')).toBeVisible()
+  await page.getByRole('link', { name: 'Ver no Etherscan' }).click()
+  await expect(page.getByRole('heading', { name: 'Explorador de transações', exact: true })).toBeVisible()
 })
 
 test('declined payment keeps the items in the cart and does not show a receipt', async ({ page }) => {

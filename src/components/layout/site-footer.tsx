@@ -3,13 +3,12 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { defaultCatalog } from "@/features/catalog/search";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   ShieldCheck,
   UsersRound,
 } from "lucide-react";
-import { useState } from "react";
 
 const benefits = [
   {
@@ -40,15 +39,15 @@ const footerGroups = [
       { label: "Minha coleção" },
       { label: "Atividade" },
       { label: "Estúdio do criador" },
-      { label: "Lista de interesse", hash: "newsletter" },
+      { label: "Lista de interesse" },
     ],
   },
   {
     title: "Central de ajuda",
     links: [
       { label: "Central de ajuda" },
-      { label: "Como comprar NFTs", hash: "collecting-title" },
-      { label: "Carteira e segurança", to: "/wallets" },
+      { label: "Como comprar NFTs" },
+      { label: "Carteira e segurança" },
       { label: "Política do mercado" },
       { label: "Denunciar item" },
     ],
@@ -70,19 +69,19 @@ function SocialIcons() {
     <div
       className="flex gap-2"
       role="group"
-      aria-label="Ícones de redes sociais, sem links disponíveis"
+      aria-label="Redes sociais"
     >
       {socials.map((name) => (
-        <span className="site-social-icon" key={name}>
+        <Link to="/em-construcao" search={{ recurso: `Kurio no ${name}` }} aria-label={name} className="site-social-icon" key={name}>
           <SocialBrandIcon brand={name} />
-        </span>
+        </Link>
       ))}
     </div>
   );
 }
 
 function NewsletterSignup() {
-  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   return (
     <section
@@ -95,7 +94,7 @@ function NewsletterSignup() {
         className="site-newsletter-form"
         onSubmit={(event) => {
           event.preventDefault();
-          setMessage("Inscrição indisponível nesta demonstração.");
+          void navigate({ to: "/em-construcao", search: { recurso: "Newsletter" } });
         }}
       >
         <FormField id="newsletter-email" label="Seu e-mail" required className="gap-0" labelClassName="sr-only">
@@ -115,11 +114,6 @@ function NewsletterSignup() {
         Receba lançamentos selecionados, histórias de criadores e novidades do
         mercado.
       </p>
-      {message && (
-        <p className="mt-2 text-xs text-muted-foreground" role="status">
-          {message}
-        </p>
-      )}
     </section>
   );
 }
@@ -165,12 +159,8 @@ export function SiteFooter({ isHome }: { isHome: boolean }) {
                 <li key={item.label}>
                   {"to" in item ? (
                     <Link to={item.to}>{item.label}</Link>
-                  ) : "hash" in item ? (
-                    <Link to="/" search={defaultCatalog} hash={item.hash}>
-                      {item.label}
-                    </Link>
                   ) : (
-                    <span>{item.label}</span>
+                    <Link to="/em-construcao" search={{ recurso: item.label }}>{item.label}</Link>
                   )}
                 </li>
               ))}

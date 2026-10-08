@@ -102,13 +102,13 @@ Há três tipos de escolha: diferenças deliberadas em relação ao desenho; ada
 
 ## 8. Ações e mensagens honestas sobre a simulação
 
-**Referência e mudança.** A confirmação do protótipo afirma registro da transferência na Ethereum e oferece “Ver no Etherscan”. A aplicação informa que o pedido e a referência são simulados e mantém esse botão desabilitado. Recuperação de senha e login social explicam sua indisponibilidade. A ação central mobile permanece desabilitada porque seu significado não foi definido.
+**Referência e mudança.** A confirmação do protótipo afirma registro da transferência na Ethereum e oferece “Ver no Etherscan”. A aplicação informa que o pedido e a referência são simulados. Por solicitação do usuário, “Ver no Etherscan”, recuperação de senha, login social e ação central mobile agora encaminham para uma tela de construção que identifica o recurso e explica sua indisponibilidade. A ação central não recebe uma operação de compra/scan porque seu significado não foi definido.
 
 **Motivação registrada.** Blockchain e pagamentos reais estão fora do escopo. O enunciado também exige comportamento coerente para ações auxiliares, sem aparentar sucesso funcional quando indisponíveis.
 
-**Experiência e consequência.** O usuário recebe uma explicação sobre o que ocorreu e sobre o que a demo permite fazer. Há diferenças de texto e ações desabilitadas em relação ao desenho. Esta escolha ajuda a cumprir o enunciado; não representa uma dispensa de implementar os fluxos obrigatórios.
+**Experiência e consequência.** O usuário recebe uma explicação sobre o que ocorreu e sobre o que a demo permite fazer. Há diferenças de texto e destinos de construção para ações auxiliares em relação ao desenho. Esta escolha ajuda a cumprir o enunciado; não representa uma dispensa de implementar os fluxos obrigatórios.
 
-**Evidências:** UI-01/UI-05/UI-06 em [UI-SPEC](UI-SPEC.md); aviso e botão em [OrderPage](../src/routes/order-page.tsx), mensagens em [AuthForm](../src/features/auth/auth-form.tsx) e ação central em [AppShell](../src/components/layout/app-shell.tsx). [checkout.spec.ts](../tests/e2e/checkout.spec.ts) e [auth.spec.ts](../tests/e2e/auth.spec.ts) contêm assertions para esses comportamentos.
+**Evidências:** UI-01/UI-05/UI-06 em [UI-SPEC](UI-SPEC.md); aviso e botão em [OrderPage](../src/routes/order-page.tsx), links em [AuthForm](../src/features/auth/auth-form.tsx) e ação central em [AppShell](../src/components/layout/app-shell.tsx). [checkout.spec.ts](../tests/e2e/checkout.spec.ts) e [auth.spec.ts](../tests/e2e/auth.spec.ts) contêm assertions para esses comportamentos.
 
 ## 9. Salvar perfil e alterar senha como ações separadas
 

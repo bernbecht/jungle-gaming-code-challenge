@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage presents its editorial sections and honest newsletter feedback", async ({
+test("homepage presents its editorial sections and routes newsletter to construction", async ({
   page,
   isMobile,
 }) => {
@@ -31,7 +31,6 @@ test("homepage presents its editorial sections and honest newsletter feedback", 
   const footer = page.getByRole("contentinfo");
   await footer.getByLabel("Seu e-mail").fill("collector@example.test");
   await footer.getByRole("button", { name: "Enviar" }).click();
-  await expect(footer.getByRole("status")).toHaveText(
-    "Inscrição indisponível nesta demonstração.",
-  );
+  await expect(page.getByRole('heading', { name: 'Newsletter', exact: true })).toBeVisible();
+  await expect(page.getByText('Esta página está sendo construída.', { exact: false })).toBeVisible();
 });

@@ -365,3 +365,9 @@ Ajuste temporário verificado: seis E2Es de favoritos passaram em desktop/mobile
 Reproduzido `CancelledError` ao abrir ou atualizar `/favorites` no Vite dev com Strict Mode: a desmontagem inicial do observador cancelava a leitura de sessão compartilhada com o guard. O bootstrap agora aguarda a recuperação da sessão antes de montar o roteador; a autenticação das rotas continua usando o guard existente. Adicionada `playwright.dev.config.ts` para executar os E2Es com Strict Mode ativo e artefatos separados da suíte de produção; comando documentado no README.
 
 Verificação: 18 E2Es de favoritos/autenticação/shell passaram em desenvolvimento e outros 18 em produção, nos projetos desktop/mobile, incluindo acesso direto e refresh. Typecheck, build, lint e diff check passaram. Sem commit desta correção.
+
+### Destinos auxiliares em construção — 08/10/2026 — Concluído
+
+Por solicitação do usuário, todos os acionadores auditados sem funcionalidade/destino próprio passaram a abrir `/em-construcao?recurso=…`. A tela identifica o recurso, informa que está sendo construída e permite voltar ao início. Conectados itens auxiliares do rodapé, redes sociais, artigos, Criadores/Aprenda, newsletter, recuperação/OAuth da modal, ação central mobile e explorador do recibo. A modal fecha ao seguir um destino de construção; não há envio de email, OAuth, inscrição nem exploração de uma transação real. UI-SPEC e as decisões de avaliação foram atualizadas.
+
+Verificação: tipos, build, lint e diff check passaram. As suítes de autenticação, homepage e checkout passaram em desktop/mobile. A nova suíte validou cliques em 20 destinos da homepage desktop e 19 mobile, os três links auxiliares da modal, acesso direto, refresh e retorno. Execução final dessa suíte: cinco testes passaram e um foi pulado porque a modal é exclusiva de desktop. Capturas desktop/mobile revisadas. Sem commit desta etapa.

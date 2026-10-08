@@ -17,6 +17,7 @@ import { CheckoutPage } from '@/routes/checkout-page'
 import { OrderPage } from '@/routes/order-page'
 import { WalletsPage } from '@/routes/wallets-page'
 import { FavoritesPage } from '@/routes/favorites-page'
+import { UnderConstructionPage } from '@/routes/under-construction-page'
 import type { Network } from '@/contracts/marketplace'
 
 const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -27,6 +28,12 @@ const rootRoute = createRootRouteWithContext<{ queryClient: QueryClient }>()({
 
 const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', validateSearch: validateCatalogSearch, component: HomePage })
 const integrationProofRoute = createRoute({ getParentRoute: () => rootRoute, path: '/__proof', component: IntegrationProofPage })
+const underConstructionRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/em-construcao',
+  validateSearch: (search: Record<string, unknown>) => ({ recurso: typeof search.recurso === 'string' && search.recurso.trim() ? search.recurso.trim().slice(0, 160) : 'Página em construção' }),
+  component: UnderConstructionPage,
+})
 const authSearch = (search: Record<string, unknown>) => ({ returnTo: typeof search.returnTo === 'string' ? search.returnTo : undefined })
 const checkoutSearch = (search: Record<string, unknown>) => ({
   network: search.network === 'ethereum' || search.network === 'polygon' || search.network === 'solana'
@@ -97,7 +104,7 @@ const orderRoute = createRoute({
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
     homeRoute, integrationProofRoute, cartRoute, loginRoute, registerRoute, profileRoute,
-    walletsRoute, favoritesRoute, checkoutRoute, nftRoute, orderRoute,
+    walletsRoute, favoritesRoute, checkoutRoute, nftRoute, orderRoute, underConstructionRoute,
   ]),
   context: { queryClient },
   scrollRestoration: true,

@@ -15,6 +15,7 @@ import { signIn, signUp } from "./api";
 import type { AuthDialogMode } from "./auth-dialog-types";
 import { cartQuery, getGuestId, mergeGuestCart } from "@/features/cart/api";
 import type { Cart } from "@/contracts/marketplace";
+import { useAuthDialog } from "./use-auth-dialog";
 import { USERNAME_PATTERN } from "@/lib/validation";
 
 export function AuthForm({
@@ -31,6 +32,7 @@ export function AuthForm({
   presentation?: "page" | "dialog";
 }) {
   const isRegister = mode === "register";
+  const authDialog = useAuthDialog();
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -203,17 +205,9 @@ export function AuthForm({
             </button>
           )}
           {dialogStyle && !isRegister && (
-            <button
-              type="button"
-              className="auth-modal-forgot"
-              onClick={() =>
-                setNotice(
-                  "A recuperação de senha não está disponível nesta demonstração.",
-                )
-              }
-            >
+            <Link to="/em-construcao" search={{ recurso: "Recuperação de senha" }} onClick={authDialog.close} className="auth-modal-forgot">
               Esqueceu a senha?
-            </button>
+            </Link>
           )}
         </FormField>
         {error && (
@@ -239,32 +233,18 @@ export function AuthForm({
             <span>Ou continue com</span>
           </div>
           <div className="auth-modal-socials">
-            <button
-              type="button"
-              onClick={() =>
-                setNotice(
-                  "O login com Google não está disponível nesta demonstração.",
-                )
-              }
-            >
+            <Link to="/em-construcao" search={{ recurso: "Login com Google" }} onClick={authDialog.close}>
               <span aria-hidden="true" className="auth-modal-google">
                 G
               </span>
               Continuar com Google
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setNotice(
-                  "O login com Facebook não está disponível nesta demonstração.",
-                )
-              }
-            >
+            </Link>
+            <Link to="/em-construcao" search={{ recurso: "Login com Facebook" }} onClick={authDialog.close}>
               <span aria-hidden="true" className="auth-modal-facebook">
                 f
               </span>
               Continuar com Facebook
-            </button>
+            </Link>
           </div>
         </>
       )}
