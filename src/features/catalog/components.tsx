@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Nft } from "@/contracts/marketplace";
 import { Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
 import { lowestEdition } from "./price";
+import { FavoriteButton } from "@/features/favorites/favorite-button";
 
 export function NftCard({
   nft,
@@ -45,14 +45,7 @@ export function NftCard({
           </p>
         </Link>
         {mobileHome && (
-          <button
-            type="button"
-            disabled
-            aria-label={`Favoritar ${nft.name} (indisponível nesta etapa)`}
-            className="absolute top-3 right-3 inline-flex size-9 items-center justify-center rounded-full bg-background/90 text-primary disabled:opacity-100 md:hidden"
-          >
-            <Heart aria-hidden="true" size={18} />
-          </button>
+          <FavoriteButton nftId={nft.id} name={nft.name} className="absolute top-3 right-3 size-9 bg-background/90 text-primary md:hidden" />
         )}
       </div>
     </article>

@@ -4,7 +4,7 @@ Fonte normativa: [challenge-description.md](challenge-description.md). Este docu
 
 ## Convenções e rastreabilidade
 
-- `REQ-*`: requisitos deste documento; `TASK-*`: [tarefas](TASKS.md); `DEC-*`: [decisões](ARCHITECTURE.md).
+- `REQ-*`: requisitos deste documento; `TASK-*`: [tarefas](TASKS.md); `DEC-*`: [decisões](ARCHITECTURE.md); `FLOW-*`: [fluxos de comportamento](docs/FLOWS.md).
 - `API-*` e `EVT-*`: [contratos](docs/CONTRACTS.md); `UI-*`: [interface](docs/UI-SPEC.md).
 - `SCN-*`: [cenários](docs/SCENARIOS.md); `TEST-*`: [verificações](docs/TEST-MATRIX.md); `REL-*`: [entrega](docs/RELEASE.md).
 - IDs são permanentes. Não renumerar itens existentes; novos itens recebem novos IDs. IDs nas tabelas definem os itens, referências em outras tabelas apontam para esses itens.

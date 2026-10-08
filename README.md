@@ -1,6 +1,6 @@
 # NFT Marketplace — desafio frontend
 
-Projeto com **TASK-01 a TASK-05 concluídas**: base, tipos, lint e build aprovados; provas Axios→MSW e Socket.IO→MSW implementadas. O usuário confirmou que a suíte E2E atual passou e que início/detalhe foram verificados em 390/768/1440. A finalização visual dos componentes abaixo do catálogo está separada na TASK-05A. Autenticação, compra e eventos de domínio ainda serão implementados.
+Projeto com **TASK-01 a TASK-05A concluídas e TASK-06 em andamento**: catálogo, homepage editorial, autenticação e favoritos estão em desenvolvimento integrado a MSW. O usuário confirmou as suítes E2E anteriores e a revisão visual inicial; TASK-06 aguarda execução local dos testes de autenticação/favoritos. Compra e eventos de domínio ainda serão implementados.
 
 Aplicação: https://jungle-gaming-code-challenge.vercel.app · [Prova de integração](https://jungle-gaming-code-challenge.vercel.app/__proof). Deploy inicial na Vercel do commit `4047da3`; evidências em [RELEASE](docs/RELEASE.md).
 
@@ -58,13 +58,13 @@ npm run dev
 | `npm run preview` | Servir `dist` em `http://127.0.0.1:4173` após build |
 | `npm run typecheck` | TypeScript dos arquivos da aplicação/configuração/testes |
 | `npm run lint` | ESLint sem warnings permitidos |
-| `npm run test:e2e` | Smoke do shell e provas REST/Socket.IO em desktop/mobile; instalar Chromium com `npx playwright install chromium` antes |
+| `npm run test:e2e` | Fluxos de shell, catálogo, homepage, autenticação/favoritos e provas MSW em desktop/mobile; instalar Chromium com `npx playwright install chromium` antes |
 | `npm run test:unit` | Testes do domínio: precisão ETH, catálogo, cotação, idempotência, estoque e efeitos de confirmação/recusa; sem browser |
 | `npm run test:visual` | Filtro `@visual`; ainda não há testes visuais, portanto não deve ser considerado aprovado |
 | `npm run test:report` | Abrir relatório HTML após execução Playwright |
 | `npm run audit:lighthouse` | Auditoria exploratória da home; iniciar preview e disponibilizar Chrome antes. Não executa ainda a matriz final da TASK-14 |
 
-O shell tem home inicial e rotas em preparação para detalhe, carrinho, login/cadastro, checkout, pedido, perfil e carteiras. Não há operações de negócio, guards/sessão, dados privados, favoritos ou preço/estoque fictícios dentro dos componentes.
+O catálogo, detalhe, homepage editorial, cadastro/login/logout, proteção de rotas privadas e favoritos estão implementados. Carrinho, checkout, pedido, perfil e carteiras ainda estão em desenvolvimento; rotas privadas já exigem sessão, embora algumas ainda mostrem uma página temporária.
 
 ## Configuração
 
@@ -86,11 +86,11 @@ Escolhida **IBM Plex Mono**, pesos 400, 500, 600 e 700, como aproximação monoe
 
 Quatro placeholders SVG abstratos estão em `public/assets/placeholders/`. Consulte [inventário de assets](docs/ASSETS.md) para origem e limitações. São temporários e não representam fidelidade às artes dos PNGs.
 
-## Credenciais e cenários — planejados
+## Credenciais e cenários
 
-Credenciais seed propostas: `collector-a@example.test` e `collector-b@example.test`, senha fictícia `DemoNft!2026`. **Ainda não são utilizáveis.** A implementação armazenará verificadores com salt, sem persistir senhas em claro.
+Credenciais seed funcionais: `collector-a@example.test` e `collector-b@example.test`, senha fictícia `DemoNft!2026` para ambas. O banco local persiste verificadores derivados com salt, nunca senhas em claro. Cadastro cria um usuário no IndexedDB do navegador atual.
 
-Seleção/reset será pelo painel de demonstração e controles MSW descritos em [SCENARIOS](docs/SCENARIOS.md). Para reproduzir falhas, usar SCN-07 (sessão expirada), SCN-10 (preço/estoque), SCN-11 (timeout após criação), SCN-12 (recusa) e SCN-14 (reconexão). Os passos e resultados esperados estão em TEST-03, TEST-07, TEST-09 e TEST-10; substituir por instruções com controles reais quando implementados.
+Reset e capacidades atuais do mock estão descritos em [SCENARIOS](docs/SCENARIOS.md). Cenários avançados de sessão expirada, preço/estoque, timeout e reconexão dependem dos controles da TASK-11.
 
 ## Testes, relatórios e entrega
 

@@ -1,6 +1,6 @@
 # Contratos REST e eventos
 
-Status: **DTOs v1 e núcleo de domínio implementados na TASK-04; endpoints de catálogo e controles básicos entregues; endpoints dos demais fluxos ainda planejados**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md). Campos observados nas screenshots foram incorporados na TASK-04; validação de formulários será completada nas tarefas dos fluxos.
+Status: **DTOs v1 e núcleo de domínio implementados na TASK-04; endpoints de catálogo, autenticação e favoritos estão em implementação na TASK-06; demais fluxos ainda planejados**. IDs estáveis; alterar schemas de forma coordenada entre handlers, serviços e testes. Origem: [requisitos](../REQUIREMENTS.md), decisões [DEC-03 a DEC-13](../ARCHITECTURE.md).
 
 ## Campos identificados nas screenshots — DEC-19
 
@@ -10,8 +10,9 @@ Modelos v1 em `src/contracts/marketplace.ts` cobrem rede, abas Novos/Em alta, or
 
 - API-03: `GET /api/nfts` e `GET /api/nfts/:id` implementados via MSW e IndexedDB.
 - API-13: `GET /api/__mock/status`, `POST /api/__mock/reset` e `POST /api/__mock/clock` implementados. Somente SCN-01 e seed 1 são aceitos nesta etapa.
-- API-08/API-09: funções de cotação, reserva, idempotência e resolução existem em `src/mocks/commerce.ts`. Seus endpoints privados e a verificação de sessão serão conectados nas tarefas de carrinho/checkout; não há compra exposta pela API nesta etapa.
-- API-01/API-02/API-04/API-05/API-06/API-07/API-10/API-11/API-12 e eventos de domínio: contratos preparados; handlers/fluxos ainda pendentes.
+- API-01/API-02/API-04: cadastro, sessão e favoritos estão ligados aos handlers MSW; verificar a cobertura E2E antes de considerar TEST-03/TEST-04 aprovados.
+- API-08/API-09: funções de cotação, reserva, idempotência e resolução existem em `src/mocks/commerce.ts`. Seus endpoints privados serão conectados nas tarefas de carrinho/checkout; não há compra exposta pela API nesta etapa.
+- API-05/API-06/API-07/API-10/API-11/API-12 e eventos de domínio: contratos preparados; handlers/fluxos ainda pendentes.
 
 ## Convenções
 
@@ -19,7 +20,7 @@ Base `/api`; JSON, exceto upload de avatar. IDs opacos em string, datas ISO UTC,
 
 Autenticação proposta: `Authorization: Bearer <token-ficticio>`. Visitante usa `X-Guest-Id` para seu carrinho; identidade autenticada prevalece. Handlers não aceitam `userId` do corpo como autorização. Recursos de outro usuário retornam 403; sessão ausente/expirada retorna 401. `expectedVersion` nas edições evita sobrescrever estado concorrente.
 
-Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/marketplace.ts). O arquivo exporta `Money`, `Network`, `ApiError`, `Page`, `Nft`, `Edition`, `CatalogParams`, `Profile`, `Session`, `Wallet`, `Collector`, `CartLine`, `Cart`, `Totals`, `Quote`, `OrderInput`, `Order` e os envelopes `NftUpdated`/`OrderUpdated`.
+Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/marketplace.ts). O arquivo exporta `Money`, `Network`, `ApiError`, `Page`, `Nft`, `Edition`, `CatalogParams`, `Profile`, `Session`, `LoginInput`, `RegisterInput`, `AuthResponse`, `Favorites`, `Wallet`, `Collector`, `CartLine`, `Cart`, `Totals`, `Quote`, `OrderInput`, `Order` e os envelopes `NftUpdated`/`OrderUpdated`.
 
 `Profile` usa `username`, `displayName`, `email`, `ensName` e `avatarUrl`; `Wallet` acrescenta `nickname`, `profileName`, `provider`, `ensName` e `referralCode`. `Collector` captura `displayName`, `username`, `email`, `profileName`, `ensName`, `referralCode` e `note`. Carteira e rede da compra são capturadas separadamente no snapshot do pedido.
 
@@ -31,10 +32,10 @@ Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/m
 
 | ID | Operação | Entrada → sucesso | Erros principais | Requisitos |
 | --- | --- | --- | --- | --- |
-| API-01 | `POST /accounts` | `{username,displayName,email,password}` → 201 `{user:Profile}`; seguir para login | 422 campos, 409 email existente | REQ-021, REQ-024 |
-| API-02 | `POST /session`, `GET /session`, `DELETE /session` | Login `{email,password}` → 200 `{token,session:Session}`; consulta → 200 Session; logout → 204 | 401 credenciais/sessão expirada | REQ-021, REQ-022, REQ-023 |
+| API-01 | `POST /auth/register` | `{username,displayName,email,password}` → 200 `{token,session:Session}` e início da sessão | 422 campos, 409 conta existente | REQ-021, REQ-024 |
+| API-02 | `POST /auth/login`, `GET /auth/session`, `POST /auth/logout` | Login → `{token,session:Session}`; consulta → `{user:Profile}`; logout → `{loggedOut:true}` | 401 credenciais/sessão expirada | REQ-021, REQ-022, REQ-023 |
 | API-03 | `GET /nfts`, `GET /nfts/:id` | Lista parametrizada → 200 página de Nft; detalhe → 200 Nft | 422 parâmetros, 404 detalhe | REQ-005, REQ-006, REQ-007 |
-| API-04 | `GET /favorites`, `PUT /favorites/:nftId`, `DELETE /favorites/:nftId` (privado) | Consulta → 200 `{nftIds:string[]}`; PUT sem corpo → 200 mesmo formato; DELETE → 200 mesmo formato; operações idempotentes | 401, 404, 503 transitório | REQ-008 |
+| API-04 | `GET /me/favorites`, `PUT /me/favorites/:nftId` (privado) | Consulta → `{userId,nftIds:string[]}`; PUT `{favorite:boolean}` → mesmo formato; seleção explícita idempotente | 401, 404, 503 transitório | REQ-008 |
 | API-05 | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:id`, `DELETE /cart/items/:id` | Consulta → Cart; adição `{nftId,editionId,quantity,expectedVersion}`; edição `{quantity,expectedVersion}`; remoção com `If-Match` da versão → 200 Cart | 404, 409 estoque/versão, 422 quantidade | REQ-009, REQ-010, REQ-011, REQ-013 |
 | API-06 | `POST /cart/merge` (privado) | `{guestId,guestVersion}` → 200 Cart com notices; repetir origem consumida não duplica | 409 revisão divergente, 401 | REQ-010, REQ-023 |
 | API-07 | `PUT /cart/coupon`, `DELETE /cart/coupon` | PUT `{code,expectedVersion}`; DELETE com `If-Match` → 200 Cart | 422 `COUPON_INVALID`/`COUPON_EXPIRED`, 409 versão | REQ-011 |
@@ -43,7 +44,7 @@ Schemas oficiais no código: [`src/contracts/marketplace.ts`](../src/contracts/m
 | API-10 | `GET /profile`, `PATCH /profile`, `PUT/DELETE /profile/avatar`, `PUT /profile/password` (privado) | GET/PATCH → `Profile`; PATCH `{username,displayName,email,ensName,expectedVersion}`; avatar multipart `file,expectedVersion` → perfil; DELETE avatar com `If-Match` → perfil; senha `{currentPassword,newPassword}` → 204 | 422 campos/arquivo/senha, 409 email/versão | REQ-024 |
 | API-11 | `GET /wallets`, `POST /wallets`, `PATCH /wallets/:id` (privado) | GET → `{items:Wallet[]}`; POST `{slot,nickname,profileName,address,network,provider,ensName,referralCode}` → 201 Wallet; PATCH mesmos campos + expectedVersion → 200 Wallet | 422 endereço/rede, 409 slot/endereço/versão, 403 | REQ-014, REQ-024 |
 | API-12 | `POST /wallet-connections`, `DELETE /wallet-connections/:id` (privado) | POST `{walletId,network}` → 201 `{id,status:'connected',walletId,network}`; DELETE → 204 | 409 `CONNECTION_REJECTED`/`NETWORK_MISMATCH`; checkout rejeita conexão encerrada | REQ-014 |
-| API-13 | Controles `/api/__mock/*`, fora da API de produto | Reset, cenário, relógio e emissão descritos em SCENARIOS; disponíveis somente quando mocks habilitados | 422 configuração inválida | REQ-030, REQ-031, REQ-044 |
+| API-13 | Controles `/api/__mock/*`, fora da API de produto | Reset e relógio; `POST /favorite-network` define falhas one-shot de favoritos e `POST /catalog-network` controla latência/falhas do catálogo | 422 configuração inválida | REQ-030, REQ-031, REQ-044 |
 
 ## Parâmetros, validações e erros
 

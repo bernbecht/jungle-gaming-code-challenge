@@ -12,6 +12,8 @@ Os fluxos abaixo são a especificação do comportamento esperado. A existência
 | --- | --- | --- | --- | --- | --- |
 | FLOW-01 | Revisar a compra e acompanhar confirmação ou recusa | REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | API-08, API-09, API-12, EVT-01, EVT-02 | TASK-04 (núcleo), TASK-07, TASK-08, TASK-10 | SCN-01, SCN-09, SCN-10, SCN-12, SCN-16, SCN-17; TEST-06, TEST-07, TEST-09, TEST-17 |
 | FLOW-02 | Recuperar uma tentativa após timeout, refresh ou reconexão | REQ-016, REQ-017, REQ-019, REQ-022, REQ-023, REQ-036 | API-02, API-09, EVT-02 | TASK-04 (núcleo), TASK-08, TASK-10 | SCN-07, SCN-11, SCN-14, SCN-15; TEST-03, TEST-07, TEST-10 |
+| FLOW-03 | Criar conta, autenticar, recuperar sessão e sair | REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | API-01, API-02 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-08; TEST-03 |
+| FLOW-04 | Consultar e alternar favoritos com autenticação | REQ-008, REQ-021, REQ-023, REQ-027 | API-02, API-04 | TASK-06, TASK-11 | SCN-01, SCN-06, SCN-07, SCN-15; TEST-03, TEST-04 |
 
 ## FLOW-01: Compra
 
@@ -107,6 +109,104 @@ flowchart TD
 - **Evento duplicado ou antigo:** não regredir o estado nem reaplicar efeitos. A API é usada para reconciliar os recursos ativos após reconexão.
 
 **Resultado:** a tentativa original é recuperada ou continua em recuperação explícita. A perda de uma resposta não cria uma nova compra nem limpa o carrinho.
+
+## FLOW-03: Cadastro, login, sessão e logout
+
+**Objetivo:** permitir que uma pessoa crie uma conta ou entre em uma existente para acessar seus recursos privados, retomando a navegação depois da autenticação.
+
+**Pré-condições:** mocks de rede ativos. Para login, a conta existe e a senha corresponde; para cadastro, os campos são válidos e e-mail/nome de usuário ainda não estão em uso.
+
+**Gatilhos:** enviar o formulário de cadastro ou login; abrir uma rota protegida sem sessão; recarregar a aplicação com uma sessão ativa; ou solicitar logout.
+
+### Caminho principal — login
+
+1. A pessoa abre Entrar ou tenta acessar uma rota protegida.
+2. Se veio de uma rota protegida, o sistema guarda o caminho interno solicitado. Endereços externos não são aceitos como retorno.
+3. A pessoa informa e-mail e senha e envia o formulário.
+4. A API valida as credenciais e retorna o perfil e um token opaco de sessão. O cliente guarda o token para a sessão atual do navegador e limpa os dados em cache associados à identidade anterior.
+5. O sistema retorna ao caminho interno guardado; sem destino anterior, volta à home.
+6. Em rotas protegidas, a aplicação consulta a sessão pela API antes de mostrar o conteúdo. Após refresh, recupera o perfil usando o token guardado.
+
+```mermaid
+flowchart TD
+    A[Abrir rota protegida ou Entrar] --> B{Sessão válida?}
+    B -->|Sim| C[Exibir recurso privado]
+    B -->|Não| D[Guardar caminho interno e mostrar login]
+    D --> E[Enviar e-mail e senha]
+    E --> F{Credenciais válidas?}
+    F -->|Não| G[Mostrar erro e manter formulário]
+    F -->|Sim| H[Guardar token e limpar cache anterior]
+    H --> I[Retornar ao caminho solicitado]
+    I --> C
+```
+
+### Caminho principal — cadastro
+
+1. A pessoa informa nome de exibição, nome de usuário, e-mail e senha.
+2. O sistema valida os campos localmente e a API valida novamente unicidade e regras do contrato.
+3. A API cria a conta, guarda um verificador de senha com salt e inicia a sessão.
+4. O cliente guarda o token e segue para o destino interno solicitado ou para a home.
+
+### Logout
+
+1. A pessoa aciona Sair.
+2. A aplicação cancela consultas em andamento e pede à API para invalidar a sessão.
+3. O token local e o cache em memória são removidos.
+4. A pessoa retorna à home como visitante. Ações privadas voltam a pedir login.
+
+### Alternativas e falhas
+
+- **Credenciais incorretas:** mostrar erro sem revelar se o e-mail ou a senha foi o campo inválido; permanecer no login.
+- **Cadastro inválido:** indicar que os dados precisam de correção. E-mail ou nome de usuário já usado não cria outra conta nem uma sessão.
+- **Sessão ausente ou expirada:** não abrir a rota privada; encaminhar ao login mantendo somente um retorno interno validado. Após autenticar, buscar os dados privados novamente.
+- **Falha de rede no login/cadastro:** manter os valores do formulário e oferecer nova tentativa; não indicar autenticação concluída.
+- **Troca de identidade:** cancelar consultas e limpar cache antes de mostrar recursos do novo usuário. Uma resposta privada de sessão anterior não pode preencher a interface atual.
+- **Falha de rede ao sair:** remover a sessão local e o cache privado mesmo sem confirmação do servidor, e não mostrar a conta anterior como autenticada neste navegador.
+
+**Resultado:** pessoa autenticada com sessão recuperável na aba atual ou visitante sem dados privados expostos. Senhas não são persistidas em claro; a autenticação é simulada pelos handlers MSW e não representa um serviço de produção.
+
+## FLOW-04: Consultar e alternar favoritos
+
+**Objetivo:** deixar uma pessoa autenticada favoritar ou desfavoritar NFTs sem misturar sua lista com a de outra conta e sem apresentar erro como sucesso.
+
+**Pré-condições:** catálogo ou detalhe do NFT carregado. O NFT existe. Favoritos pertencem ao usuário autenticado.
+
+**Gatilho:** abrir o catálogo/detalhe ou acionar o controle de coração.
+
+### Caminho principal
+
+1. Sem sessão, o controle encaminha ao login e guarda o caminho atual para retorno. Não altera favoritos.
+2. Com sessão, a aplicação consulta a lista de favoritos da identidade atual.
+3. O botão informa visual e semanticamente se o NFT está favoritado (`aria-pressed`).
+4. Ao alternar, a interface atualiza o estado imediatamente e guarda uma cópia da lista anterior.
+5. Axios envia a escolha explícita à API. O handler identifica o usuário pela sessão, valida que o NFT existe e persiste a alteração.
+6. Em sucesso, a consulta de favoritos é revalidada; o mesmo estado aparece ao reabrir o detalhe ou atualizar a página.
+
+```mermaid
+flowchart TD
+    A[Abrir catálogo ou detalhe] --> B{Sessão válida?}
+    B -->|Não| C[Login com retorno à página atual]
+    C --> D[Autenticar]
+    B -->|Sim| E[Consultar favoritos do usuário]
+    D --> E
+    E --> F[Exibir estado do coração]
+    F --> G[Alternar favorito]
+    G --> H[Atualizar interface imediatamente e guardar snapshot]
+    H --> I{API salvou?}
+    I -->|Sim| J[Revalidar lista persistida]
+    I -->|Não| K[Restaurar snapshot e informar falha]
+```
+
+### Alternativas e regras de privacidade
+
+- **API rejeita a alteração ou falha:** restaurar o snapshot anterior, informar que não foi possível salvar e permitir nova tentativa.
+- **A pessoa troca de conta ou encerra sessão:** cancelar consultas privadas e limpar o cache antes de carregar favoritos de outra identidade.
+- **Sessão expira entre a leitura e a alteração:** a API responde 401; limpar a sessão local e encaminhar para autenticação, sem manter o estado otimista como persistido.
+- **NFT inexistente:** a API responde 404 e a interface reverte a alteração.
+- **Dois usuários:** consultas usam identidade própria e handlers derivam autorização da sessão. Nunca aceitar `userId` do corpo para selecionar a lista.
+- **Alterações repetidas:** definir explicitamente `favorite: true` ou `false` torna a operação idempotente; não alternar no servidor por simples inversão de estado.
+
+**Resultado:** favorito confirmado e persistido para o usuário atual ou restauração do estado anterior com erro compreensível. Não há confirmação visual permanente quando a API falha.
 
 ## Como manter este documento
 

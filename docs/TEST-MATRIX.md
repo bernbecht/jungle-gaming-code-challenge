@@ -1,6 +1,6 @@
 # Matriz de testes e evidências
 
-Status: **smoke do shell, E2E de catálogo/detalhe (TEST-01/02 e parte de TEST-12), revisão responsiva da TASK-05 em 390/768/1440, REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 14 testes unitários do catálogo/núcleo aprovados pelo agente**. Os demais fluxos de negócio na interface ainda serão implementados. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
+Status: **smoke do shell, E2E anteriores de catálogo/detalhe (TEST-01/02 e parte de TEST-12), revisão responsiva da TASK-05 em 390/768/1440, REST/Socket.IO e fundação MSW/IndexedDB aprovados pelo usuário; 15 testes unitários aprovados pelo agente. TEST-03/04 de autenticação/favoritos estão preparados, aguardando execução local; checkout e demais fluxos ainda serão implementados**. IDs são grupos de verificação, não necessariamente um único `test()`. Os primeiros 12 correspondem diretamente aos 12 grupos da seção 9 do [desafio](../challenge-description.md).
 
 Requisitos: [REQUIREMENTS](../REQUIREMENTS.md). Preparação: [SCENARIOS](SCENARIOS.md). Contratos: [CONTRACTS](CONTRACTS.md). Execução: TASK-13 a TASK-15 em [TASKS](../TASKS.md).
 
@@ -57,6 +57,7 @@ Preencher uma linha por grupo/projeto executado. `Não executado` é diferente d
 | Demais grupos | — | Não executado | — | A implementar |
 | TEST-17 — núcleo financeiro/idempotência (parcial) | Árvore de trabalho TASK-04 | 12 testes unitários passaram, executados pelo agente | `npm run test:unit`; `tests/unit/marketplace.spec.ts` | Precisão wei, filtros/paginação, fixtures, fingerprint, cotação alterada, reserva, recusa, snapshot e remoção de lotes. Não comprova checkout na interface. Typecheck, lint e build também passaram. |
 | Fundação MSW/IndexedDB — catálogo, refresh e reset | Árvore de trabalho TASK-04 | Passou, conforme confirmação do usuário em 07/10/2026 | `npm run test:e2e`; `tests/e2e/mock-foundation.spec.ts`; terminal local do usuário | Suíte desktop/mobile, incluindo shell e provas REST/Socket.IO. Relatório/trace não anexado. Tentativa do agente bloqueada antes dos testes por `listen EPERM` em `127.0.0.1:4173`. Não comprova fluxos de catálogo/compra na interface. |
+| TEST-03/TEST-04 — autenticação e favoritos | Árvore de trabalho TASK-06 | Não executado: bloqueado antes das assertions | `npx playwright test tests/e2e/auth.spec.ts` | Testes preparados para desktop/mobile; o preview não pôde abrir `127.0.0.1:4173` (`listen EPERM`). Typecheck/lint/build passaram, mas não contam como validação dos fluxos. |
 
 ## Evidência de referência visual (não é execução de teste)
 
@@ -88,5 +89,11 @@ Revisão UI-01, item 2: E2E de busca/histórico/resposta antiga adaptados para a
 Revisão UI-01, item 3: TEST-01 adaptado para combinar busca, rede e duas categorias via grupo Coleções; restauração e ordenação mantidas. E2E adaptado ainda não executado; comparação visual dos três grupos pendente.
 
 Revisão de contagens/aparência UI-01: 15 testes unitários passaram, incluindo contagem única de NFTs e atualização após mudanças de categoria/rede. Typecheck, lint e build passaram. TEST-01 adaptado para seleção por botões e `aria-pressed`; E2E/cores/alinhamento ainda sem validação no navegador.
+
+## Evidência TASK-06 — 08/10/2026
+
+- Implementados endpoints MSW de cadastro/login/sessão/logout/favoritos, formulários de autenticação, guards e retorno interno; sessão recuperada via token de `sessionStorage`.
+- Favorito foi conectado no catálogo e detalhe com atualização otimista, rollback e cache por usuário. Adicionados testes E2E de guard/refresh, cadastro/conflito, rollback e isolamento A→B em `tests/e2e/auth.spec.ts`.
+- `npm run typecheck`, `npm run lint` e `npm run build` passaram. A execução `npx playwright test tests/e2e/auth.spec.ts` foi bloqueada antes de iniciar o preview por `listen EPERM` em `127.0.0.1:4173`; aguarda execução local para fechar TEST-03/TEST-04.
 
 Revisão UI-01 de paginação: TEST-01 adaptado para números, `aria-current`, avanço/retorno e ausência de avanço na última página. Teste E2E preparado, não executado. Revisão visual da paginação pendente; estado da URL e total continuam derivados da consulta.

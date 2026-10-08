@@ -9,6 +9,13 @@ export const http = axios.create({
   headers: { Accept: 'application/json' },
 })
 
+http.interceptors.request.use(config => {
+  const token = typeof sessionStorage === 'undefined' ? null : sessionStorage.getItem('kurio-session-token')
+  if (token) config.headers.set('Authorization', `Bearer ${token}`)
+  else config.headers.delete('Authorization')
+  return config
+})
+
 export function shouldRetryQuery(failureCount: number, error: unknown): boolean {
   if (failureCount >= 1 || !axios.isAxiosError(error) || axios.isCancel(error)) {
     return false

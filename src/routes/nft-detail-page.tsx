@@ -14,14 +14,13 @@ import { Link, useParams } from "@tanstack/react-router";
 import axios from "axios";
 import {
   ChevronLeft,
-  Heart,
-  HeartIcon,
   Linkedin,
   Mail,
   ShoppingCart,
   Star,
   Twitter,
 } from "lucide-react";
+import { FavoriteButton } from "@/features/favorites/favorite-button";
 import { useRef, useState } from "react";
 
 function CollectorRating({ rating, count }: { rating: number; count: number }) {
@@ -127,14 +126,7 @@ function NftDetail({ nft }: { nft: Nft }) {
         <Link to="/" search={defaultCatalog} aria-label="Voltar ao mercado">
           <ChevronLeft aria-hidden="true" />
         </Link>
-        <button
-          type="button"
-          disabled
-          aria-label="Favoritos indisponíveis nesta etapa"
-          className="disabled:opacity-100"
-        >
-          <Heart aria-hidden="true" />
-        </button>
+        <FavoriteButton nftId={nft.id} name={nft.name} className="size-10" />
       </nav>
       <nav
         aria-label="Caminho da página"
@@ -273,10 +265,7 @@ function NftDetail({ nft }: { nft: Nft }) {
               <Button className="uppercase" disabled>
                 Comprar
               </Button>
-              <Button variant="outline" disabled>
-                <HeartIcon size={20} aria-hidden />
-                Favoritar
-              </Button>
+              <FavoriteButton nftId={nft.id} name={nft.name} showLabel className="min-h-11 gap-2 rounded-md border border-border px-4 text-sm font-semibold hover:bg-muted" />
             </div>
           </div>
           <dl className="mt-6 space-y-3 text-base text-muted-foreground">

@@ -22,6 +22,10 @@ export type Profile = {
   ensName: string | null; avatarUrl: string | null
 }
 export type Session = { id: string; user: Profile; expiresAt: string }
+export type LoginInput = { email: string; password: string }
+export type RegisterInput = { username: string; displayName: string; email: string; password: string }
+export type AuthResponse = { token: string; session: Session }
+export type Favorites = { userId: string; nftIds: string[] }
 export type Wallet = {
   id: string; version: number; slot: 'primary' | 'secondary'; nickname: string
   profileName: string; address: string; network: Network

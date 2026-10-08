@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 a TASK-15 ainda a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. O núcleo de domínio e catálogo simulado existem; a fidelidade da home abaixo do catálogo foi finalizada na TASK-05A. Sua entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A concluídas; TASK-06 em andamento; TASK-07 a TASK-15 a fazer. Cadastro, login/logout, guards e favoritos começaram na TASK-06. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -28,7 +28,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-04 | 1 / 2 | Implementar contratos, dinheiro exato, banco versionado, fixtures com placeholders locais (DEC-17), reset e núcleo de cotação/pedidos | TASK-03 | REQ-006, REQ-012, REQ-016, REQ-025, REQ-028, REQ-029, REQ-030 | TEST-16, TEST-17 | Concluída |
 | TASK-05 | 1 / 3 | Base da home (hero/catálogo) e detalhe; URL validada, filtros combinados, API parametrizada, cancelamento, galeria e estados | TASK-01, TASK-04 | REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-026, REQ-027 | TEST-01, TEST-02, TEST-12 | Concluída |
 | TASK-05A | 1 / 3 (complemento visual) | Finalizar a composição da home conforme o PNG desktop: destaque sob os filtros, banners abaixo do catálogo, cards editoriais, transições/espaçamentos e footer; adaptar a composição mobile/tablet sem inventar conteúdo ausente | TASK-01; base de home da TASK-05 | REQ-003, REQ-004, REQ-037, REQ-040 | TEST-19; comparação com UI-01 em TEST-14 (TASK-12) | Concluída |
-| TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | A fazer |
+| TASK-06 | 1 / 4 | Cadastro/login/logout/guards, retorno interno, recuperação de sessão, isolamento e favorito otimista com rollback (FLOW-03, FLOW-04) | TASK-04, TASK-05 | REQ-002, REQ-003, REQ-008, REQ-021, REQ-022, REQ-023, REQ-024, REQ-027 | TEST-03, TEST-04 | Em andamento |
 | TASK-07 | 1 / 4 | Carrinho persistente, merge idempotente de visitante, estoque, cupom e totais retornados pela API | TASK-06 | REQ-002, REQ-003, REQ-009, REQ-010, REQ-011, REQ-012 | TEST-05, TEST-17 | A fazer |
 | TASK-08 | 1 / 5 | Checkout com carteiras seed; conexão/rede, revisão, cotação revalidada, pedido idempotente e recibo; refresh recupera tentativa | TASK-07 | REQ-002, REQ-003, REQ-012, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020 | TEST-06, TEST-07, TEST-17 | A fazer |
 | TASK-09 | 2 / 7 | Completar perfil/avatar/senha e cadastro/edição de carteiras; persistir alterações e exibir erros da API | TASK-08 | REQ-002, REQ-003, REQ-014, REQ-024 | TEST-08 | A fazer |
@@ -149,7 +149,19 @@ API privada de carrinho/cotação/pedidos e telas serão conectadas nas TASK-06 
 - [x] Implementar a composição responsiva em uma coluna no mobile, duas colunas intermediárias e a grade desktop; não há PNG do conteúdo abaixo do catálogo em mobile/tablet (DEC-18).
 - [x] Revisar a nova composição no browser nos viewports previstos; o usuário confirmou os testes e a revisão das resoluções. O aceite visual geral e as baselines permanecem na TASK-12/TEST-14 e TASK-13.
 
-Compra e favorito têm indicação de indisponibilidade nesta etapa; serão conectados nas TASK-06/TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
+Na entrega da TASK-05A, compra e favorito ainda estavam indisponíveis; favoritos foram conectados à API na TASK-06 e compra/carrinho permanecem na TASK-07. Eventos de atualização continuam na TASK-10. Não há publicação nem commit desta etapa.
+
+### TASK-06 — autenticação e favoritos (em andamento)
+
+- [x] Expor cadastro, login, sessão, logout e favoritos por endpoints MSW; senha nunca é salva em claro e as operações privadas validam token/sessão no banco.
+- [x] Formulários de cadastro/login com validação, mensagens de API e retorno interno validado; proteger perfil, carteiras, checkout e pedidos.
+- [x] Recuperar sessão após refresh com token opaco em `sessionStorage`; limpar/cancelar cache ao sair e limpar cache ao autenticar outra identidade.
+- [x] Conectar favorito do catálogo e detalhe; atualizar otimisticamente e reverter em erro; separar a consulta pelo `userId` autenticado.
+- [x] Preparar `tests/e2e/auth.spec.ts` para cadastro/conflito, guard/retorno/refresh, rollback e isolamento entre usuários.
+- [ ] Executar TEST-03/TEST-04 em Chromium desktop/mobile; a tentativa do agente foi bloqueada antes da inicialização por `listen EPERM` em `127.0.0.1:4173`.
+- [ ] Cobrir cenários de sessão expirada e resposta antiga após troca/reset quando os controles determinísticos da TASK-11 estiverem disponíveis.
+
+Typecheck, lint e build passaram. A suíte E2E direcionada foi preparada, mas não conseguiu iniciar o preview nesta sandbox; os novos fluxos precisam de validação local do usuário antes de encerrar a task. Perfil e carteiras continuam com páginas protegidas de indisponibilidade e serão implementados na TASK-09.
 
 Revisão UI-01 solicitada: item 1 (slider de faixa de preço) implementado, com dois controles, leitura ETH e Aplicar; aguardando verificação visual/E2E local. Itens 2–5 (busca, grupos da sidebar, ordenação sutil e fundo do card) serão tratados separadamente conforme orientação do usuário.
 

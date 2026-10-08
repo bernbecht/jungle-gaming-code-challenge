@@ -108,7 +108,7 @@ Arquivo Figma ainda não inspecionado diretamente. As 15 screenshots foram anali
 
 ### Ajustes propostos após análise das screenshots — DEC-14
 
-Login/cadastro usam apresentação modal no desktop e página no mobile, preservando rotas e acesso direto. Checkout mobile deve oferecer dados/revisão além do frame de carteira. Header privado deve refletir sessão apesar do botão Entrar presente na referência. Recibo deve indicar simulação em vez de alegar transação real. IDs/imagens/badges inconsistentes entre PNGs serão substituídos por uma fixture coerente. Essas decisões preservam REQ-014, REQ-020, REQ-021 e REQ-030; ainda não foram implementadas ou verificadas. Detalhes de ENS/indicação e da ação central mobile permanecem decisões pendentes, não funcionalidades inferidas.
+Login/cadastro preservam rotas dedicadas e retorno interno validado; o formulário atual é uma página em desktop/mobile, e a apresentação modal desktop da proposta visual fica pendente de revisão na TASK-12. Checkout mobile deve oferecer dados/revisão além do frame de carteira. Header privado reflete sessão apesar do botão Entrar presente na referência. Recibo deve indicar simulação em vez de alegar transação real. IDs/imagens/badges inconsistentes entre PNGs serão substituídos por uma fixture coerente. Detalhes de ENS/indicação e da ação central mobile permanecem decisões pendentes, não funcionalidades inferidas.
 
 ### Estado da base — TASK-02
 
@@ -140,7 +140,15 @@ Home compõe as seções pós-catálogo em `src/features/home/home-editorial.tsx
 
 ### Detalhe mobile — UI-02 / TASK-05
 
-Na rota `/nfts/:nftId`, o mobile esconde o header global e a navegação inferior do shell. O detalhe tem controles próprios de voltar/favoritar no topo e uma barra fixa inferior com quantidade, preço, compra e carrinho; o conteúdo reserva espaço para não ficar encoberto e respeita a safe area. Compra/favorito/adicionar ao carrinho seguem desabilitados até TASK-06/TASK-07 implementarem as operações. A screenshot mostra a barra junto ao rodapé; fixidez durante rolagem foi adotada como interpretação e precisa de validação no browser.
+Na rota `/nfts/:nftId`, o mobile esconde o header global e a navegação inferior do shell. O detalhe tem controles próprios de voltar/favoritar no topo e uma barra fixa inferior com quantidade, preço, compra e carrinho; o conteúdo reserva espaço para não ficar encoberto e respeita a safe area. Compra/adicionar ao carrinho continuam pendentes da TASK-07. A screenshot mostra a barra junto ao rodapé; fixidez durante rolagem foi adotada como interpretação e precisa de validação no browser.
+
+### Sessão e favoritos — TASK-06 (em andamento)
+
+O token opaco fica em `sessionStorage`; `GET /auth/session` recupera o perfil no bootstrap e em navegações para rotas protegidas. `features/auth` cuida de cadastro/login/logout e fornece a consulta de sessão; `features/favorites` contém a API e os componentes de favoritos e depende da consulta de sessão. Ambas as features passam pelo Axios e handlers MSW, com autorização verificada no banco IndexedDB por token e usuário — nunca por `userId` enviado pelo cliente. Perfil, carteiras, checkout e pedidos têm guard; retorno após autenticação só aceita caminho interno.
+
+Query de favoritos é isolada por `userId`. A mutation captura o snapshot anterior, altera a lista visível imediatamente, restaura o snapshot no erro e invalida a query ao concluir. Logout cancela consultas e limpa o cache; login limpa cache antes de estabelecer a nova identidade. TEST-03/04 foi escrito, mas o runner desta sandbox não iniciou por `listen EPERM`; isolamento de respostas antigas e expiração determinística ainda aguardam controles da TASK-11.
+
+Comportamento percebido pelo usuário: [FLOW-03 (cadastro, login, sessão e logout)](docs/FLOWS.md#flow-03-cadastro-login-sessão-e-logout) e [FLOW-04 (favoritos)](docs/FLOWS.md#flow-04-consultar-e-alternar-favoritos).
 
 ### Revisão UI-01 — filtro de preço
 

@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { HeaderSearch } from "@/features/catalog/header-search";
 import { defaultCatalog } from "@/features/catalog/search";
-import { Link, Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation, useRouter } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { sessionQuery, signOut } from "@/features/auth/api";
 import {
   Heart,
   Home,
@@ -14,6 +16,18 @@ import {
 } from "lucide-react";
 
 export function AppShell() {
+  const session = useQuery(sessionQuery);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const logoutMutation = useMutation({
+    mutationFn: signOut,
+    onMutate: async () => { await queryClient.cancelQueries(); },
+    onSettled: () => {
+      queryClient.clear();
+      queryClient.setQueryData(['session'], null);
+      void router.navigate({ to: '/', search: defaultCatalog });
+    },
+  });
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
   const isNftDetail = pathname.startsWith("/nfts/");
@@ -80,12 +94,12 @@ export function AppShell() {
               <ShoppingCart aria-hidden="true" />
             </Link>
           </Button>
-          <Button size={"sm"} asChild>
-            <Link to="/login">
-              <LogIn aria-hidden="true" />
-              Entrar
-            </Link>
-          </Button>
+          {session.data ? <>
+            <Button variant="ghost" size="sm" asChild><Link to="/profile">{session.data.displayName}</Link></Button>
+            <Button size="sm" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>{logoutMutation.isPending ? 'Saindo…' : 'Sair'}</Button>
+          </> : <Button size="sm" asChild>
+            <Link to="/login" search={{ returnTo: undefined }}><LogIn aria-hidden="true" />Entrar</Link>
+          </Button>}
         </div>
       </header>
 

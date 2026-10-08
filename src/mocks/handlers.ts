@@ -4,10 +4,12 @@ import { catalogFacets, listNfts, parseCatalogParams, readNft } from './catalog'
 import { advanceClock } from './commerce'
 import { resetDatabase, transact } from './database'
 import { invalid, MockError } from './errors'
+import { login, logout, PASSWORD_ITERATIONS, passwordVerifier, readFavorites, register, requireSession, setFavorite } from './auth'
 
 // MSW normalizes Socket.IO's default `/socket.io/` path to `/` before matching ws.link.
 const socket = ws.link(window.location.origin.replace(/^http/, 'ws'))
 let catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
+let favoriteFailuresRemaining = 0
 const closeSockets = new Set<() => void>()
 
 async function respond<T extends object>(operation: () => Promise<T>) {
@@ -25,7 +27,50 @@ async function readBody(request: Request): Promise<Record<string, unknown>> {
   return body as Record<string, unknown>
 }
 
+function readToken(request: Request) {
+  const authorization = request.headers.get('Authorization')
+  return authorization?.startsWith('Bearer ') ? authorization.slice(7) : null
+}
+
+function stringField(body: Record<string, unknown>, name: string) {
+  if (typeof body[name] !== 'string') invalid(`Campo ${name} inválido.`)
+  return body[name] as string
+}
+
 export const handlers = [
+  http.post('/api/auth/login', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const input = { email: stringField(body, 'email'), password: stringField(body, 'password') }
+    const user = await transact(state => state.users.find(candidate => candidate.profile.email.toLowerCase() === input.email.trim().toLowerCase()))
+    const verifier = user ? await passwordVerifier(input.password, user.password.salt, user.password.iterations) : ''
+    return transact(state => login(state, input, verifier))
+  })),
+  http.post('/api/auth/register', async ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const input = { username: stringField(body, 'username'), displayName: stringField(body, 'displayName'), email: stringField(body, 'email'), password: stringField(body, 'password') }
+    const salt = crypto.randomUUID()
+    const password = { salt, verifier: await passwordVerifier(input.password, salt, PASSWORD_ITERATIONS), iterations: PASSWORD_ITERATIONS }
+    return transact(state => register(state, input, password))
+  })),
+  http.get('/api/auth/session', ({ request }) => respond(() => transact(state => requireSession(state, readToken(request)).session))),
+  http.post('/api/auth/logout', ({ request }) => respond(() => transact(state => logout(state, readToken(request))))),
+  http.get('/api/me/favorites', ({ request }) => respond(() => transact(state => {
+    const { userId } = requireSession(state, readToken(request))
+    return readFavorites(state, userId)
+  }))),
+  http.put('/api/me/favorites/:nftId', async ({ request, params }) => respond(async () => {
+    const body = await readBody(request)
+    if (typeof body.favorite !== 'boolean') invalid('Favorito inválido.')
+    if (favoriteFailuresRemaining > 0) {
+      await transact(state => requireSession(state, readToken(request)))
+      favoriteFailuresRemaining--
+      throw new MockError(503, 'TRANSIENT_FAILURE', 'Falha temporária ao atualizar favoritos.')
+    }
+    return transact(state => {
+      const { userId } = requireSession(state, readToken(request))
+      return setFavorite(state, userId, String(params.nftId), body.favorite as boolean)
+    })
+  })),
   http.post('/api/__mock/catalog-network', ({ request }) => respond(async () => {
     const body = await readBody(request)
     const delayMs = body.delayMs ?? 0, failuresRemaining = body.failuresRemaining ?? 0
@@ -33,6 +78,13 @@ export const handlers = [
     if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
     catalogNetwork = { delayMs, failuresRemaining }
     return { ...catalogNetwork }
+  })),
+  http.post('/api/__mock/favorite-network', ({ request }) => respond(async () => {
+    const body = await readBody(request)
+    const failuresRemaining = body.failuresRemaining ?? 0
+    if (typeof failuresRemaining !== 'number' || !Number.isSafeInteger(failuresRemaining) || failuresRemaining < 0 || failuresRemaining > 10) invalid('Quantidade de falhas inválida (0–10).')
+    favoriteFailuresRemaining = failuresRemaining
+    return { failuresRemaining }
   })),
   http.get('/api/nfts', async ({ request }) => {
     const delayMs = catalogNetwork.delayMs
@@ -56,6 +108,7 @@ export const handlers = [
     if (now !== undefined && (!Number.isFinite(now) || !Number.isSafeInteger(now))) invalid('Data de reset inválida.')
     await resetDatabase(now)
     catalogNetwork = { delayMs: 0, failuresRemaining: 0 }
+    favoriteFailuresRemaining = 0
     for (const close of closeSockets) close()
     closeSockets.clear()
     return { scenarioId: 'SCN-01', reset: true }
