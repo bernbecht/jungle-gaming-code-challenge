@@ -176,3 +176,5 @@ Revisão UI-02 — tabs: removido o aspecto de botões; abas usam texto plano, s
 Revisão UI-02 — galeria: miniaturas ocupam 100 × 100 px quadrados. A imagem selecionada agora fica na segunda coluna de uma grade dedicada e usa largura total + `aspect-square`, garantindo proporção 1:1 em vez de depender do cálculo flex. Lint/build pendentes.
 
 Refino da imagem principal: cantos arredondados e recorte de overflow aplicados também no desktop, com o mesmo raio amplo usado no mobile.
+
+Revisão UI-01 — header desktop: removido o border-bottom global; links Início/Mercado usam estado ativo de aba (texto cobre, borda inferior com respiro) conforme home/detalhe/catálogo.

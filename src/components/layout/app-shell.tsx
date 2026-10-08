@@ -5,21 +5,36 @@ import { Heart, Home, LogIn, ScanLine, ShoppingBag, UserRound } from 'lucide-rea
 import { Button } from '@/components/ui/button'
 
 export function AppShell() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const isHome = pathname === '/'
   const isNftDetail = pathname.startsWith('/nfts/')
+  const isMarketActive = isNftDetail || (isHome && hash === 'colecoes')
+  const isHomeActive = isHome && !isMarketActive
   return (
     <div className="min-h-dvh">
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
-      <header className={`page-container flex min-h-20 items-center justify-between gap-4 border-b border-border ${(isHome || isNftDetail) ? 'hidden md:flex' : ''}`}>
+      <header className={`page-container flex min-h-20 items-center justify-between gap-4 ${(isHome || isNftDetail) ? 'hidden md:flex' : ''}`}>
         <Link to="/" search={defaultCatalog} aria-label="Kurio — início" className="text-lg font-bold tracking-[0.14em]">
           KURIO
         </Link>
         <nav aria-label="Navegação principal" className="hidden items-center gap-8 md:flex">
-          <Link to="/" search={defaultCatalog} activeOptions={{ exact: true }} activeProps={{ className: 'text-primary' }}>
+          <Link
+            to="/"
+            search={defaultCatalog}
+            aria-current={isHomeActive ? 'page' : undefined}
+            className={`flex h-20 items-center border-b-2 px-0 pb-3 pt-3 transition-colors ${isHomeActive ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}
+          >
             Início
           </Link>
-          <Link to="/" search={defaultCatalog} hash="colecoes">Mercado</Link>
+          <Link
+            to="/"
+            search={defaultCatalog}
+            hash="colecoes"
+            aria-current={isMarketActive ? 'page' : undefined}
+            className={`flex h-20 items-center border-b-2 px-0 pb-3 pt-3 transition-colors ${isMarketActive ? 'border-primary text-primary' : 'border-transparent text-foreground hover:text-primary'}`}
+          >
+            Mercado
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <HeaderSearch />
