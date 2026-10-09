@@ -82,6 +82,7 @@ As decisões abaixo complementam DEC-14. Fonte local, placeholders e composiçõ
 | DEC-30 | Salvar dados do perfil e alterar senha são ações separadas. A senha exige validação da credencial atual, confirmação e mensagens próprias; a API não oferece transação atômica que englobe perfil e senha, então um único botão poderia confirmar apenas parte das alterações quando uma das operações falhasse | TASK-09C; cobrir senha atual incorreta, confirmação, nova autenticação e rejeição da senha antiga em TEST-08C/TEST-03 | REQ-024 |
 | DEC-31 | A UI oferece os slots principal e secundário; limitar a conta a esses dois slots é uma interpretação do escopo nomeado no desafio, não um limite numérico explícito. O slot/nickname é estável após cadastro; “Igual à carteira principal” apenas copia valores para edição independente. Validar endereços conforme a rede (EVM em Ethereum/Polygon, Base58 em Solana), impedir duplicação na mesma rede e refletir a versão salva no cache compartilhado do checkout | TASK-09D; validar criação, edição, concorrência, refresh e checkout em TEST-08D/TEST-06; confirmar com o avaliador se deve haver mais slots | REQ-014, REQ-024 |
 | DEC-33 | Não tornar o login a primeira tela mobile por padrão. Manter home/catálogo e conteúdo institucional acessíveis sem conta; solicitar autenticação quando a pessoa escolher Entrar ou tentar acessar uma rota protegida. Login e cadastro permanecem disponíveis por rota direta | DEC-33; revisar descoberta/retorno e comportamento mobile em TEST-14 | REQ-002, REQ-003, REQ-021 |
+| DEC-34 | No detalhe mobile, manter um único CTA `Comprar`, que adiciona o NFT e navega ao carrinho. Remover o botão adicional de carrinho, que repetia a mesma mutação sem navegação; igualar rótulo e resultado principal ao desktop | DEC-34; conferir inclusão bem-sucedida, navegação e erro em TEST-05/TEST-06 | REQ-007, REQ-009, REQ-037 |
 
 As decisões interpretam o protótipo e o escopo, mas não alteram os critérios do enunciado. Arte e fonte substituídas, ENS opcional, dois slots de carteira e composição do recibo têm consequências descritas no [documento para avaliação](docs/DECISOES-PARA-AVALIACAO.md).
 
@@ -110,6 +111,14 @@ As rotas `/login` e `/register` continuam acessíveis diretamente em mobile e de
 Essa interpretação favorece descoberta e reduz uma barreira antes de a pessoa entender o serviço. Em contrapartida, diverge de uma leitura possível do frame mobile como onboarding obrigatório e deixa o CTA de login menos dominante na primeira experiência. A tela de autenticação dedicada continua fiel ao frame quando solicitada; a decisão diz respeito ao ponto de entrada, não à remoção do login.
 
 Motivação e consequências em [DEC-33](docs/DECISOES-PARA-AVALIACAO.md#13-manter-a-descoberta-pública-antes-do-login-no-mobile).
+
+### DEC-34 — Um único CTA de compra no detalhe mobile
+
+O detalhe mobile apresentava “Comprar NFT”, que adicionava o item e levava ao carrinho, mais um botão de ícone de carrinho que adicionava o mesmo item e permanecia no detalhe. A tela desktop oferece uma única ação de compra. Removi o segundo controle e usei “Comprar” como rótulo do único CTA mobile; ele adiciona a edição/quantidade escolhida pela API e navega para `/cart` após sucesso.
+
+Isso reduz duplicidade e aproxima a ação principal entre os breakpoints. Como consequência, deixa de existir no mobile a opção de adicionar e continuar no detalhe por esse ícone; a pessoa pode retornar ao catálogo a partir do carrinho. A decisão reduz a quantidade de controles sem retirar a inclusão de itens do fluxo mobile.
+
+Motivação e consequências em [DEC-34](docs/DECISOES-PARA-AVALIACAO.md#14-um-único-cta-de-compra-no-detalhe-mobile).
 
 O endereço é validado com formato compatível com a rede: EVM para Ethereum/Polygon e Base58 em faixa de tamanho de Solana. A validação detecta erros de formato, não comprova propriedade, saldo ou existência on-chain. Depois de salvar, a query de carteiras compartilhada com o checkout é atualizada/invalidada, para que os campos somente leitura usem o cadastro vigente.
 

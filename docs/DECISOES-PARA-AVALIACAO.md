@@ -166,6 +166,16 @@ O enunciado pede cadastro e edição de carteiras principal e secundária, mas n
 
 **Evidências:** DEC-33 em [ARCHITECTURE](../ARCHITECTURE.md); home pública e rotas de autenticação/guards em [router](../src/app/router.ts) e [AppShell](../src/components/layout/app-shell.tsx); variação desktop/mobile nos acionadores de autenticação em [AuthDialog](../src/features/auth/auth-dialog.tsx). O fluxo está relacionado ao [FLOW-03](FLOWS.md#flow-03-cadastro-login-sessão-e-logout); esta justificativa registra uma decisão de produto, não uma medição de conversão ou pesquisa com usuários.
 
+## 14. Um único CTA de compra no detalhe mobile
+
+**Referência e mudança — DEC-34.** O detalhe mobile tinha dois botões que adicionavam a mesma edição e quantidade: “Comprar NFT”, que seguia ao carrinho, e um ícone de carrinho, que mantinha a pessoa no detalhe. O desktop apresenta uma única ação “Comprar”. Removi o ícone redundante e deixei um único botão **“Comprar”** no mobile, com inclusão pela API e navegação ao carrinho após sucesso.
+
+**Motivação.** A mesma compra não precisa de duas ações equivalentes na barra. Um só CTA aproxima o fluxo mobile ao desktop e torna claro o próximo passo após adicionar o NFT.
+
+**Experiência e consequência.** A pessoa escolhe quantidade e edição e usa a ação principal para adicionar e abrir o carrinho. O ícone não oferece mais a alternativa de adicionar sem sair do detalhe; ainda é possível retornar ao catálogo pelo carrinho. Erros da API continuam exibidos no detalhe, sem navegar ou indicar sucesso.
+
+**Evidências:** DEC-34 em [ARCHITECTURE](../ARCHITECTURE.md); `AddToCartButton` e `mobile-purchase-bar` em [nft-detail-page.tsx](../src/routes/nft-detail-page.tsx); descrição do frame/adaptação em [UI-SPEC](UI-SPEC.md); FLOW-06 em [FLOWS](FLOWS.md#flow-06-carrinho-e-cupom). A decisão foi conferida no código; não houve medição com usuários nem nova execução E2E nesta revisão.
+
 ## Adaptações e limitações que também devem ser consideradas
 
 - **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil, gestão de carteiras e recibo têm composições responsivas; a gestão de carteiras foi aprovada em E2E desktop/mobile na TASK-09D.
@@ -188,6 +198,7 @@ Use o ambiente e as credenciais descritos no [README de avaliação](../README.a
 | Usar “Igual à carteira principal” no formulário secundário | Valores copiados para edição; salvamento continua explícito | 11 |
 | Percorrer os benefícios do rodapé | Escudo, pessoas e sino junto dos títulos e descrições | 10 |
 | Abrir a aplicação sem sessão em mobile e depois acessar uma rota protegida | Home/catálogo públicos; login só aparece quando escolhido ou exigido, com retorno à rota solicitada | 13 |
+| Abrir um NFT em mobile e acionar Comprar | Um único CTA adiciona o item e leva ao carrinho, como a ação desktop | 14 |
 
 ## Evidências e limites desta revisão
 

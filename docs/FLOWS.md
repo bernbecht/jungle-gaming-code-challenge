@@ -289,7 +289,7 @@ flowchart TD
 
 ### Caminho principal
 
-1. A pessoa escolhe edição e quantidade no detalhe e aciona **“Comprar”**. Após inclusão bem-sucedida, segue para `/cart`; se a API rejeitar, permanece no detalhe com erro. O controle adicional de inclusão no mobile permite adicionar sem navegar.
+1. A pessoa escolhe edição e quantidade no detalhe e aciona o único CTA **“Comprar”** em desktop ou mobile. Após inclusão bem-sucedida, segue para `/cart`; se a API rejeitar, permanece no detalhe com erro.
 2. A página mostra itens agrupados por rede, quantidades, cupom e resumo. Carrinho e cupom persistem no banco simulado; os totais são calculados pelas regras do mock com precisão inteira e devolvidos pela API.
 3. Alterar/remover quantidade envia a versão lida. Conflito de versão ou estoque mantém o estado persistido, informa o erro e reconsulta o carrinho; não aplica uma alteração local silenciosa.
 4. Aplicar cupom válido atualiza a versão e o resumo. Código inválido/expirado retorna erro sem alterar o carrinho; remover cupom é uma operação explícita.

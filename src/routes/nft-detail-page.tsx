@@ -17,7 +17,6 @@ import {
   ChevronLeft,
   Linkedin,
   Mail,
-  ShoppingCart,
   Star,
   Twitter,
 } from "lucide-react";
@@ -57,7 +56,7 @@ function CollectorRating({ rating, count }: { rating: number; count: number }) {
   );
 }
 
-function AddToCartButton({ nft, editionId, quantity, disabled, iconOnly = false, mobile = false }: { nft: Nft; editionId: string; quantity: number; disabled: boolean; iconOnly?: boolean; mobile?: boolean }) {
+function AddToCartButton({ nft, editionId, quantity, disabled, mobile = false }: { nft: Nft; editionId: string; quantity: number; disabled: boolean; mobile?: boolean }) {
   const navigate = useNavigate()
   const session = useQuery(sessionQuery)
   const identity = session.data ? `user:${session.data.id}` : `guest:${getGuestId()}`
@@ -68,7 +67,7 @@ function AddToCartButton({ nft, editionId, quantity, disabled, iconOnly = false,
     mutationFn: () => addCartItem({ nftId: nft.id, editionId, quantity, expectedVersion: cart.data!.version }),
     onSuccess: (updated) => {
       queryClient.setQueryData(key, updated)
-      if (!iconOnly) void navigate({ to: "/cart" })
+      void navigate({ to: "/cart" })
     },
     onError: () => void queryClient.invalidateQueries({ queryKey: key }),
   })
@@ -77,14 +76,11 @@ function AddToCartButton({ nft, editionId, quantity, disabled, iconOnly = false,
     <div className={mobile ? "flex min-w-0 flex-1 flex-wrap items-center gap-3" : "flex flex-wrap items-center gap-3"}>
       <Button
         type="button"
-        variant={iconOnly ? "outline" : "default"}
-        size={iconOnly ? "icon" : "default"}
-        className={iconOnly ? "size-14 rounded-full" : mobile ? "h-14 w-full rounded-full" : "min-h-11 uppercase"}
+        className={mobile ? "h-14 w-full rounded-full" : "min-h-11 uppercase"}
         disabled={isDisabled}
-        aria-label={iconOnly ? `Adicionar ${nft.name} ao carrinho` : undefined}
         onClick={() => mutation.mutate()}
       >
-        {iconOnly ? <ShoppingCart aria-hidden="true" /> : mutation.isPending ? "Adicionando…" : mobile ? "Comprar NFT" : "Comprar"}
+        {mutation.isPending ? "Adicionando…" : "Comprar"}
       </Button>
       {mutation.isSuccess && <span role="status" className="text-sm text-primary">Adicionado ao carrinho.</span>}
       {mutation.isError && <span role="alert" className="text-sm text-destructive">Não foi possível adicionar. Atualize o carrinho e tente novamente.</span>}
@@ -501,9 +497,8 @@ function NftDetail({ nft }: { nft: Nft }) {
             {edition.unitPrice} ETH
           </p>
         </div>
-        <div className="mt-4 flex gap-3">
+        <div className="mt-4">
           <AddToCartButton nft={nft} editionId={edition.id} quantity={quantity} disabled={edition.available === 0} mobile />
-          <AddToCartButton nft={nft} editionId={edition.id} quantity={quantity} disabled={edition.available === 0} iconOnly />
         </div>
       </div>
     </div>
