@@ -84,6 +84,14 @@ export function HomePage() {
             Explorar →
           </a>
         </div>
+        <nav
+          aria-label="Páginas do destaque"
+          className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-2"
+        >
+          <span aria-hidden="true" className="size-2.5 rounded-full bg-primary" />
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-primary bg-transparent" />
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-primary bg-transparent" />
+        </nav>
         <img
           src="/assets/placeholders/emerald.svg"
           alt="Arte digital temporária em tons de verde"
@@ -96,7 +104,7 @@ export function HomePage() {
           alt="Arte digital temporária complementar"
           width={96}
           height={96}
-          className="absolute right-[28%] bottom-3 aspect-square w-[23%] rounded-xl border-2 border-card object-cover"
+          className="absolute right-[28%] bottom-8 aspect-square w-[23%] rounded-xl border-2 border-card object-cover"
         />
       </section>
       <section
