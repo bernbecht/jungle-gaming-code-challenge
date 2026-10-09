@@ -6,6 +6,25 @@ import { favoritesQuery, saveFavorite } from './api'
 import { useAuthDialog } from '@/features/auth/use-auth-dialog'
 import { cn } from '@/lib/utils'
 
+export function FavoriteIndicator({ nftId, name, className = '' }: { nftId: string; name: string; className?: string }) {
+  const session = useQuery(sessionQuery)
+  const userId = session.data?.id
+  const favorites = useQuery({ ...favoritesQuery(userId ?? ''), enabled: Boolean(userId) })
+  const isFavorite = Boolean(favorites.data?.nftIds.includes(nftId))
+
+  if (!isFavorite) return null
+
+  return (
+    <span
+      role="img"
+      aria-label={`${name} está nos favoritos`}
+      className={cn('inline-flex items-center justify-center rounded-full', className)}
+    >
+      <Heart aria-hidden="true" className="fill-primary text-primary" />
+    </span>
+  )
+}
+
 export function FavoriteButton({ nftId, name, className = '', showLabel = false }: { nftId: string; name: string; className?: string; showLabel?: boolean }) {
   const session = useQuery(sessionQuery)
   const userId = session.data?.id

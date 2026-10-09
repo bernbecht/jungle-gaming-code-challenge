@@ -59,7 +59,7 @@ A URL guarda busca, filtros, ordenação e página. Query guarda dados remotos. 
 | DEC-14 | Assets locais, tokens aproximados a partir dos PNGs, estados acessíveis reutilizáveis e layouts próprios para mobile quando necessários. Tokens originais do arquivo Figma não foram inspecionados | REQ-004, REQ-037, REQ-038, REQ-039, REQ-040 |
 | DEC-15 | Cenário padrão, reset, relógio e controles básicos de latência/pagamento disponíveis por endpoints MSW. Painel e cenários avançados ainda pendentes; testes alteram o mock pela rede | REQ-031, REQ-044 |
 
-## Decisões de interface e produto — DEC-16 a DEC-32
+## Decisões de interface e produto — DEC-16 a DEC-35
 
 As decisões abaixo complementam DEC-14. Fonte local, placeholders e composições responsivas estão implementados; isso não comprova fidelidade visual ou acessibilidade completas. A coluna de verificação aponta a tarefa e o grupo de testes correspondente, não uma aprovação automática de todo o requisito.
 
@@ -83,6 +83,7 @@ As decisões abaixo complementam DEC-14. Fonte local, placeholders e composiçõ
 | DEC-31 | A UI oferece os slots principal e secundário; limitar a conta a esses dois slots é uma interpretação do escopo nomeado no desafio, não um limite numérico explícito. O slot/nickname é estável após cadastro; “Igual à carteira principal” apenas copia valores para edição independente. Validar endereços conforme a rede (EVM em Ethereum/Polygon, Base58 em Solana), impedir duplicação na mesma rede e refletir a versão salva no cache compartilhado do checkout | TASK-09D; validar criação, edição, concorrência, refresh e checkout em TEST-08D/TEST-06; confirmar com o avaliador se deve haver mais slots | REQ-014, REQ-024 |
 | DEC-33 | Não tornar o login a primeira tela mobile por padrão. Manter home/catálogo e conteúdo institucional acessíveis sem conta; solicitar autenticação quando a pessoa escolher Entrar ou tentar acessar uma rota protegida. Login e cadastro permanecem disponíveis por rota direta | DEC-33; revisar descoberta/retorno e comportamento mobile em TEST-14 | REQ-002, REQ-003, REQ-021 |
 | DEC-34 | No detalhe mobile, manter um único CTA `Comprar`, que adiciona o NFT e navega ao carrinho. Remover o botão adicional de carrinho, que repetia a mesma mutação sem navegação; igualar rótulo e resultado principal ao desktop | DEC-34; conferir inclusão bem-sucedida, navegação e erro em TEST-05/TEST-06 | REQ-007, REQ-009, REQ-037 |
+| DEC-35 | No catálogo mobile, o coração é um indicador estático exibido somente em NFTs já favoritados. Não oferecer favoritar/desfavoritar no card; manter a ação nos detalhes da NFT para evitar mutação acidental durante a exploração | DEC-35; E2E mobile verifica presença/ausência, ausência de controle acionável e estado no detalhe; atualizar baseline visual mobile | REQ-008, REQ-037, REQ-039 |
 
 As decisões interpretam o protótipo e o escopo, mas não alteram os critérios do enunciado. Arte e fonte substituídas, ENS opcional, dois slots de carteira e composição do recibo têm consequências descritas no [documento para avaliação](docs/DECISOES-PARA-AVALIACAO.md).
 
@@ -119,6 +120,14 @@ O detalhe mobile apresentava “Comprar NFT”, que adicionava o item e levava a
 Isso reduz duplicidade e aproxima a ação principal entre os breakpoints. Como consequência, deixa de existir no mobile a opção de adicionar e continuar no detalhe por esse ícone; a pessoa pode retornar ao catálogo a partir do carrinho. A decisão reduz a quantidade de controles sem retirar a inclusão de itens do fluxo mobile.
 
 Motivação e consequências em [DEC-34](docs/DECISOES-PARA-AVALIACAO.md#14-um-único-cta-de-compra-no-detalhe-mobile).
+
+### DEC-35 — Coração como indicador no catálogo mobile
+
+No catálogo mobile, o coração aparece sobre a imagem somente quando aquela NFT já está nos favoritos da conta autenticada. O ícone é estático: não é botão nem link e não permite adicionar ou remover favoritos. A ação permanece disponível na tela de detalhes da NFT.
+
+Essa separação mantém a leitura do card como acesso à obra e reduz alterações acidentais ao tocar na imagem. Usuários visitantes e NFTs não salvas não exibem coração. O status vem da consulta de favoritos da sessão atual.
+
+Motivação, limites e evidências em [DEC-35](docs/DECISOES-PARA-AVALIACAO.md#15-indicador-de-favorito-no-catálogo-mobile).
 
 O endereço é validado com formato compatível com a rede: EVM para Ethereum/Polygon e Base58 em faixa de tamanho de Solana. A validação detecta erros de formato, não comprova propriedade, saldo ou existência on-chain. Depois de salvar, a query de carteiras compartilhada com o checkout é atualizada/invalidada, para que os campos somente leitura usem o cadastro vigente.
 

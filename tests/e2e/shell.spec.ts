@@ -23,7 +23,7 @@ test("opens shell website, navigates and retrieves routes without runtime error"
       ? "Seja dono da cultura digital"
       : "Seja dono do futuro da arte digital",
   });
-  await hero.getByRole("link", { name: "Explorar", exact: true }).click();
+  await hero.getByRole("link", { name: /^Explorar/ }).click();
   await expect(page).toHaveURL(/#colecoes$/);
   if (isMobile) {
     // The desktop header is intentionally hidden on the mobile homepage.

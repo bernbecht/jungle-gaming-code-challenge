@@ -67,6 +67,27 @@ test("tablet keeps catalog filters available in a dialog", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("mobile catalog shows favorite status without a favorite action", async ({ page, isMobile }) => {
+  test.skip(!isMobile);
+  await page.goto("/");
+  const catalog = page.getByTestId("catalog-grid");
+  await page.goto("/login");
+  await page.getByLabel(/^E-mail/).fill("collector-a@example.test");
+  await page.getByLabel(/^Senha/).fill("DemoNft!2026");
+  await page.getByRole("main").getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(/\/$|\/\?.*/);
+
+  const savedHeart = catalog.getByRole("img", { name: "Violet Nomad está nos favoritos" });
+  await expect(savedHeart).toBeVisible();
+  await expect(catalog.getByRole("img", { name: "Sage Nomad está nos favoritos" })).toHaveCount(0);
+  await expect(catalog.getByRole("button", { name: /favorit|remover .*favoritos/i })).toHaveCount(0);
+  await expect(savedHeart.locator("xpath=ancestor::a")).toHaveCount(0);
+
+  await catalog.getByRole("link", { name: "Ver Violet Nomad", exact: true }).click();
+  await expect(page).toHaveURL(/\/nfts\/nft-001$/);
+  await expect(page.getByRole("button", { name: "Remover Violet Nomad dos favoritos" })).toHaveAttribute("aria-pressed", "true");
+});
+
 test("catalog combines filters, sorts, paginates and restores URL history", async ({
   page,
   isMobile,
@@ -304,8 +325,7 @@ test("catalog displays API failure and recovers after explicit retry", async ({
     fetch("/api/__mock/catalog-network", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // Keep the error state stable even if the query retries or refetches
-      // while the test navigates back to the home page.
+      // Keep the failure visible until the test explicitly retries.
       body: JSON.stringify({ failuresRemaining: 10 }),
     }),
   );
@@ -313,16 +333,17 @@ test("catalog displays API failure and recovers after explicit retry", async ({
   await expect(page.getByRole("alert")).toContainText(
     "Não foi possível carregar os NFTs.",
   );
-  await page.evaluate(() =>
-    fetch("/api/__mock/catalog-network", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "{}",
-    }),
-  );
   await page
     .getByRole("button", { name: "Tentar novamente", exact: true })
-    .click();
+    .evaluate(async (button) => {
+      const response = await fetch("/api/__mock/catalog-network", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      if (!response.ok) throw new Error("Could not reset catalog network failure");
+      (button as HTMLButtonElement).click();
+    });
   await expect(
     page.getByTestId("catalog-grid").getByRole("article"),
   ).toHaveCount(12);

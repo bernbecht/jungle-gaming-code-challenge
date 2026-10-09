@@ -176,6 +176,16 @@ O enunciado pede cadastro e edição de carteiras principal e secundária, mas n
 
 **Evidências:** DEC-34 em [ARCHITECTURE](../ARCHITECTURE.md); `AddToCartButton` e `mobile-purchase-bar` em [nft-detail-page.tsx](../src/routes/nft-detail-page.tsx); descrição do frame/adaptação em [UI-SPEC](UI-SPEC.md); FLOW-06 em [FLOWS](FLOWS.md#flow-06-carrinho-e-cupom). A decisão foi conferida no código; não houve medição com usuários nem nova execução E2E nesta revisão.
 
+## 15. Indicador de favorito no catálogo mobile
+
+**Decisão — DEC-35.** No catálogo mobile, mostrar um coração estático no canto superior direito da imagem somente quando a NFT já estiver favoritada pela conta autenticada. O card não adiciona nem remove favoritos; a pessoa abre os detalhes da NFT para realizar essa ação.
+
+**Motivação.** O card é a superfície para explorar e abrir a obra. Um coração acionável sobre a imagem pode receber toques acidentais enquanto a pessoa navega. Separar o indicador da ação comunica o estado sem alterar favoritos durante a exploração do catálogo.
+
+**Experiência e consequência.** NFTs não salvas e visitantes não veem coração no card mobile. Para itens salvos, o coração preenchido informa o estado, sem papel de botão ou link. A ação de favoritar/desfavoritar permanece na página de detalhes; a implementação consulta os favoritos da sessão para desenhar o indicador.
+
+**Evidências:** DEC-35 em [ARCHITECTURE](../ARCHITECTURE.md); `FavoriteIndicator` em [favorite-button.tsx](../src/features/favorites/favorite-button.tsx), uso no card em [components.tsx](../src/features/catalog/components.tsx), cobertura E2E em [catalog.spec.ts](../tests/e2e/catalog.spec.ts) e baseline mobile em [home-chromium-mobile-darwin.png](../tests/e2e/visual.spec.ts-snapshots/home-chromium-mobile-darwin.png). A decisão expressa a preferência de interação aprovada pelo usuário; não representa resultado de pesquisa com usuários.
+
 ## Adaptações e limitações que também devem ser consideradas
 
 - **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil, gestão de carteiras e recibo têm composições responsivas; a gestão de carteiras foi aprovada em E2E desktop/mobile na TASK-09D.
