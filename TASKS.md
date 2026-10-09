@@ -16,7 +16,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 - [x] Instalar dependências, gerar lockfile e validar tipos/lint/build.
 - [x] Smoke Playwright inicial do shell desktop/mobile executado pelo usuário e aprovado.
 
-**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D, TASK-10A/B/C/D/E e TASK-11 concluídas; TASK-06 em andamento (resposta privada antiga após troca/reset ainda sem E2E dedicado); TASK-12 e suas subtarefas adiadas até nova análise; TASK-13 a TASK-15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
+**Resumo:** TASK-01 a TASK-05A, TASK-07/08, TASK-09A/B/C/D, TASK-10A/B/C/D/E e TASK-11 concluídas; TASK-06 em andamento (resposta privada antiga após troca/reset ainda sem E2E dedicado); TASK-12 e suas subtarefas adiadas até nova análise; TASK-13 em andamento (regressão visual implementada); TASK-14/15 a fazer. A prova REST/Socket.IO está publicada e validada na Vercel. A entrega final pertence à TASK-15.
 
 ## Tarefas
 
@@ -56,7 +56,7 @@ Itens sem execução permanecem em **A fazer**. Estados permitidos: A fazer → 
 | TASK-12D | 2 / 9 | Revisar teclado, ordem e visibilidade de foco, contenção/retorno em diálogo e drawer, semântica, labels/erros associados, alt, contraste e feedback acessível de mutations/eventos | TASK-12B, TASK-12C | REQ-039 | TEST-11, TEST-14 | Adiada — aguarda nova análise |
 | TASK-12E | 2 / 9 | Revisar ações auxiliares e destinos do shell, autenticação, detalhe, conteúdo editorial e footer; garantir ação coerente ou aviso acessível de indisponibilidade, sem falso sucesso | TASK-12B, TASK-12D | REQ-004, REQ-026, REQ-039 | TEST-11, TEST-14 | Adiada — aguarda nova análise |
 | TASK-12F | 2 / 9 | Consolidar aceite visual/responsivo/acessível: capturas das nove telas e favoritos em 390/768/1440, snapshots estáveis de início/detalhe/carrinho/checkout em 390/1440 e evidências/desvios em UI-SPEC/TEST-MATRIX | TASK-12A, TASK-12B, TASK-12C, TASK-12D, TASK-12E | REQ-004, REQ-026, REQ-037, REQ-038, REQ-039, REQ-040 | TEST-11, TEST-12, TEST-13, TEST-14 | Adiada — aguarda nova análise |
-| TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | A fazer |
+| TASK-13 | 1 / 6 e 2 / 10 | Criar testes junto dos fluxos; consolidar 12 grupos, desktop/mobile, baselines revisadas, HTML e traces | TASK-03; conclusão após TASK-11, TASK-12 | REQ-041, REQ-042, REQ-043, REQ-044 | TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07, TEST-08, TEST-09, TEST-10, TEST-11, TEST-12, TEST-13, TEST-16 | Em andamento |
 | TASK-14 | 2 / 11 | Auditar cedo; concluir 12 medições no build final, medianas/métricas, HTML/JSON e análise de desvios | TASK-12 | REQ-001, REQ-045, REQ-046 | TEST-15 | A fazer |
 | TASK-15 | 2 / 12 | Atualizar docs para implementação real, checkout limpo, entregar artefatos, deploy final e smoke público | TASK-13, TASK-14 | REQ-028, REQ-033, REQ-047, REQ-048, REQ-049, REQ-050 | TEST-16, TEST-18 | A fazer |
 
@@ -404,3 +404,9 @@ Verificação desta decomposição: revisão documental do escopo, requisitos, g
 Por solicitação do usuário, todos os acionadores auditados sem funcionalidade/destino próprio passaram a abrir `/em-construcao?recurso=…`. A tela identifica o recurso, informa que está sendo construída e permite voltar ao início. Conectados itens auxiliares do rodapé, redes sociais, artigos, Criadores/Aprenda, newsletter, recuperação/OAuth da modal, ação central mobile e explorador do recibo. A modal fecha ao seguir um destino de construção; não há envio de email, OAuth, inscrição nem exploração de uma transação real. UI-SPEC e as decisões de avaliação foram atualizadas.
 
 Verificação: tipos, build, lint e diff check passaram. As suítes de autenticação, homepage e checkout passaram em desktop/mobile. A nova suíte validou cliques em 20 destinos da homepage desktop e 19 mobile, os três links auxiliares da modal, acesso direto, refresh e retorno. Execução final dessa suíte: cinco testes passaram e um foi pulado porque a modal é exclusiva de desktop. Capturas desktop/mobile revisadas. Sem commit desta etapa.
+
+### TASK-13 — Regressão visual automatizada — 08/10/2026
+
+Implementados oito testes `@visual` para início, detalhe, carrinho e pagamento em Chromium desktop/mobile, com dez PNGs de baseline, incluindo a revisão do pagamento. Cenário SCN-01/seed 1, relógios fixos, fontes/imagens aguardadas e animações desabilitadas na captura. A execução normal falha se a baseline estiver ausente ou diferente; atualizações exigem `--update-snapshots`. Procedimento e ambiente em [VISUAL-TESTS](docs/VISUAL-TESTS.md).
+
+Capturas inspecionadas e comparação repetida três vezes por caso: 24 testes passaram sem atualizar as imagens. A execução final com atualização automática bloqueada também passou nos oito testes; typecheck/build, lint e diff check passaram. Baselines representam o estado atual, sem concluir o aceite contra as referências. TASK-12 continua adiada até nova análise; TASK-13 permanece em andamento para consolidar os demais grupos e artefatos. Sem commit nesta etapa.

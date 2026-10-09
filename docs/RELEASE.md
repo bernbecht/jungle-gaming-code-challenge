@@ -51,7 +51,7 @@ Registre os resultados reais dos comandos; não marque uma etapa como aprovada a
 
 O reporter gera `playwright-report/`; traces e screenshots de falhas ficam em `test-results/`. Para abrir o relatório localmente, use `npm run test:report`. A configuração não faz retries automáticos. Se um preview já estiver aberto fora de CI, ele pode ser reutilizado: confira que está servindo o build candidato.
 
-`npm run test:visual` existe e seleciona testes marcados com `@visual`. Nesta revisão, não há suíte visual/baselines versionadas que comprovem a regressão exigida. Executar esse comando sem casos correspondentes não atende REL-02.
+`npm run test:visual` executa oito testes `@visual` de início, detalhe, carrinho e pagamento em Chromium desktop/mobile, com dez baselines (pagamento inclui dados e revisão). Procedimento e limites em [VISUAL-TESTS](VISUAL-TESTS.md). As baselines registram a aplicação atual; o aceite contra as referências e as correções adiadas na TASK-12 continuam pendentes. REL-02 ainda exige a consolidação dos demais grupos e artefatos.
 
 `playwright-report/`, `test-results/` e `artifacts/` estão ignorados pelo Git. Para a entrega, reúna as evidências finais em um pacote ou localização acessível e registre o link abaixo; não presuma que os relatórios serão enviados junto com o código. Baselines e configuração de auditoria devem ser versionadas, conforme o enunciado.
 

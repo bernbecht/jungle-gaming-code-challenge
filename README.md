@@ -201,7 +201,7 @@ Relatórios, traces e `artifacts/` são ignorados pelo Git. O pacote final deve 
 | Comando adicional | Finalidade / limite atual |
 | --- | --- |
 | `npm run preview` | Serve o build em `http://127.0.0.1:4173` |
-| `npm run test:visual` | Filtra testes `@visual`; baselines e suíte visual ainda pendentes |
+| `npm run test:visual` | Compara início, detalhe, carrinho e pagamento em desktop/mobile com as baselines; [execução e atualização](docs/VISUAL-TESTS.md) |
 | `npm run audit:lighthouse` | Auditoria exploratória da home; requer preview ativo e Chrome disponível |
 
 O script Lighthouse atual não executa a matriz completa exigida. A entrega final deverá incluir início/detalhe × desktop/mobile × três execuções, medianas, LCP/CLS/TBT e relatórios HTML/JSON. Procedimento e metas em [RELEASE](docs/RELEASE.md).
