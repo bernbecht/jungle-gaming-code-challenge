@@ -235,6 +235,7 @@ O estado detalhado está em [TASKS](TASKS.md), as evidências em [TEST-MATRIX](d
 | Ações do usuário e alternativas dos fluxos | [Fluxos](docs/FLOWS.md) |
 | Fixtures, falhas e controles | [Cenários](docs/SCENARIOS.md) e [guia dos mocks](docs/MOCKS-GUIDE.md) |
 | Cobertura, resultados e publicação | [Matriz de testes](docs/TEST-MATRIX.md) e [entrega](docs/RELEASE.md) |
+| Como executar, revisar e atualizar as capturas de regressão visual | [Testes visuais](docs/VISUAL-TESTS.md) |
 | Referências visuais e substituições | [UI-SPEC](docs/UI-SPEC.md) e [assets](docs/ASSETS.md) |
 | Exigências e rastreabilidade | [Enunciado](challenge-description.md) e [requisitos](REQUIREMENTS.md) |
 | Planejamento e histórico de desenvolvimento | [Backlog](TASKS.md) e [roteiro](ROTEIRO.md) |
