@@ -91,15 +91,16 @@ test('cart query recovers from a deterministic network failure after retry', asy
   await page.getByRole('link', { name: /Carrinho de NFTs/ }).click()
   await expect(page.getByRole('alert')).toContainText('Não foi possível carregar o carrinho.')
 
-  await page.evaluate(async () => {
+  await page.getByRole('button', { name: 'Tentar novamente', exact: true }).evaluate(async button => {
     const response = await fetch('/api/__mock/cart-network', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}',
     })
     if (!response.ok) throw new Error('Could not clear the cart network failure')
+    const retryButton = button as HTMLButtonElement
+    retryButton.click()
   })
-  await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Seu carrinho está vazio' })).toBeVisible()
 })
 
