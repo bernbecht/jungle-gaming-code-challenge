@@ -154,6 +154,18 @@ O enunciado pede cadastro e edição de carteiras principal e secundária, mas n
 
 **Evidências:** [FavoritesPage](../src/routes/favorites-page.tsx), rota protegida em [router](../src/app/router.ts) e navegação em [AppShell](../src/components/layout/app-shell.tsx). [favorites.spec.ts](../tests/e2e/favorites.spec.ts) cobre retorno após login, refresh, detalhe, remoção com rollback e nova tentativa, inclusão a partir do detalhe e isolamento entre contas nos projetos desktop/mobile. Resultados da execução ficam registrados na [matriz de testes](TEST-MATRIX.md).
 
+## 13. Manter a descoberta pública antes do login no mobile
+
+**Referência e ambiguidade.** O frame de login mobile do Figma mostra a tela de autenticação, mas não especifica se ela deve ser o primeiro conteúdo apresentado a toda pessoa não autenticada ou somente a tela exibida quando alguém escolhe entrar. O enunciado pede uma aplicação de marketplace acessível pelo navegador e não exige autenticação como porta de entrada.
+
+**Decisão — DEC-33.** Ao abrir o endereço da aplicação em um navegador mobile, a pessoa vê a home e pode explorar catálogo, obras e seções públicas sem criar conta. O login e o cadastro continuam em rotas próprias, acessíveis pelo fluxo de autenticação ou diretamente por `/login` e `/register`. Uma tentativa de acessar rota protegida encaminha para login e preserva o destino interno para retorno após autenticação.
+
+**Motivação.** Um visitante pode conhecer a empresa, a proposta do produto e o catálogo antes de decidir se quer se cadastrar. Exigir login imediatamente imporia uma barreira antes de oferecer contexto sobre o marketplace e seus NFTs. Manter descoberta pública é uma escolha de experiência adequada a este produto web.
+
+**Experiência e consequência.** A home oferece contexto e exploração pública na primeira visita; o usuário ainda pode escolher Entrar a qualquer momento. Essa decisão diverge de uma interpretação possível do frame mobile como tela inicial obrigatória e torna o login menos dominante no primeiro contato. O layout dedicado de autenticação continua disponível quando solicitado; a escolha define o ponto de entrada, não a aparência nem a disponibilidade da tela de login.
+
+**Evidências:** DEC-33 em [ARCHITECTURE](../ARCHITECTURE.md); home pública e rotas de autenticação/guards em [router](../src/app/router.ts) e [AppShell](../src/components/layout/app-shell.tsx); variação desktop/mobile nos acionadores de autenticação em [AuthDialog](../src/features/auth/auth-dialog.tsx). O fluxo está relacionado ao [FLOW-03](FLOWS.md#flow-03-cadastro-login-sessão-e-logout); esta justificativa registra uma decisão de produto, não uma medição de conversão ou pesquisa com usuários.
+
 ## Adaptações e limitações que também devem ser consideradas
 
 - **Responsividade sem frames completos — DEC-18.** O enunciado exige versões mobile de perfil, carteiras e confirmação, mesmo sem referência. Perfil, gestão de carteiras e recibo têm composições responsivas; a gestão de carteiras foi aprovada em E2E desktop/mobile na TASK-09D.
@@ -175,6 +187,7 @@ Use o ambiente e as credenciais descritos no [README de avaliação](../README.a
 | Preencher o ENS no perfil | Um campo completo e descrição de opcionalidade | 6 |
 | Usar “Igual à carteira principal” no formulário secundário | Valores copiados para edição; salvamento continua explícito | 11 |
 | Percorrer os benefícios do rodapé | Escudo, pessoas e sino junto dos títulos e descrições | 10 |
+| Abrir a aplicação sem sessão em mobile e depois acessar uma rota protegida | Home/catálogo públicos; login só aparece quando escolhido ou exigido, com retorno à rota solicitada | 13 |
 
 ## Evidências e limites desta revisão
 

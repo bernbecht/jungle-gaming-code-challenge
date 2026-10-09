@@ -110,7 +110,7 @@ Desktop: modal sobre a home, medida pelo usuário em 500 × 600 px, centralizada
 
 Mobile: páginas próprias com logo KURIO no topo, título, inputs largos, CTA, separador e botões Google/Facebook; link para alternar login/cadastro ao final. Login inclui Esqueceu a senha.
 
-Proposta: preservar rotas `/login` e `/register`; apresentação de diálogo com fundo de home/contexto no desktop e página no mobile, inclusive no acesso direto. Modal exige foco contido e retorno ao disparador. Placeholders não substituem labels acessíveis. OAuth e recuperação por email não estão exigidos como integrações: manter tratamento honesto de ação auxiliar indisponível na demo, sem fingir autenticação ou envio.
+Proposta: preservar rotas `/login` e `/register`; apresentação de diálogo com fundo de home/contexto no desktop e página no mobile, inclusive no acesso direto. A tela de login mobile é apresentada quando solicitada ou ao proteger uma rota, não como primeira tela obrigatória do visitante; manter home/catálogo públicos conforme DEC-33. Modal exige foco contido e retorno ao disparador. Placeholders não substituem labels acessíveis. OAuth e recuperação por email não estão exigidos como integrações: manter tratamento honesto de ação auxiliar indisponível na demo, sem fingir autenticação ou envio.
 
 ### UI-08 — Perfil
 

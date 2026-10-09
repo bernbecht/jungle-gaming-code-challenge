@@ -72,6 +72,7 @@ Ao transformar o protótipo em fluxos funcionais, algumas escolhas exigiram ajus
 - **Recibo recuperável:** a confirmação fica em `/orders/:orderId`, permitindo consultar o pedido por um endereço próprio e representar seus diferentes estados.
 - **Perfil e senha separados:** cada ação tem validações e resultado próprios, coerentes com os endpoints independentes implementados.
 - **Clareza no mobile:** remoção com ícone e texto no carrinho; checkout em etapas com revisão explícita antes do envio.
+- **Descoberta antes do login:** a home e o catálogo permanecem públicos no mobile. A pessoa pode conhecer o marketplace antes de entrar; login é solicitado quando escolhido ou necessário para uma rota protegida.
 - **Iconografia do rodapé:** escudo, pessoas e sino substituem as letras W/C/D para ilustrar segurança, criadores e alertas, mantendo os textos explicativos.
 
 Essas decisões têm benefícios esperados e custos descritos na documentação. A melhoria de usabilidade não foi medida em pesquisa com usuários. Fonte semelhante e imagens temporárias são limitações de fidelidade visual, registradas em [ASSETS](docs/ASSETS.md).
