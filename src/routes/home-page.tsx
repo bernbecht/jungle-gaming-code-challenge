@@ -81,7 +81,7 @@ export function HomePage() {
             href="#colecoes"
             className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary"
           >
-            Explorar
+            Explorar →
           </a>
         </div>
         <img
@@ -131,12 +131,6 @@ export function HomePage() {
             fetchPriority="high"
             className="aspect-square w-full rounded-3xl border border-border bg-card object-cover"
           />
-          <figcaption className="absolute right-5 bottom-5 left-5 rounded-xl border border-white/10 bg-background/90 px-5 py-4 text-sm">
-            Arte sem fronteiras.
-            <span className="mt-1 block text-xs text-muted-foreground">
-              Uma nova perspectiva para sua coleção.
-            </span>
-          </figcaption>
         </figure>
       </section>
 
